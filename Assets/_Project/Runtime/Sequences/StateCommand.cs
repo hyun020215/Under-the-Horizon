@@ -1,0 +1,1 @@
+using System;using System.Threading.Tasks;using UnityEngine; [Serializable]public sealed class StateCommand:SequenceCommand { [SerializeField]private GameEffect[] effects;public override Task ExecuteAsync(SequenceContext context){if(effects!=null)foreach(var effect in effects)effect?.Apply(context.State);return Task.CompletedTask;} }

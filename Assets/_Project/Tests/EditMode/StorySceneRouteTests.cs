@@ -1,0 +1,1 @@
+using NUnit.Framework;using UnityEngine;public sealed class StorySceneRouteTests { [Test]public void MissingRouteIsNotAvailable(){var route=new StorySceneRoute();var go=new GameObject();try{Assert.IsFalse(route.IsAvailable(go.AddComponent<GameStateStore>()));}finally{Object.DestroyImmediate(go);}} }

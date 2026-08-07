@@ -1,0 +1,1 @@
+using UnityEngine; public sealed class SfxController:MonoBehaviour { [SerializeField]private AudioSource source;public void Play(AudioClip clip,float volume=1){if(source!=null&&clip!=null)source.PlayOneShot(clip,volume);} }
