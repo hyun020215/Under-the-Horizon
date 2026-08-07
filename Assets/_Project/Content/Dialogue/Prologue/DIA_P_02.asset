@@ -1,0 +1,295 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 095a65fbf799fe24caef37230cb0482e, type: 3}
+  m_Name: DIA_P_02
+  m_EditorClassIdentifier: UTH.Runtime::DialogueSequence
+  id: DIA_P_02
+  lines:
+  - id: P-02_001
+    speaker:
+      character: {fileID: 0}
+      overrideName: NARRATION
+    text: "\uC2B9\uC120 \uD1B5\uB85C\uC758 \uAE08\uC18D \uBC14\uB2E5\uC774 \uBC1C\uAC78\uC74C\uB9C8\uB2E4
+      \uB0AE\uAC8C \uC6B8\uB838\uB2E4. \uC774\uBE14\uB9B0 \uC1FC\uB294 \uC904\uC758
+      \uD750\uB984\uC744 \uBA48\uCD94\uC9C0 \uC54A\uC740 \uCC44 \uBA85\uB2E8\uC744
+      \uC218\uC815\uD558\uACE0 \uC788\uC5C8\uB2E4."
+    expression: 0
+    voiceRequired: 0
+    voiceClip: {fileID: 0}
+    conditions: []
+    effects: []
+    choices: []
+  - id: P-02_002
+    speaker:
+      character: {fileID: 11400000, guid: fdd5bfea0f994cb4f83fdab6046bacb3, type: 2}
+      overrideName: EVELYN
+    text: "\uBA38\uC11C \uC528. \uB4F1\uB85D\uB41C \uB3D9\uBC18 \uCDE8\uC7AC\uC9C4\uC740
+      \uC5C6\uAD70\uC694. \uC218\uD558\uBB3C \uAC80\uC0AC\uB294 \uC77C\uBC18 \uC2B9\uAC1D\uACFC
+      \uB3D9\uC77C\uD558\uAC8C \uC9C4\uD589\uB429\uB2C8\uB2E4."
+    expression: 0
+    voiceRequired: 1
+    voiceClip: {fileID: 0}
+    conditions: []
+    effects: []
+    choices: []
+  - id: P-02_003
+    speaker:
+      character: {fileID: 11400000, guid: 3c149c9299d6ca44b95f2cdf2aaf07d0, type: 2}
+      overrideName: DANIEL
+    text: "\uCD08\uB300\uD55C \uCABD\uC774 \uC81C \uC7A5\uBE44 \uBAA9\uB85D\uAE4C\uC9C0
+      \uBAA8\uB974\uB294 \uBAA8\uC591\uC774\uB124\uC694."
+    expression: 0
+    voiceRequired: 1
+    voiceClip: {fileID: 0}
+    conditions: []
+    effects: []
+    choices: []
+  - id: P-02_004
+    speaker:
+      character: {fileID: 11400000, guid: fdd5bfea0f994cb4f83fdab6046bacb3, type: 2}
+      overrideName: EVELYN
+    text: "\uD68C\uC7A5\uB2D8\uC758 \uCD08\uB300\uB294 \uC7AC\uB7C9\uC774 \uB113\uC2B5\uB2C8\uB2E4.
+      \uD589\uC815\uC740 \uADF8\uBCF4\uB2E4 \uC881\uACE0\uC694."
+    expression: 0
+    voiceRequired: 1
+    voiceClip: {fileID: 0}
+    conditions: []
+    effects: []
+    choices: []
+  - id: P-02_005
+    speaker:
+      character: {fileID: 11400000, guid: 99dea77ccfe60e6488bf2f60fd73b4a4, type: 2}
+      overrideName: RICHARD
+    text: "\uBA38\uC11C? \uB204\uAC00 \uC774 \uC0AC\uB78C\uC744\u2014"
+    expression: 0
+    voiceRequired: 1
+    voiceClip: {fileID: 0}
+    conditions: []
+    effects: []
+    choices: []
+  - id: P-02_006
+    speaker:
+      character: {fileID: 11400000, guid: fdd5bfea0f994cb4f83fdab6046bacb3, type: 2}
+      overrideName: EVELYN
+    text: "\uD68C\uC7A5\uB2D8 \uBA85\uC758\uC758 \uD2B9\uBCC4 \uCD08\uCCAD\uC785\uB2C8\uB2E4.
+      \uC804\uC790\uC11C\uBA85\uB3C4 \uC77C\uCE58\uD569\uB2C8\uB2E4."
+    expression: 0
+    voiceRequired: 1
+    voiceClip: {fileID: 0}
+    conditions: []
+    effects: []
+    choices: []
+  - id: P-02_007
+    speaker:
+      character: {fileID: 11400000, guid: 99dea77ccfe60e6488bf2f60fd73b4a4, type: 2}
+      overrideName: RICHARD
+    text: "\uB098\uB294 \uADF8\uB7F0 \uCD08\uB300\uB97C \uC2B9\uC778\uD55C \uAE30\uC5B5\uC774
+      \uC5C6\uC18C."
+    expression: 0
+    voiceRequired: 1
+    voiceClip: {fileID: 0}
+    conditions: []
+    effects: []
+    choices: []
+  - id: P-02_008
+    speaker:
+      character: {fileID: 11400000, guid: 3c149c9299d6ca44b95f2cdf2aaf07d0, type: 2}
+      overrideName: DANIEL
+    text: "\uAE30\uC5B5\uC740 \uAE30\uB85D\uBCF4\uB2E4 \uD3B8\uB9AC\uD558\uC8E0,
+      \uD638\uC190 \uD68C\uC7A5\uB2D8."
+    expression: 0
+    voiceRequired: 1
+    voiceClip: {fileID: 0}
+    conditions: []
+    effects: []
+    choices: []
+  - id: P-02_009
+    speaker:
+      character: {fileID: 0}
+      overrideName: NARRATION
+    text: "[\uC870\uC0AC: \uC2B9\uC120 \uBA85\uB2E8]"
+    expression: 0
+    voiceRequired: 0
+    voiceClip: {fileID: 0}
+    conditions: []
+    effects: []
+    choices: []
+  - id: P-02_010
+    speaker:
+      character: {fileID: 11400000, guid: deea118744593fa4883b9fc7691a6c13, type: 2}
+      overrideName: ADRIAN
+    text: "\uB2E4\uB2C8\uC5D8\uC758 \uC774\uB984\uC740 \uC778\uC1C4\uAC00 \uC544\uB2C8\uB77C
+      \uAC80\uC740 \uC789\uD06C\uB85C \uB07C\uC6CC \uB123\uC5C8\uB2E4. \uC218\uC815
+      \uC774\uB2C8\uC15C \u2018\uC774\xB7\uC5D0\uC2A4\u2019\uAC00 \uC606 \uCE78\uC5D0
+      \uB0A8\uC544 \uC788\uB2E4."
+    expression: 0
+    voiceRequired: 1
+    voiceClip: {fileID: 0}
+    conditions: []
+    effects: []
+    choices: []
+  - id: P-02_011
+    speaker:
+      character: {fileID: 0}
+      overrideName: SYSTEM
+    text: "\uB2E8\uC11C \uD68D\uB4DD: \uBCF4\uC870 \uB2E8\uC11C: \uC218\uAE30 \uC218\uC815\uB41C
+      \uBA85\uB2E8"
+    expression: 0
+    voiceRequired: 0
+    voiceClip: {fileID: 0}
+    conditions: []
+    effects: []
+    choices: []
+  - id: P-02_012
+    speaker:
+      character: {fileID: 0}
+      overrideName: NARRATION
+    text: "[\uC870\uC0AC: \uC804\uC790\uC11C\uBA85 \uAC80\uC99D\uCC3D]"
+    expression: 0
+    voiceRequired: 0
+    voiceClip: {fileID: 0}
+    conditions: []
+    effects: []
+    choices: []
+  - id: P-02_013
+    speaker:
+      character: {fileID: 11400000, guid: deea118744593fa4883b9fc7691a6c13, type: 2}
+      overrideName: ADRIAN
+    text: "\uC11C\uBA85 \uD0A4\uB294 \uB9AC\uCC98\uB4DC \uAC1C\uC778 \uD0A4\uAC00
+      \uB9DE\uB2E4. \uB2E4\uB9CC \uBC1C\uC1A1 \uC11C\uBC84\uB294 \uD68C\uC7A5\uC2E4\uC774
+      \uC544\uB2C8\uB77C \uBE44\uC11C\uC2E4 \uAC8C\uC774\uD2B8\uC6E8\uC774\uB2E4."
+    expression: 0
+    voiceRequired: 1
+    voiceClip: {fileID: 0}
+    conditions: []
+    effects: []
+    choices: []
+  - id: P-02_014
+    speaker:
+      character: {fileID: 0}
+      overrideName: SYSTEM
+    text: "\uB2E8\uC11C \uD68D\uB4DD: C-01 \uB2E4\uB2C8\uC5D8\uC758 \uCD08\uB300\uC7A5"
+    expression: 0
+    voiceRequired: 0
+    voiceClip: {fileID: 0}
+    conditions: []
+    effects: []
+    choices: []
+  - id: P-02_015
+    speaker:
+      character: {fileID: 0}
+      overrideName: PLAYER_CHOICE
+    text: "\uC774\uBE14\uB9B0\uC5D0\uAC8C \uBA85\uB2E8 \uC218\uC815\uC790\uB97C \uBB3B\uAE30"
+    expression: 0
+    voiceRequired: 0
+    voiceClip: {fileID: 0}
+    conditions: []
+    effects: []
+    choices: []
+  - id: P-02_016
+    speaker:
+      character: {fileID: 11400000, guid: deea118744593fa4883b9fc7691a6c13, type: 2}
+      overrideName: ADRIAN
+    text: "\uBA85\uB2E8\uC5D0 \uC218\uC815\uC790\uB85C \uC5D0\uBE14\uB9B0 \uC288\uBBF8\uD2B8\uC758
+      \uC774\uB984\uC774 \uC801\uD600 \uC788\uC2B5\uB2C8\uB2E4. \uC9C1\uC811 \uACE0\uCE58\uC168\uC2B5\uB2C8\uAE4C?"
+    expression: 0
+    voiceRequired: 1
+    voiceClip: {fileID: 0}
+    conditions: []
+    effects: []
+    choices: []
+  - id: P-02_017
+    speaker:
+      character: {fileID: 11400000, guid: fdd5bfea0f994cb4f83fdab6046bacb3, type: 2}
+      overrideName: EVELYN
+    text: "\uC774\uBE14\uB9B0 \uC1FC\uC785\uB2C8\uB2E4. \uD68C\uC7A5 \uBE44\uC11C\uC2E4
+      \uC18C\uC18D\uC774\uACE0\uC694. \uB124. \uD0D1\uC2B9 \uC9C0\uC5F0\uC744 \uB9C9\uAE30
+      \uC704\uD55C \uD589\uC815 \uCC98\uB9AC\uC600\uC2B5\uB2C8\uB2E4. \uC11C\uBA85\uC774
+      \uC9C4\uC9DC\uB77C\uBA74 \uBA85\uB2E8\uC774 \uB2A6\uC740 \uCABD\uC774 \uBB38\uC81C\uB2C8\uAE4C\uC694."
+    expression: 0
+    voiceRequired: 1
+    voiceClip: {fileID: 0}
+    conditions: []
+    effects: []
+    choices: []
+  - id: P-02_018
+    speaker:
+      character: {fileID: 11400000, guid: deea118744593fa4883b9fc7691a6c13, type: 2}
+      overrideName: ADRIAN
+    text: "\uBC1C\uC1A1 \uC11C\uBC84\uB3C4 \uBE44\uC11C\uC2E4\uC785\uB2C8\uB2E4."
+    expression: 0
+    voiceRequired: 1
+    voiceClip: {fileID: 0}
+    conditions: []
+    effects: []
+    choices: []
+  - id: P-02_019
+    speaker:
+      character: {fileID: 11400000, guid: fdd5bfea0f994cb4f83fdab6046bacb3, type: 2}
+      overrideName: EVELYN
+    text: "\uD68C\uC7A5\uB2D8 \uC11C\uC2E0 \uB300\uBD80\uBD84\uC740 \uC81C \uBD80\uC11C\uAC00
+      \uBC1C\uC1A1\uD569\uB2C8\uB2E4. \uAD8C\uD55C\uACFC \uC758\uB3C4\uAC00 \uAC19\uC740
+      \uAC83\uC740 \uC544\uB2D9\uB2C8\uB2E4."
+    expression: 0
+    voiceRequired: 1
+    voiceClip: {fileID: 0}
+    conditions: []
+    effects: []
+    choices: []
+  - id: P-02_020
+    speaker:
+      character: {fileID: 11400000, guid: 99dea77ccfe60e6488bf2f60fd73b4a4, type: 2}
+      overrideName: RICHARD
+    text: "\uBCA0\uC77C, \uB0B4 \uC2A4\uC704\uD2B8\uB85C \uC624\uC2DC\uC624. \uC9C0\uAE08
+      \uB2F9\uC7A5."
+    expression: 0
+    voiceRequired: 1
+    voiceClip: {fileID: 0}
+    conditions: []
+    effects: []
+    choices: []
+  - id: P-02_021
+    speaker:
+      character: {fileID: 11400000, guid: 3c149c9299d6ca44b95f2cdf2aaf07d0, type: 2}
+      overrideName: DANIEL
+    text: "\uB2F9\uD669\uC740 \uAE30\uB85D\uBCF4\uB2E4 \uBE68\uB9AC \uB098\uD0C0\uB098\uC8E0.
+      \uBD24\uC2B5\uB2C8\uAE4C?"
+    expression: 0
+    voiceRequired: 1
+    voiceClip: {fileID: 0}
+    conditions: []
+    effects: []
+    choices: []
+  - id: P-02_022
+    speaker:
+      character: {fileID: 11400000, guid: deea118744593fa4883b9fc7691a6c13, type: 2}
+      overrideName: ADRIAN
+    text: "\uBD24\uC2B5\uB2C8\uB2E4. \uB204\uAC00 \uCD08\uB300\uD588\uB294\uC9C0\uB294
+      \uC544\uC9C1 \uBABB \uBD24\uC9C0\uB9CC."
+    expression: 0
+    voiceRequired: 1
+    voiceClip: {fileID: 0}
+    conditions: []
+    effects: []
+    choices: []
+  - id: P-02_023
+    speaker:
+      character: {fileID: 0}
+      overrideName: SYSTEM
+    text: "\uC0C8\uB85C\uC6B4 \uC815\uBCF4: \uBE44\uC11C\uC2E4 \uBC1C\uC1A1 \uAD8C\uD55C.
+      \uB9AC\uCC98\uB4DC\uC758 \uCD08\uCCAD \uBD80\uC778\uACFC \uD568\uAED8 \uAE30\uB85D\uB429\uB2C8\uB2E4."
+    expression: 0
+    voiceRequired: 0
+    voiceClip: {fileID: 0}
+    conditions: []
+    effects: []
+    choices: []

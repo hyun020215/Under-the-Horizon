@@ -1,0 +1,19 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3904bcc264dbd59469064ee9ccee0b60, type: 3}
+  m_Name: C16_VisorDNA
+  m_EditorClassIdentifier: UTH.Runtime::EvidenceDefinition
+  id: C-16
+  displayName: "\uBCF4\uD638\uBA74 DNA"
+  description: "\uB2E4\uB2C8\uC5D8\uACFC \uC774\uBE14\uB9B0\uC758 \uC9C1\uC811 \uC811\uCD09"
+  image: {fileID: 21300000, guid: 8736f509a50f4b928d7e5bebdc8f7971, type: 3}
+  quality: 0

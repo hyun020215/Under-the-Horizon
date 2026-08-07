@@ -1,0 +1,18 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a20f2a1302c123c46bcf19e51aefcb17, type: 3}
+  m_Name: CHR_CREW_M01
+  m_EditorClassIdentifier: UTH.Runtime::CharacterDefinition
+  id: CHR_CREW_M01
+  displayName: Crew M01
+  portrait: {fileID: 0}
+  visuals: []

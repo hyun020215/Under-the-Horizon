@@ -1,0 +1,37 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 25fadb5404a158643a3915c0636cc84c, type: 3}
+  m_Name: D4_04_UnspokenTestimony
+  m_EditorClassIdentifier: UTH.Runtime::StorySceneDefinition
+  id: D4-04
+  displayName: "\uB9D0\uD558\uC9C0 \uBABB\uD55C \uC99D\uC5B8"
+  chapter: 4
+  day: 4
+  timeBlock: 3
+  entryConditions: []
+  location: {fileID: 11400000, guid: a1a72777e0981534ba0483237811377a, type: 2}
+  locationState: {fileID: 11400000, guid: f05fe2bf1326d7448995839540f6f776, type: 2}
+  initialScreen: 2
+  characterSet: {fileID: 11400000, guid: 69708429ade63ca41982151eb71cff79, type: 2}
+  interactionSet: {fileID: 11400000, guid: f94f217de112906439d8816f819d8b8a, type: 2}
+  entryDialogue: {fileID: 11400000, guid: fe62d7bfc45008748bc4664043208006, type: 2}
+  puzzle: {fileID: 0}
+  audioProfile: {fileID: 11400000, guid: ae4df05403ce07e4caa2e4580ac28dca, type: 2}
+  entrySequence: {fileID: 0}
+  exitSequence: {fileID: 0}
+  entryTransition: {fileID: 11400000, guid: dca78952fd04d4d4392054d9a3fc41e2, type: 2}
+  exitTransition: {fileID: 11400000, guid: dca78952fd04d4d4392054d9a3fc41e2, type: 2}
+  onEnterEffects: []
+  onCompleteEffects: []
+  routes:
+  - targetSceneId: D5-01
+    conditions: []

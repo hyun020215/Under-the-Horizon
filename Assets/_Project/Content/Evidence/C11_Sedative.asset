@@ -1,0 +1,19 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3904bcc264dbd59469064ee9ccee0b60, type: 3}
+  m_Name: C11_Sedative
+  m_EditorClassIdentifier: UTH.Runtime::EvidenceDefinition
+  id: C-11
+  displayName: "\uC548\uC815\uC81C"
+  description: "\uC0AC\uB9DD \uC2DC\uAC01 \uC624\uD310\uACFC \uC800\uD56D \uC9C0\uC5F0"
+  image: {fileID: 21300000, guid: 954c37bcf5664c1db032589606b2f26f, type: 3}
+  quality: 0

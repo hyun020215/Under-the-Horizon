@@ -1,0 +1,35 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 25fadb5404a158643a3915c0636cc84c, type: 3}
+  m_Name: D8_01_FinalInterrogation
+  m_EditorClassIdentifier: UTH.Runtime::StorySceneDefinition
+  id: D8-01
+  displayName: "\uCD5C\uC885 \uC2EC\uBB38"
+  chapter: 8
+  day: 8
+  timeBlock: 1
+  entryConditions: []
+  location: {fileID: 11400000, guid: d4c15ea9358c6024ca6793677b4ff7db, type: 2}
+  locationState: {fileID: 11400000, guid: 891674ee7b2063546a445296d65bf11c, type: 2}
+  initialScreen: 2
+  characterSet: {fileID: 11400000, guid: bf21e89df8b8dc14bab633d0126d70f8, type: 2}
+  interactionSet: {fileID: 11400000, guid: 1425fb1a586989449b4738444e12a004, type: 2}
+  entryDialogue: {fileID: 11400000, guid: 97ddbf1a35b14e64eac128751bb65915, type: 2}
+  puzzle: {fileID: 11400000, guid: 19fd27baa2bb69a48ada4338d2c8386f, type: 2}
+  audioProfile: {fileID: 11400000, guid: b6cede6fe84473e4dbbf209311896600, type: 2}
+  entrySequence: {fileID: 0}
+  exitSequence: {fileID: 0}
+  entryTransition: {fileID: 11400000, guid: dca78952fd04d4d4392054d9a3fc41e2, type: 2}
+  exitTransition: {fileID: 11400000, guid: dca78952fd04d4d4392054d9a3fc41e2, type: 2}
+  onEnterEffects: []
+  onCompleteEffects: []
+  routes: []

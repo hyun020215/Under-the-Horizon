@@ -1,0 +1,357 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 095a65fbf799fe24caef37230cb0482e, type: 3}
+  m_Name: DIA_D1_03
+  m_EditorClassIdentifier: UTH.Runtime::DialogueSequence
+  id: DIA_D1_03
+  lines:
+  - id: D1-03_001
+    speaker:
+      character: {fileID: 0}
+      overrideName: NARRATION
+    text: "\uBCFC\uB8F8\uC758 \uCC9C\uC7A5 \uB808\uC77C\uC5D0\uC11C\uB294 \uBCC4
+      \uBAA8\uC591 \uC7A5\uC2DD\uC774 \uCC9C\uCC9C\uD788 \uD68C\uC804\uD588\uB2E4.
+      \uCE74\uBA54\uB77C \uC138 \uB300\uAC00 \uBB34\uB300\uB97C \uD5A5\uD588\uACE0,
+      \uD55C \uB300\uB294 \uCD9C\uC785\uBB38\uACFC \uBC14\uB97C \uD568\uAED8 \uB2F4\uACE0
+      \uC788\uC5C8\uB2E4."
+    expression: 0
+    voiceRequired: 0
+    voiceClip: {fileID: 0}
+    conditions: []
+    effects: []
+    choices: []
+  - id: D1-03_002
+    speaker:
+      character: {fileID: 11400000, guid: 87372f6a812eed34c9efc03f7f51d8af, type: 2}
+      overrideName: OWEN
+    text: "\uC7A5\uC2DD \uC544\uB798 \uC11C\uC9C0 \uB9C8\uC2ED\uC2DC\uC624. \uC815\uACA9\uC740
+      \uCDA9\uBD84\uD558\uC9C0\uB9CC \uC0AC\uB78C\uB4E4\uC740 \u2018\uCDA9\uBD84\u2019\uC774\uB77C\uB294
+      \uB9D0\uC744 \uB4E4\uC73C\uBA74 \uAF2D \uC2DC\uD5D8\uD574 \uBD05\uB2C8\uB2E4."
+    expression: 0
+    voiceRequired: 1
+    voiceClip: {fileID: 0}
+    conditions: []
+    effects: []
+    choices: []
+  - id: D1-03_003
+    speaker:
+      character: {fileID: 0}
+      overrideName: NARRATION
+    text: "[\uC870\uC0AC: \uCC9C\uC7A5 \uD589\uC0AC \uB808\uC77C]"
+    expression: 0
+    voiceRequired: 0
+    voiceClip: {fileID: 0}
+    conditions: []
+    effects: []
+    choices: []
+  - id: D1-03_004
+    speaker:
+      character: {fileID: 11400000, guid: deea118744593fa4883b9fc7691a6c13, type: 2}
+      overrideName: ADRIAN
+    text: "\uC870\uBA85\uACFC \uC7A5\uC2DD\uBB3C\uC744 \uBB34\uB300 \uB4A4 \uC11C\uBE44\uC2A4
+      \uAD6C\uC5ED\uC5D0\uC11C \uB04C\uC5B4\uC624\uB294 \uB808\uC77C\uC774\uB2E4.
+      \uD638\uB77C\uC774\uC98C \uB8F8 \uBC29\uD5A5 \uBD84\uAE30 \uD45C\uC2DC\uB294
+      \uD589\uC0AC \uC9C0\uB3C4\uC5D0\uC11C \uC798\uB824 \uC788\uB2E4."
+    expression: 0
+    voiceRequired: 1
+    voiceClip: {fileID: 0}
+    conditions: []
+    effects: []
+    choices: []
+  - id: D1-03_005
+    speaker:
+      character: {fileID: 0}
+      overrideName: SYSTEM
+    text: "\uB2E8\uC11C \uD68D\uB4DD: \uBCF4\uC870 \uB2E8\uC11C: \uD589\uC0AC \uB808\uC77C
+      \uAD6C\uC870"
+    expression: 0
+    voiceRequired: 0
+    voiceClip: {fileID: 0}
+    conditions: []
+    effects: []
+    choices: []
+  - id: D1-03_006
+    speaker:
+      character: {fileID: 0}
+      overrideName: NARRATION
+    text: "[\uC870\uC0AC: \uD30C\uD2F0 \uCE74\uBA54\uB77C \uBC30\uCE58]"
+    expression: 0
+    voiceRequired: 0
+    voiceClip: {fileID: 0}
+    conditions: []
+    effects: []
+    choices: []
+  - id: D1-03_007
+    speaker:
+      character: {fileID: 11400000, guid: deea118744593fa4883b9fc7691a6c13, type: 2}
+      overrideName: ADRIAN
+    text: "\uC8FC \uCD9C\uC785\uBB38\uACFC \uBC14\uB294 \uCD2C\uC601\uB418\uC9C0\uB9CC
+      \uCC9C\uC7A5 \uC0C1\uBD80\uC640 \uC11C\uBE44\uC2A4 \uB3C4\uC5B4 \uC548\uCABD\uC740
+      \uD504\uB808\uC784 \uBC16\uC774\uB2E4."
+    expression: 0
+    voiceRequired: 1
+    voiceClip: {fileID: 0}
+    conditions: []
+    effects: []
+    choices: []
+  - id: D1-03_008
+    speaker:
+      character: {fileID: 0}
+      overrideName: SYSTEM
+    text: "\uB2E8\uC11C \uD68D\uB4DD: \uBCF4\uC870 \uB2E8\uC11C: \uCE74\uBA54\uB77C
+      \uBC30\uCE58"
+    expression: 0
+    voiceRequired: 0
+    voiceClip: {fileID: 0}
+    conditions: []
+    effects: []
+    choices: []
+  - id: D1-03_009
+    speaker:
+      character: {fileID: 11400000, guid: 8582caea0d2b3204bad2ba188e71e46d, type: 2}
+      overrideName: CLAIRE
+    text: "\uBAA8\uB450\uAC00 \uC0AC\uC9C4\uC744 \uCC0D\uB294 \uB0A0\uC5D0\uB294
+      \uAC70\uC9D3\uB9D0\uD558\uAE30\uAC00 \uB354 \uC5B4\uB835\uC8E0."
+    expression: 0
+    voiceRequired: 1
+    voiceClip: {fileID: 0}
+    conditions: []
+    effects: []
+    choices: []
+  - id: D1-03_010
+    speaker:
+      character: {fileID: 11400000, guid: fdd5bfea0f994cb4f83fdab6046bacb3, type: 2}
+      overrideName: EVELYN
+    text: "\uADF8\uB798\uC11C \uACF5\uC2DD \uC0AC\uC9C4\uD300\uC774 5\uBD84 \uAC04\uACA9\uC73C\uB85C
+      \uCD2C\uC601\uD569\uB2C8\uB2E4. \uD589\uC0AC \uAE30\uB85D\uC740 \uBD84\uC7C1\uC744
+      \uC904\uC5EC \uC90D\uB2C8\uB2E4."
+    expression: 0
+    voiceRequired: 1
+    voiceClip: {fileID: 0}
+    conditions: []
+    effects: []
+    choices: []
+  - id: D1-03_011
+    speaker:
+      character: {fileID: 11400000, guid: deea118744593fa4883b9fc7691a6c13, type: 2}
+      overrideName: ADRIAN
+    text: "\uB2F9\uC2E0\uB3C4 \uACC4\uC18D \uC0AC\uC9C4\uC5D0 \uCC0D\uD788\uACA0\uAD70\uC694."
+    expression: 0
+    voiceRequired: 1
+    voiceClip: {fileID: 0}
+    conditions: []
+    effects: []
+    choices: []
+  - id: D1-03_012
+    speaker:
+      character: {fileID: 11400000, guid: fdd5bfea0f994cb4f83fdab6046bacb3, type: 2}
+      overrideName: EVELYN
+    text: "21\uC2DC\uBD80\uD130 22\uC2DC 30\uBD84\uAE4C\uC9C0\uC694. \uD68C\uC7A5\uB2D8
+      \uC77C\uC815\uB3C4 \uC81C\uAC00 \uAD00\uB9AC\uD569\uB2C8\uB2E4."
+    expression: 0
+    voiceRequired: 1
+    voiceClip: {fileID: 0}
+    conditions: []
+    effects: []
+    choices: []
+  - id: D1-03_013
+    speaker:
+      character: {fileID: 11400000, guid: 99dea77ccfe60e6488bf2f60fd73b4a4, type: 2}
+      overrideName: RICHARD
+    text: "\uB0B4 \uC794\uC774\uB098 \uAD00\uB9AC\uD574. \uC77C\uC815\uC740 \uB0B4\uAC00
+      \uC54C\uC544\uC11C \uD558\uC9C0."
+    expression: 0
+    voiceRequired: 1
+    voiceClip: {fileID: 0}
+    conditions: []
+    effects: []
+    choices: []
+  - id: D1-03_014
+    speaker:
+      character: {fileID: 11400000, guid: 27fd81a8d6a20df42936ea19be2665f7, type: 2}
+      overrideName: HELENA
+    text: "\uD68C\uC7A5\uB2D8, \uC624\uB298\uC740 \uADF8 \uC794\uC774 \uB124 \uBC88\uC9F8\uC785\uB2C8\uB2E4."
+    expression: 0
+    voiceRequired: 1
+    voiceClip: {fileID: 0}
+    conditions: []
+    effects: []
+    choices: []
+  - id: D1-03_015
+    speaker:
+      character: {fileID: 11400000, guid: 99dea77ccfe60e6488bf2f60fd73b4a4, type: 2}
+      overrideName: RICHARD
+    text: "\uC758\uC0AC\uAE4C\uC9C0 \uC99D\uC778\uC774\uAD70."
+    expression: 0
+    voiceRequired: 1
+    voiceClip: {fileID: 0}
+    conditions: []
+    effects: []
+    choices: []
+  - id: D1-03_016
+    speaker:
+      character: {fileID: 11400000, guid: 3c149c9299d6ca44b95f2cdf2aaf07d0, type: 2}
+      overrideName: DANIEL
+    text: "\uC99D\uC778\uC740 \uB9CE\uC744\uC218\uB85D \uC88B\uC2B5\uB2C8\uB2E4.
+      \uD2B9\uD788 \uAE30\uC5B5\uC774 \uD750\uB9B0 \uC0AC\uB78C \uACC1\uC5D0\uB294."
+    expression: 0
+    voiceRequired: 1
+    voiceClip: {fileID: 0}
+    conditions: []
+    effects: []
+    choices: []
+  - id: D1-03_017
+    speaker:
+      character: {fileID: 11400000, guid: deea118744593fa4883b9fc7691a6c13, type: 2}
+      overrideName: ADRIAN
+    text: "\uB2E4\uB2C8\uC5D8, \uC81C\uBCF4 \uC5F0\uB77D\uC740 \uC654\uC2B5\uB2C8\uAE4C?"
+    expression: 0
+    voiceRequired: 1
+    voiceClip: {fileID: 0}
+    conditions: []
+    effects: []
+    choices: []
+  - id: D1-03_018
+    speaker:
+      character: {fileID: 11400000, guid: 3c149c9299d6ca44b95f2cdf2aaf07d0, type: 2}
+      overrideName: DANIEL
+    text: "\uC544\uC9C1. \uB300\uC2E0 \uB204\uAD70\uAC00 \uC81C \uAC1D\uC2E4 \uBB38\uC744
+      \uC5F4\uC5B4 \uBCF4\uB824 \uD588\uC2B5\uB2C8\uB2E4. \uC2E4\uD328\uD588\uC9C0\uB9CC\uC694."
+    expression: 0
+    voiceRequired: 1
+    voiceClip: {fileID: 0}
+    conditions: []
+    effects: []
+    choices: []
+  - id: D1-03_019
+    speaker:
+      character: {fileID: 11400000, guid: 3c149c9299d6ca44b95f2cdf2aaf07d0, type: 2}
+      overrideName: DANIEL
+    text: "\uC5F0\uB77D\uC774 \uC624\uBA74 \uD63C\uC790 \uC6C0\uC9C1\uC774\uACA0\uC2B5\uB2C8\uB2E4.
+      \uB2F9\uC2E0\uC774 \uB530\uB77C\uC624\uBA74 \uC81C\uBCF4\uC790\uB294 \uC0AC\uB77C\uC838\uC694."
+    expression: 0
+    voiceRequired: 1
+    voiceClip: {fileID: 0}
+    conditions: []
+    effects: []
+    choices: []
+  - id: D1-03_020
+    speaker:
+      character: {fileID: 0}
+      overrideName: PLAYER_CHOICE
+    text: "\uB2E4\uB2C8\uC5D8\uC744 \uCD94\uC801"
+    expression: 0
+    voiceRequired: 0
+    voiceClip: {fileID: 0}
+    conditions: []
+    effects: []
+    choices: []
+  - id: D1-03_021
+    speaker:
+      character: {fileID: 0}
+      overrideName: PLAYER_CHOICE
+    text: "\uD30C\uD2F0 \uC778\uBB3C\uC744 \uD0D0\uBB38"
+    expression: 0
+    voiceRequired: 0
+    voiceClip: {fileID: 0}
+    conditions: []
+    effects: []
+    choices: []
+  - id: D1-03_022
+    speaker:
+      character: {fileID: 11400000, guid: deea118744593fa4883b9fc7691a6c13, type: 2}
+      overrideName: ADRIAN
+    text: "\uD63C\uC790 \uC6C0\uC9C1\uC778\uB2E4\uACE0 \uD588\uC9C0, \uD63C\uC790
+      \uB450\uACA0\uB2E4\uACE0\uB294 \uC548 \uD588\uC2B5\uB2C8\uB2E4."
+    expression: 0
+    voiceRequired: 1
+    voiceClip: {fileID: 0}
+    conditions: []
+    effects: []
+    choices: []
+  - id: D1-03_023
+    speaker:
+      character: {fileID: 0}
+      overrideName: NARRATION
+    text: "\uB2E4\uB2C8\uC5D8\uC740 \uC794\uC744 \uB0B4\uB824\uB193\uACE0 \uC11C\uBE44\uC2A4
+      \uB3C4\uC5B4 \uCABD\uC73C\uB85C \uD5A5\uD588\uB2E4. 21\uC2DC 22\uBD84, \uADF8\uC758
+      \uBA54\uC2E0\uC800 \uD654\uBA74\uC774 \uD55C \uBC88 \uBC1D\uC544\uC84C\uB2E4."
+    expression: 0
+    voiceRequired: 0
+    voiceClip: {fileID: 0}
+    conditions: []
+    effects: []
+    choices: []
+  - id: D1-03_024
+    speaker:
+      character: {fileID: 11400000, guid: deea118744593fa4883b9fc7691a6c13, type: 2}
+      overrideName: ADRIAN
+    text: "\uC0AC\uC9C4 \uAE30\uB85D\uC740 \uC54C\uB9AC\uBC14\uC774\uAC00 \uC544\uB2C8\uB77C
+      \uC2DC\uAC04\uD45C\uC785\uB2C8\uB2E4. \uB2E4\uB4E4 \uC5B8\uC81C \uD504\uB808\uC784\uC5D0\uC11C
+      \uC0AC\uB77C\uC84C\uB294\uC9C0\uBD80\uD130 \uD655\uC778\uD558\uC8E0."
+    expression: 0
+    voiceRequired: 1
+    voiceClip: {fileID: 0}
+    conditions: []
+    effects: []
+    choices: []
+  - id: D1-03_025
+    speaker:
+      character: {fileID: 0}
+      overrideName: NARRATION
+    text: "\uACF5\uC2DD \uC0AC\uC9C4\uC5D0\uB294 \uC774\uBE14\uB9B0\uC774 21:05,
+      21:10, 21:15, 21:20\uC5D0 \uC5F0\uC18D\uC73C\uB85C \uCC0D\uD600 \uC788\uC5C8\uB2E4.
+      \uB9AC\uCC98\uB4DC\uB294 \uAC19\uC740 \uC2DC\uAC04\uB300\uC5D0 \uBC14\uC5D0\uC11C
+      \uC220\uC744 \uBC1B\uACE0 \uC788\uC5C8\uB2E4."
+    expression: 0
+    voiceRequired: 0
+    voiceClip: {fileID: 0}
+    conditions: []
+    effects: []
+    choices: []
+  - id: D1-03_026
+    speaker:
+      character: {fileID: 11400000, guid: e1e53316d69c50e43ac1baded7ce3c54, type: 2}
+      overrideName: MARCUS
+    text: "\uC11C\uBE44\uC2A4 \uB3C4\uC5B4\uAC00 \uC5F4\uB838\uC2B5\uB2C8\uB2E4.
+      \uC2B9\uC778 \uC5C6\uB294 \uC2B9\uAC1D \uD0DC\uADF8\uC785\uB2C8\uB2E4."
+    expression: 0
+    voiceRequired: 1
+    voiceClip: {fileID: 0}
+    conditions: []
+    effects: []
+    choices: []
+  - id: D1-03_027
+    speaker:
+      character: {fileID: 11400000, guid: deea118744593fa4883b9fc7691a6c13, type: 2}
+      overrideName: ADRIAN
+    text: "\uB2E4\uB2C8\uC5D8\uC774\uAD70\uC694."
+    expression: 0
+    voiceRequired: 1
+    voiceClip: {fileID: 0}
+    conditions: []
+    effects: []
+    choices: []
+  - id: D1-03_028
+    speaker:
+      character: {fileID: 0}
+      overrideName: SYSTEM
+    text: "\uC6B0\uC120 \uB2E8\uC11C\uAC00 \uC124\uC815\uB418\uC5C8\uC2B5\uB2C8\uB2E4.
+      \uB450 \uACBD\uB85C\uB294 \uBAA8\uB450 \uD68C\uC218 \uAC00\uB2A5\uD558\uC9C0\uB9CC
+      \uBA3C\uC800 \uC120\uD0DD\uD55C \uACBD\uB85C\uC758 \uC815\uBCF4\uAC00 \uB354
+      \uC9C1\uC811\uC801\uC73C\uB85C \uC81C\uACF5\uB429\uB2C8\uB2E4."
+    expression: 0
+    voiceRequired: 0
+    voiceClip: {fileID: 0}
+    conditions: []
+    effects: []
+    choices: []

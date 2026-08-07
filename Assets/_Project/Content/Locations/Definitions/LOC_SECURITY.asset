@@ -1,0 +1,24 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 66b556a0cebf3a94e959d302a82ac530, type: 3}
+  m_Name: LOC_SECURITY
+  m_EditorClassIdentifier: UTH.Runtime::LocationDefinition
+  id: LOC_SECURITY
+  displayName: Security
+  defaultBackground: {fileID: 21300000, guid: 029dbf9cf0f02304483c8fe564f11d77, type: 3}
+  states:
+  - {fileID: 11400000, guid: a3057224cc6401f4aa8e81f4a141cab4, type: 2}
+  exits: []
+  defaultAudio: {fileID: 11400000, guid: 1e5f8bb518def9649ab100ae165a3060, type: 2}
+  mapNode:
+    id: 
+    normalizedPosition: {x: 0, y: 0}

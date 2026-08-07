@@ -1,0 +1,23 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 319f22a64bc42b249b4e6072b708e3c4, type: 3}
+  m_Name: AUDIO_DANIEL_CABIN_DEFAULT
+  m_EditorClassIdentifier: UTH.Runtime::AudioCueProfile
+  music: {fileID: 8300000, guid: ed6eae0ce5ac3dc478a14bbcb87b7ea6, type: 3}
+  ambienceA: {fileID: 8300000, guid: ee196b8acfce357458efe9b87f1a758d, type: 3}
+  ambienceB: {fileID: 0}
+  musicVolume: 0.65
+  ambienceAVolume: 0.6
+  ambienceBVolume: 0.4
+  crossfadeDuration: 1.2
+  entryStinger: {fileID: 0}
+  dialogueDucking: {fileID: 0}

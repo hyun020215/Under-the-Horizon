@@ -1,0 +1,37 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 25fadb5404a158643a3915c0636cc84c, type: 3}
+  m_Name: D3_02_RichardConfession
+  m_EditorClassIdentifier: UTH.Runtime::StorySceneDefinition
+  id: D3-02
+  displayName: "\uB9AC\uCC98\uB4DC\uC758 \uC790\uBC31 1"
+  chapter: 3
+  day: 3
+  timeBlock: 1
+  entryConditions: []
+  location: {fileID: 11400000, guid: d45a956ac8b73344fb8ea6d566ba9fb0, type: 2}
+  locationState: {fileID: 11400000, guid: badce38ed1208b24bb8343def09837df, type: 2}
+  initialScreen: 2
+  characterSet: {fileID: 11400000, guid: 95b5d1e5a06486c47b80bb3816a683a0, type: 2}
+  interactionSet: {fileID: 11400000, guid: 6a1ecb4cb81ca144aba7f36942cab5d9, type: 2}
+  entryDialogue: {fileID: 11400000, guid: 4e676909e4d83b44fa52918f2fb4759a, type: 2}
+  puzzle: {fileID: 0}
+  audioProfile: {fileID: 11400000, guid: b05fdf959d6580c4aa2ae06a3ff372ff, type: 2}
+  entrySequence: {fileID: 0}
+  exitSequence: {fileID: 0}
+  entryTransition: {fileID: 11400000, guid: dca78952fd04d4d4392054d9a3fc41e2, type: 2}
+  exitTransition: {fileID: 11400000, guid: dca78952fd04d4d4392054d9a3fc41e2, type: 2}
+  onEnterEffects: []
+  onCompleteEffects: []
+  routes:
+  - targetSceneId: D3-03
+    conditions: []

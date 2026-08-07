@@ -1,0 +1,37 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 25fadb5404a158643a3915c0636cc84c, type: 3}
+  m_Name: P02_GangwayManifest
+  m_EditorClassIdentifier: UTH.Runtime::StorySceneDefinition
+  id: P-02
+  displayName: "\uC2B9\uC120 \uBA85\uB2E8\uC758 \uC624\uB958"
+  chapter: 0
+  day: 0
+  timeBlock: 2
+  entryConditions: []
+  location: {fileID: 11400000, guid: 8927a02e93e690242b1a957ebee934e8, type: 2}
+  locationState: {fileID: 11400000, guid: 383ee029d52aafc4cbf6841ff533915f, type: 2}
+  initialScreen: 2
+  characterSet: {fileID: 11400000, guid: 4425a1e7ad2c8364988e55bcb63e1ba4, type: 2}
+  interactionSet: {fileID: 11400000, guid: 05b7a4f1201209847bc2706de522e106, type: 2}
+  entryDialogue: {fileID: 11400000, guid: afbecc5451b47474b8b08ff57a1802bc, type: 2}
+  puzzle: {fileID: 0}
+  audioProfile: {fileID: 11400000, guid: e41301e6eb6a1d54caabe157ef9bd61d, type: 2}
+  entrySequence: {fileID: 0}
+  exitSequence: {fileID: 0}
+  entryTransition: {fileID: 11400000, guid: dca78952fd04d4d4392054d9a3fc41e2, type: 2}
+  exitTransition: {fileID: 11400000, guid: dca78952fd04d4d4392054d9a3fc41e2, type: 2}
+  onEnterEffects: []
+  onCompleteEffects: []
+  routes:
+  - targetSceneId: P-03
+    conditions: []

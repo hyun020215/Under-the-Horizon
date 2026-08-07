@@ -1,0 +1,37 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 25fadb5404a158643a3915c0636cc84c, type: 3}
+  m_Name: D4_01_MarcusLie
+  m_EditorClassIdentifier: UTH.Runtime::StorySceneDefinition
+  id: D4-01
+  displayName: "Marcus\uC758 \uAC70\uC9D3\uB9D0"
+  chapter: 4
+  day: 4
+  timeBlock: 1
+  entryConditions: []
+  location: {fileID: 11400000, guid: fb229075c4592e44089385d165f70561, type: 2}
+  locationState: {fileID: 11400000, guid: a3057224cc6401f4aa8e81f4a141cab4, type: 2}
+  initialScreen: 2
+  characterSet: {fileID: 11400000, guid: 1fa8698e8551a0a479aa655227908732, type: 2}
+  interactionSet: {fileID: 11400000, guid: ee52d4f387f2497428f8cee1402a4135, type: 2}
+  entryDialogue: {fileID: 11400000, guid: 137c778bbbcb0304bbad3a0517d576e1, type: 2}
+  puzzle: {fileID: 0}
+  audioProfile: {fileID: 11400000, guid: 1e5f8bb518def9649ab100ae165a3060, type: 2}
+  entrySequence: {fileID: 0}
+  exitSequence: {fileID: 0}
+  entryTransition: {fileID: 11400000, guid: dca78952fd04d4d4392054d9a3fc41e2, type: 2}
+  exitTransition: {fileID: 11400000, guid: dca78952fd04d4d4392054d9a3fc41e2, type: 2}
+  onEnterEffects: []
+  onCompleteEffects: []
+  routes:
+  - targetSceneId: D4-02
+    conditions: []

@@ -1,0 +1,24 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 66b556a0cebf3a94e959d302a82ac530, type: 3}
+  m_Name: LOC_FORENSIC
+  m_EditorClassIdentifier: UTH.Runtime::LocationDefinition
+  id: LOC_FORENSIC
+  displayName: Forensic
+  defaultBackground: {fileID: 21300000, guid: 189ee9fb68ba95e42b558ec18a12039f, type: 3}
+  states:
+  - {fileID: 11400000, guid: ebecc3955998af74094cdfd1a2fe9926, type: 2}
+  exits: []
+  defaultAudio: {fileID: 11400000, guid: 4d795f2c1dfa2574ebbdfd47b67398be, type: 2}
+  mapNode:
+    id: 
+    normalizedPosition: {x: 0, y: 0}
