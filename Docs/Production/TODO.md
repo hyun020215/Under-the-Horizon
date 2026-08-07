@@ -20,7 +20,7 @@
 
 ## P0 — Unity에서 먼저 복구할 항목
 
-- [ ] 0바이트 `.asset` 212개를 실제 ScriptableObject로 저작한다.
+- [x] 0바이트 `.asset` 212개를 현재 스키마의 실제 ScriptableObject로 변환한다.
   - Story Scene 41개
   - Location과 Location State
   - CharacterDefinition과 CharacterPlacementSet
@@ -29,11 +29,13 @@
   - EvidenceDefinition `C-01`~`C-18`
   - PuzzleDefinition, AudioCueProfile, TransitionProfile, Sequence
   - `GAME_` 및 `DATABASE_` 루트 자산
-- [ ] 0바이트 Prefab을 실제 GameObject 계층과 현재 스크립트 참조로 다시 만든다.
+- [x] 0바이트 Prefab을 실제 GameObject 계층과 현재 스크립트 참조로 다시 만든다.
   - App, Character, Interaction, Location, UI, FX, Puzzle Prefab
-- [ ] `Bootstrap.unity`에서 App 서비스와 `Game.unity` 로드를 연결한다.
-- [ ] `Game.unity`에서 WorldCanvas, UICanvas, Directors, EventSystem을 실제 Prefab·컴포넌트에 연결한다.
-- [ ] `ContentDatabase`에 41개 장면과 장소·증거 데이터베이스를 등록한다.
+- [x] `Bootstrap.unity`에서 App 수명주기와 `Game.unity` 로드를 연결한다.
+- [x] `Game.unity`에서 WorldCanvas, UICanvas, Directors, EventSystem을 실제 Prefab·컴포넌트에 연결한다.
+- [x] `ContentDatabase`에 41개 장면과 장소·증거 데이터베이스를 등록한다.
+
+P0 자산은 `Under The Horizon > Build > P0 Project Content`에서 다시 생성할 수 있다. Story Scene별 상세 상호작용·연출·최종 배치 튜닝은 아래 P1 항목에서 계속 추적한다.
 
 0바이트 자리표시자는 완성 자산으로 계산하지 않는다. 이전 스크립트 GUID를 가진 레거시 ScriptableObject를 그대로 활성화하지 말고 현재 스키마로 변환한다.
 
