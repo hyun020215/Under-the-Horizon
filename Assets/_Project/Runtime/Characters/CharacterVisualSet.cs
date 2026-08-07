@@ -1,0 +1,1 @@
+using System;using UnityEngine; [Serializable] public sealed class CharacterVisualSet { [SerializeField]private CharacterPose pose;[SerializeField]private CharacterExpression expression;[SerializeField]private Sprite sprite;public CharacterPose Pose=>pose;public CharacterExpression Expression=>expression;public Sprite Sprite=>sprite; }

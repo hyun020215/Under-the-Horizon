@@ -1,0 +1,1 @@
+using System;using UnityEngine; [Serializable] public sealed class MapNodeDefinition { [SerializeField]private string id;[SerializeField]private Vector2 normalizedPosition;public string Id=>id;public Vector2 NormalizedPosition=>normalizedPosition; }
