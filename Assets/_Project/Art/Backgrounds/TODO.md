@@ -1,0 +1,1 @@
+Images of each locations should be added!

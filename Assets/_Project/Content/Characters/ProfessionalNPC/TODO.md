@@ -1,0 +1,1 @@
+Assets of other professional NPCs should be added!

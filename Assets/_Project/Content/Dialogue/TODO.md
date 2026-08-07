@@ -1,0 +1,1 @@
+Dialogues of each day and scene should be added.

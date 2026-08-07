@@ -1,0 +1,1 @@
+States of each locations should be added!
