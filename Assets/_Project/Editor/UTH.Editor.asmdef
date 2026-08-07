@@ -1,0 +1,7 @@
+{
+  "name": "UTH.Editor",
+  "rootNamespace": "UnderTheHorizon.Editor",
+  "references": ["UTH.Runtime", "Unity.TextMeshPro"],
+  "includePlatforms": ["Editor"],
+  "autoReferenced": true
+}

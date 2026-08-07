@@ -1,0 +1,6 @@
+{
+  "name": "UTH.Runtime",
+  "rootNamespace": "UnderTheHorizon",
+  "references": ["Unity.InputSystem", "Unity.TextMeshPro", "UnityEngine.UI"],
+  "autoReferenced": true
+}
