@@ -1,1 +1,4 @@
-public static class SaveVersion { public const int Current = 1; }
+public static class SaveVersion
+{
+    public const int Current = 1;
+}

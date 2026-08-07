@@ -1,1 +1,32 @@
-using System.Threading.Tasks;using UnityEngine; public sealed class FadeTransitionPlayer:TransitionPlayer { [SerializeField]private CanvasGroup overlay;public override bool Supports(TransitionType type)=>type==TransitionType.Fade||type==TransitionType.Instant;public override async Task PlayAsync(TransitionRequest request){if(overlay==null||request.Profile==null)return;float duration=request.Entering?request.Profile.coverDuration:request.Profile.revealDuration;float from=request.Entering?0:1,to=request.Entering?1:0;if(request.Profile.type==TransitionType.Instant)duration=0;float elapsed=0;do{elapsed+=Time.unscaledDeltaTime;overlay.alpha=Mathf.Lerp(from,to,duration<=0?1:elapsed/duration);await Task.Yield();}while(elapsed<duration);overlay.alpha=to;} }
+using System.Threading.Tasks;
+using UnityEngine;
+
+public sealed class FadeTransitionPlayer : TransitionPlayer
+{
+    [SerializeField]
+    private CanvasGroup overlay;
+
+    public override bool Supports(TransitionType type) =>
+        type == TransitionType.Fade || type == TransitionType.Instant;
+
+    public override async Task PlayAsync(TransitionRequest request)
+    {
+        if (overlay == null || request.Profile == null)
+            return;
+        float duration = request.Entering
+            ? request.Profile.coverDuration
+            : request.Profile.revealDuration;
+        float from = request.Entering ? 0 : 1,
+            to = request.Entering ? 1 : 0;
+        if (request.Profile.type == TransitionType.Instant)
+            duration = 0;
+        float elapsed = 0;
+        do
+        {
+            elapsed += Time.unscaledDeltaTime;
+            overlay.alpha = Mathf.Lerp(from, to, duration <= 0 ? 1 : elapsed / duration);
+            await Task.Yield();
+        } while (elapsed < duration);
+        overlay.alpha = to;
+    }
+}

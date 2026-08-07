@@ -1,1 +1,17 @@
-public readonly struct InteractionContext { public InteractionContext(GameStateStore state,NarrativeDirector narrative,PuzzleDirector puzzles){State=state;Narrative=narrative;Puzzles=puzzles;}public GameStateStore State{get;}public NarrativeDirector Narrative{get;}public PuzzleDirector Puzzles{get;} }
+public readonly struct InteractionContext
+{
+    public InteractionContext(
+        GameStateStore state,
+        NarrativeDirector narrative,
+        PuzzleDirector puzzles
+    )
+    {
+        State = state;
+        Narrative = narrative;
+        Puzzles = puzzles;
+    }
+
+    public GameStateStore State { get; }
+    public NarrativeDirector Narrative { get; }
+    public PuzzleDirector Puzzles { get; }
+}

@@ -1,1 +1,1 @@
-public sealed class InterrogationScreen:ScreenBase { }
+public sealed class InterrogationScreen : ScreenBase { }

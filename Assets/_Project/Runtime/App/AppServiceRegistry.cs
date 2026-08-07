@@ -1,1 +1,17 @@
-using System;using System.Collections.Generic; public sealed class AppServiceRegistry { private readonly Dictionary<Type,object> services=new();public void Register<T>(T service)where T:class=>services[typeof(T)]=service??throw new ArgumentNullException(nameof(service));public T Get<T>()where T:class=>services.TryGetValue(typeof(T),out object value)?(T)value:throw new InvalidOperationException($"Service {typeof(T).Name} is not registered."); }
+using System;
+using System.Collections.Generic;
+
+public sealed class AppServiceRegistry
+{
+    private readonly Dictionary<Type, object> services = new();
+
+    public void Register<T>(T service)
+        where T : class =>
+        services[typeof(T)] = service ?? throw new ArgumentNullException(nameof(service));
+
+    public T Get<T>()
+        where T : class =>
+        services.TryGetValue(typeof(T), out object value)
+            ? (T)value
+            : throw new InvalidOperationException($"Service {typeof(T).Name} is not registered.");
+}

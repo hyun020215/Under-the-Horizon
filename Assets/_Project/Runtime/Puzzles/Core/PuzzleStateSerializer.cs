@@ -1,1 +1,10 @@
-public static class PuzzleStateSerializer { public static void Save(GameStateStore state,string puzzleId,string payload)=>state?.SetPuzzleProgress(puzzleId,payload);public static string Load(GameStateStore state,string puzzleId)=>state!=null&&state.TryGetPuzzleProgress(puzzleId,out string payload)?payload:string.Empty; }
+public static class PuzzleStateSerializer
+{
+    public static void Save(GameStateStore state, string puzzleId, string payload) =>
+        state?.SetPuzzleProgress(puzzleId, payload);
+
+    public static string Load(GameStateStore state, string puzzleId) =>
+        state != null && state.TryGetPuzzleProgress(puzzleId, out string payload)
+            ? payload
+            : string.Empty;
+}

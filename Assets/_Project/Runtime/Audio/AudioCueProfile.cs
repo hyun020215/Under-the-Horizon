@@ -1,6 +1,6 @@
 using UnityEngine;
 
-[CreateAssetMenu(fileName="AUDIO_", menuName="Under The Horizon/Audio/Cue Profile")]
+[CreateAssetMenu(fileName = "AUDIO_", menuName = "Under The Horizon/Audio/Cue Profile")]
 public sealed class AudioCueProfile : ScriptableObject
 {
     public AudioClip music;

@@ -1,1 +1,23 @@
-using System.Collections.Generic; public sealed class CCTVLogPuzzleController:ValidatedPuzzleController { private readonly HashSet<string> observations=new();protected override void ResetPuzzle()=>observations.Clear();public void Observe(string id){if(!string.IsNullOrWhiteSpace(id))observations.Add(id);}public bool Submit()=>CompleteWhen(observations.Contains("cctv")&&observations.Contains("door_log")&&observations.Contains("detector_error")&&observations.Contains("location"),string.Join(",",observations)); }
+using System.Collections.Generic;
+
+public sealed class CCTVLogPuzzleController : ValidatedPuzzleController
+{
+    private readonly HashSet<string> observations = new();
+
+    protected override void ResetPuzzle() => observations.Clear();
+
+    public void Observe(string id)
+    {
+        if (!string.IsNullOrWhiteSpace(id))
+            observations.Add(id);
+    }
+
+    public bool Submit() =>
+        CompleteWhen(
+            observations.Contains("cctv")
+                && observations.Contains("door_log")
+                && observations.Contains("detector_error")
+                && observations.Contains("location"),
+            string.Join(",", observations)
+        );
+}

@@ -1,1 +1,1 @@
-public sealed class InvestigationRecordScreen:ScreenBase { }
+public sealed class InvestigationRecordScreen : ScreenBase { }

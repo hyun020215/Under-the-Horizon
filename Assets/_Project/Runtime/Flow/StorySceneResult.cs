@@ -1,1 +1,11 @@
-public readonly struct StorySceneResult { public StorySceneResult(bool completed, string nextSceneId = null) { Completed = completed; NextSceneId = nextSceneId ?? string.Empty; } public bool Completed { get; } public string NextSceneId { get; } }
+public readonly struct StorySceneResult
+{
+    public StorySceneResult(bool completed, string nextSceneId = null)
+    {
+        Completed = completed;
+        NextSceneId = nextSceneId ?? string.Empty;
+    }
+
+    public bool Completed { get; }
+    public string NextSceneId { get; }
+}

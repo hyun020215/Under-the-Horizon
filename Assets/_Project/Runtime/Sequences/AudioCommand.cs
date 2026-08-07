@@ -1,1 +1,16 @@
-using System;using System.Threading.Tasks;using UnityEngine; [Serializable]public sealed class AudioCommand:SequenceCommand { [SerializeField]private AudioCueProfile profile;public override Task ExecuteAsync(SequenceContext context){context.Audio?.Apply(profile);return Task.CompletedTask;} }
+using System;
+using System.Threading.Tasks;
+using UnityEngine;
+
+[Serializable]
+public sealed class AudioCommand : SequenceCommand
+{
+    [SerializeField]
+    private AudioCueProfile profile;
+
+    public override Task ExecuteAsync(SequenceContext context)
+    {
+        context.Audio?.Apply(profile);
+        return Task.CompletedTask;
+    }
+}

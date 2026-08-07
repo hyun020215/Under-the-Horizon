@@ -1,1 +1,25 @@
-using UnityEngine; public sealed class StabilizerPuzzleController:ValidatedPuzzleController { private float frequency,phase;protected override void ResetPuzzle(){frequency=phase=0;}public void SetFilter(float frequency,float phase){this.frequency=frequency;this.phase=phase;}public bool Submit(Vector2 target,float tolerance=.05f)=>CompleteWhen(Mathf.Abs(frequency-target.x)<=tolerance&&Mathf.Abs(phase-target.y)<=tolerance,$"{frequency}:{phase}"); }
+using UnityEngine;
+
+public sealed class StabilizerPuzzleController : ValidatedPuzzleController
+{
+    private float frequency,
+        phase;
+
+    protected override void ResetPuzzle()
+    {
+        frequency = phase = 0;
+    }
+
+    public void SetFilter(float frequency, float phase)
+    {
+        this.frequency = frequency;
+        this.phase = phase;
+    }
+
+    public bool Submit(Vector2 target, float tolerance = .05f) =>
+        CompleteWhen(
+            Mathf.Abs(frequency - target.x) <= tolerance
+                && Mathf.Abs(phase - target.y) <= tolerance,
+            $"{frequency}:{phase}"
+        );
+}

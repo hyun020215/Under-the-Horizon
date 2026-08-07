@@ -1,1 +1,7 @@
-public enum EvidenceQuality { Unknown, Questionable, Corroborated, Conclusive }
+public enum EvidenceQuality
+{
+    Unknown,
+    Questionable,
+    Corroborated,
+    Conclusive,
+}

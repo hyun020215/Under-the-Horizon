@@ -1,1 +1,1 @@
-public sealed class SettingsScreen:ScreenBase { }
+public sealed class SettingsScreen : ScreenBase { }

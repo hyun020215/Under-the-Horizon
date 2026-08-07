@@ -1,1 +1,1 @@
-public sealed class EvidenceBoardScreen:ScreenBase { }
+public sealed class EvidenceBoardScreen : ScreenBase { }

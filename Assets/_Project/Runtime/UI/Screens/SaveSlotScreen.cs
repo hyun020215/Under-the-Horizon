@@ -1,1 +1,1 @@
-public sealed class SaveSlotScreen:ScreenBase { }
+public sealed class SaveSlotScreen : ScreenBase { }

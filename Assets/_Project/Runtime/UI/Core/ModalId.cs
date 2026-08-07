@@ -1,1 +1,7 @@
-public enum ModalId { None, Confirm, Pause, Tooltip }
+public enum ModalId
+{
+    None,
+    Confirm,
+    Pause,
+    Tooltip,
+}

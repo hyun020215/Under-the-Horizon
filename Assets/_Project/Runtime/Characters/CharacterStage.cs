@@ -4,8 +4,11 @@ using UnityEngine;
 
 public sealed class CharacterStage : MonoBehaviour
 {
-    [SerializeField] private CharacterView prefab;
-    [SerializeField] private RectTransform root;
+    [SerializeField]
+    private CharacterView prefab;
+
+    [SerializeField]
+    private RectTransform root;
     private readonly List<CharacterView> views = new();
 
     public Task ApplyAsync(CharacterPlacementSet set)
@@ -25,7 +28,9 @@ public sealed class CharacterStage : MonoBehaviour
 
     public void Clear()
     {
-        foreach (CharacterView view in views) if (view != null) Destroy(view.gameObject);
+        foreach (CharacterView view in views)
+            if (view != null)
+                Destroy(view.gameObject);
         views.Clear();
     }
 }

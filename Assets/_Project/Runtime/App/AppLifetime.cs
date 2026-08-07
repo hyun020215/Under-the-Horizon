@@ -1,1 +1,19 @@
-using UnityEngine; public sealed class AppLifetime:MonoBehaviour { private static AppLifetime instance;private void Awake(){if(instance!=null&&instance!=this){Destroy(gameObject);return;}instance=this;DontDestroyOnLoad(gameObject);}public void Quit()=>Application.Quit(); }
+using UnityEngine;
+
+public sealed class AppLifetime : MonoBehaviour
+{
+    private static AppLifetime instance;
+
+    private void Awake()
+    {
+        if (instance != null && instance != this)
+        {
+            Destroy(gameObject);
+            return;
+        }
+        instance = this;
+        DontDestroyOnLoad(gameObject);
+    }
+
+    public void Quit() => Application.Quit();
+}

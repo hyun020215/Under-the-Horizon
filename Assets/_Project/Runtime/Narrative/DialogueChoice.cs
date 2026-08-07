@@ -1,1 +1,33 @@
-using System;using UnityEngine; [Serializable] public sealed class DialogueChoice { [SerializeField]private string id;[SerializeField]private string text;[SerializeField]private Condition[] conditions;[SerializeField]private GameEffect[] effects;[SerializeField]private string nextLineId;public string Id=>id;public string Text=>text;public string NextLineId=>nextLineId;public bool IsAvailable(GameStateStore state)=>ConditionResolver.All(conditions,state);public void Apply(GameStateStore state){if(effects!=null)foreach(var effect in effects)effect?.Apply(state);} }
+using System;
+using UnityEngine;
+
+[Serializable]
+public sealed class DialogueChoice
+{
+    [SerializeField]
+    private string id;
+
+    [SerializeField]
+    private string text;
+
+    [SerializeField]
+    private Condition[] conditions;
+
+    [SerializeField]
+    private GameEffect[] effects;
+
+    [SerializeField]
+    private string nextLineId;
+    public string Id => id;
+    public string Text => text;
+    public string NextLineId => nextLineId;
+
+    public bool IsAvailable(GameStateStore state) => ConditionResolver.All(conditions, state);
+
+    public void Apply(GameStateStore state)
+    {
+        if (effects != null)
+            foreach (var effect in effects)
+                effect?.Apply(state);
+    }
+}

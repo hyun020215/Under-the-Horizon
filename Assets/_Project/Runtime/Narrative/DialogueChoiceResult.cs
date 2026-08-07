@@ -1,1 +1,9 @@
-public readonly struct DialogueChoiceResult { public DialogueChoiceResult(DialogueChoice choice){Choice=choice;}public DialogueChoice Choice{get;} }
+public readonly struct DialogueChoiceResult
+{
+    public DialogueChoiceResult(DialogueChoice choice)
+    {
+        Choice = choice;
+    }
+
+    public DialogueChoice Choice { get; }
+}

@@ -1,54 +1,82 @@
 using UnityEngine;
 
-[CreateAssetMenu(
-    fileName = "StoryScene",
-    menuName = "Under The Horizon/Story/Story Scene")]
+[CreateAssetMenu(fileName = "StoryScene", menuName = "Under The Horizon/Story/Story Scene")]
 public sealed class StorySceneDefinition : ScriptableObject
 {
     [Header("Identity")]
-    [SerializeField] private string id;
-    [SerializeField] private string displayName;
+    [SerializeField]
+    private string id;
+
+    [SerializeField]
+    private string displayName;
 
     [Header("Story")]
-    [SerializeField] private StoryChapter chapter;
-    [SerializeField] private StoryDay day;
-    [SerializeField] private TimeBlock timeBlock;
+    [SerializeField]
+    private StoryChapter chapter;
+
+    [SerializeField]
+    private StoryDay day;
+
+    [SerializeField]
+    private TimeBlock timeBlock;
 
     [Header("Entry")]
-    [SerializeField] private Condition[] entryConditions;
+    [SerializeField]
+    private Condition[] entryConditions;
 
     [Header("Location")]
-    [SerializeField] private LocationDefinition location;
-    [SerializeField] private LocationStateDefinition locationState;
+    [SerializeField]
+    private LocationDefinition location;
+
+    [SerializeField]
+    private LocationStateDefinition locationState;
 
     [Header("Presentation")]
-    [SerializeField] private ScreenMode initialScreen;
-    [SerializeField] private CharacterPlacementSet characterSet;
-    [SerializeField] private InteractionSet interactionSet;
+    [SerializeField]
+    private ScreenMode initialScreen;
+
+    [SerializeField]
+    private CharacterPlacementSet characterSet;
+
+    [SerializeField]
+    private InteractionSet interactionSet;
 
     [Header("Narrative")]
-    [SerializeField] private DialogueSequence entryDialogue;
+    [SerializeField]
+    private DialogueSequence entryDialogue;
 
     [Header("Puzzle")]
-    [SerializeField] private PuzzleDefinition puzzle;
+    [SerializeField]
+    private PuzzleDefinition puzzle;
 
     [Header("Audio")]
-    [SerializeField] private AudioCueProfile audioProfile;
+    [SerializeField]
+    private AudioCueProfile audioProfile;
 
     [Header("Sequence")]
-    [SerializeField] private SceneSequenceDefinition entrySequence;
-    [SerializeField] private SceneSequenceDefinition exitSequence;
+    [SerializeField]
+    private SceneSequenceDefinition entrySequence;
+
+    [SerializeField]
+    private SceneSequenceDefinition exitSequence;
 
     [Header("Transition")]
-    [SerializeField] private TransitionProfile entryTransition;
-    [SerializeField] private TransitionProfile exitTransition;
+    [SerializeField]
+    private TransitionProfile entryTransition;
+
+    [SerializeField]
+    private TransitionProfile exitTransition;
 
     [Header("State")]
-    [SerializeField] private GameEffect[] onEnterEffects;
-    [SerializeField] private GameEffect[] onCompleteEffects;
+    [SerializeField]
+    private GameEffect[] onEnterEffects;
+
+    [SerializeField]
+    private GameEffect[] onCompleteEffects;
 
     [Header("Flow")]
-    [SerializeField] private StorySceneRoute[] routes;
+    [SerializeField]
+    private StorySceneRoute[] routes;
 
     public string Id => id;
     public string DisplayName => displayName;

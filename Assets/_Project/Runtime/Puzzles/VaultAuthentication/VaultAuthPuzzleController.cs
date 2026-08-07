@@ -1,1 +1,20 @@
-using System.Collections.Generic; public sealed class VaultAuthPuzzleController:ValidatedPuzzleController { private readonly List<int> input=new();protected override void ResetPuzzle()=>input.Clear();public void Enter(int value)=>input.Add(value);public bool Submit(int[] expected){if(expected==null||expected.Length!=input.Count)return false;for(int i=0;i<expected.Length;i++)if(expected[i]!=input[i])return false;return CompleteWhen(true,"authenticated");} }
+using System.Collections.Generic;
+
+public sealed class VaultAuthPuzzleController : ValidatedPuzzleController
+{
+    private readonly List<int> input = new();
+
+    protected override void ResetPuzzle() => input.Clear();
+
+    public void Enter(int value) => input.Add(value);
+
+    public bool Submit(int[] expected)
+    {
+        if (expected == null || expected.Length != input.Count)
+            return false;
+        for (int i = 0; i < expected.Length; i++)
+            if (expected[i] != input[i])
+                return false;
+        return CompleteWhen(true, "authenticated");
+    }
+}

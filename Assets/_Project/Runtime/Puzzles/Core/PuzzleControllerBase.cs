@@ -1,1 +1,10 @@
-using System.Threading.Tasks;using UnityEngine; public abstract class PuzzleControllerBase:MonoBehaviour { [SerializeField]private string controllerKey;public string ControllerKey=>controllerKey;public abstract Task<PuzzleResult> PlayAsync(PuzzleContext context); }
+using System.Threading.Tasks;
+using UnityEngine;
+
+public abstract class PuzzleControllerBase : MonoBehaviour
+{
+    [SerializeField]
+    private string controllerKey;
+    public string ControllerKey => controllerKey;
+    public abstract Task<PuzzleResult> PlayAsync(PuzzleContext context);
+}

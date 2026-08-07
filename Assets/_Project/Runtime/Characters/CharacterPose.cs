@@ -1,1 +1,9 @@
-public enum CharacterPose { Default, Neutral, Open, Closed, Injured, Seated }
+public enum CharacterPose
+{
+    Default,
+    Neutral,
+    Open,
+    Closed,
+    Injured,
+    Seated,
+}

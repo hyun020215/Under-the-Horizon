@@ -1,1 +1,17 @@
-using System;using UnityEngine; [Serializable] public sealed class DialogueSpeaker { [SerializeField]private CharacterDefinition character;[SerializeField]private string overrideName;public string DisplayName=>string.IsNullOrWhiteSpace(overrideName)?character?.DisplayName??string.Empty:overrideName;public CharacterDefinition Character=>character; }
+using System;
+using UnityEngine;
+
+[Serializable]
+public sealed class DialogueSpeaker
+{
+    [SerializeField]
+    private CharacterDefinition character;
+
+    [SerializeField]
+    private string overrideName;
+    public string DisplayName =>
+        string.IsNullOrWhiteSpace(overrideName)
+            ? character?.DisplayName ?? string.Empty
+            : overrideName;
+    public CharacterDefinition Character => character;
+}

@@ -1,1 +1,21 @@
-using System.Threading.Tasks;using UnityEngine; public abstract class ScreenBase:MonoBehaviour { [SerializeField]private ScreenId id;public ScreenId Id=>id;public virtual Task OpenAsync(ScreenContext context){gameObject.SetActive(true);return Task.CompletedTask;}public virtual Task CloseAsync(){gameObject.SetActive(false);return Task.CompletedTask;} }
+using System.Threading.Tasks;
+using UnityEngine;
+
+public abstract class ScreenBase : MonoBehaviour
+{
+    [SerializeField]
+    private ScreenId id;
+    public ScreenId Id => id;
+
+    public virtual Task OpenAsync(ScreenContext context)
+    {
+        gameObject.SetActive(true);
+        return Task.CompletedTask;
+    }
+
+    public virtual Task CloseAsync()
+    {
+        gameObject.SetActive(false);
+        return Task.CompletedTask;
+    }
+}

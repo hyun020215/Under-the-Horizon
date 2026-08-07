@@ -1,1 +1,1 @@
-public sealed class ReconstructionScreen:ScreenBase { }
+public sealed class ReconstructionScreen : ScreenBase { }

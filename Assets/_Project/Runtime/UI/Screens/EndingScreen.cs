@@ -1,1 +1,1 @@
-public sealed class EndingScreen:ScreenBase { }
+public sealed class EndingScreen : ScreenBase { }

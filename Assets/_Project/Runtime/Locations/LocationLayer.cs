@@ -1,1 +1,7 @@
-public enum LocationLayer { Background, Midground, Foreground, Overlay }
+public enum LocationLayer
+{
+    Background,
+    Midground,
+    Foreground,
+    Overlay,
+}

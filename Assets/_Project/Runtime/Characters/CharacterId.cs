@@ -1,1 +1,11 @@
-using System; [Serializable] public struct CharacterId { public string value; public override string ToString()=>value??string.Empty; public static implicit operator string(CharacterId id)=>id.value; }
+using System;
+
+[Serializable]
+public struct CharacterId
+{
+    public string value;
+
+    public override string ToString() => value ?? string.Empty;
+
+    public static implicit operator string(CharacterId id) => id.value;
+}

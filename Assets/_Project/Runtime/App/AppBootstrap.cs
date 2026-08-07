@@ -1,1 +1,21 @@
-using System.Collections;using UnityEngine;using UnityEngine.SceneManagement; public sealed class AppBootstrap:MonoBehaviour { [SerializeField]private string gameScene="Game";private IEnumerator Start(){DontDestroyOnLoad(gameObject);AppContext.Services=new AppServiceRegistry();if(SceneManager.GetActiveScene().name!=gameScene){AsyncOperation operation=SceneManager.LoadSceneAsync(gameScene);while(operation!=null&&!operation.isDone)yield return null;}} }
+using System.Collections;
+using UnityEngine;
+using UnityEngine.SceneManagement;
+
+public sealed class AppBootstrap : MonoBehaviour
+{
+    [SerializeField]
+    private string gameScene = "Game";
+
+    private IEnumerator Start()
+    {
+        DontDestroyOnLoad(gameObject);
+        AppContext.Services = new AppServiceRegistry();
+        if (SceneManager.GetActiveScene().name != gameScene)
+        {
+            AsyncOperation operation = SceneManager.LoadSceneAsync(gameScene);
+            while (operation != null && !operation.isDone)
+                yield return null;
+        }
+    }
+}

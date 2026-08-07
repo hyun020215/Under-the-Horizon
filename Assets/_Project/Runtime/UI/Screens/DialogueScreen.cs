@@ -1,1 +1,1 @@
-public sealed class DialogueScreen:ScreenBase { }
+public sealed class DialogueScreen : ScreenBase { }

@@ -1,1 +1,13 @@
-using System.Collections.Generic; public sealed class CauseOfDeathPuzzleController:ValidatedPuzzleController { private readonly HashSet<string> cards=new();protected override void ResetPuzzle()=>cards.Clear();public void Select(string id)=>cards.Add(id);public bool Submit(string cause,string mechanism)=>CompleteWhen(cards.Contains(cause)&&cards.Contains(mechanism),cause+":"+mechanism); }
+using System.Collections.Generic;
+
+public sealed class CauseOfDeathPuzzleController : ValidatedPuzzleController
+{
+    private readonly HashSet<string> cards = new();
+
+    protected override void ResetPuzzle() => cards.Clear();
+
+    public void Select(string id) => cards.Add(id);
+
+    public bool Submit(string cause, string mechanism) =>
+        CompleteWhen(cards.Contains(cause) && cards.Contains(mechanism), cause + ":" + mechanism);
+}

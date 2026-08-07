@@ -1,1 +1,13 @@
-using System;using System.Threading.Tasks;using UnityEngine; [Serializable]public sealed class UICommand:SequenceCommand { [SerializeField]private ScreenId screen;public override Task ExecuteAsync(SequenceContext context)=>context.Screens?.OpenAsync(screen)??Task.CompletedTask; }
+using System;
+using System.Threading.Tasks;
+using UnityEngine;
+
+[Serializable]
+public sealed class UICommand : SequenceCommand
+{
+    [SerializeField]
+    private ScreenId screen;
+
+    public override Task ExecuteAsync(SequenceContext context) =>
+        context.Screens?.OpenAsync(screen) ?? Task.CompletedTask;
+}

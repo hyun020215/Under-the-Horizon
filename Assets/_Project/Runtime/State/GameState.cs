@@ -34,13 +34,19 @@ public sealed class GameState
             trust = new Dictionary<string, int>(trust, StringComparer.Ordinal),
             flags = new HashSet<string>(flags, StringComparer.Ordinal),
             discoveredEvidence = new HashSet<string>(discoveredEvidence, StringComparer.Ordinal),
-            completedInteractions = new HashSet<string>(completedInteractions, StringComparer.Ordinal),
+            completedInteractions = new HashSet<string>(
+                completedInteractions,
+                StringComparer.Ordinal
+            ),
             completedPuzzles = new HashSet<string>(completedPuzzles, StringComparer.Ordinal),
-            completedStoryScenes = new HashSet<string>(completedStoryScenes, StringComparer.Ordinal),
+            completedStoryScenes = new HashSet<string>(
+                completedStoryScenes,
+                StringComparer.Ordinal
+            ),
             completedObjectives = new HashSet<string>(completedObjectives, StringComparer.Ordinal),
             unlockedLocations = new HashSet<string>(unlockedLocations, StringComparer.Ordinal),
             puzzleProgress = new Dictionary<string, string>(puzzleProgress, StringComparer.Ordinal),
-            endingId = endingId
+            endingId = endingId,
         };
     }
 }

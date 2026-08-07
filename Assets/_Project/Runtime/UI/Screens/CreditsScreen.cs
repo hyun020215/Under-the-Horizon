@@ -1,1 +1,1 @@
-public sealed class CreditsScreen:ScreenBase { }
+public sealed class CreditsScreen : ScreenBase { }

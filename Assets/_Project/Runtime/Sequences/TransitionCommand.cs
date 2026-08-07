@@ -1,1 +1,18 @@
-using System;using System.Threading.Tasks;using UnityEngine; [Serializable]public sealed class TransitionCommand:SequenceCommand { [SerializeField]private TransitionProfile profile;public override async Task ExecuteAsync(SequenceContext context){if(context.Transitions==null)return;await context.Transitions.BeginAsync(profile);await context.Transitions.EndAsync(profile);} }
+using System;
+using System.Threading.Tasks;
+using UnityEngine;
+
+[Serializable]
+public sealed class TransitionCommand : SequenceCommand
+{
+    [SerializeField]
+    private TransitionProfile profile;
+
+    public override async Task ExecuteAsync(SequenceContext context)
+    {
+        if (context.Transitions == null)
+            return;
+        await context.Transitions.BeginAsync(profile);
+        await context.Transitions.EndAsync(profile);
+    }
+}

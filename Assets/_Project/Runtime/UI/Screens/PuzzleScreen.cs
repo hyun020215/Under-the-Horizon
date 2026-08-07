@@ -1,1 +1,1 @@
-public sealed class PuzzleScreen:ScreenBase { }
+public sealed class PuzzleScreen : ScreenBase { }

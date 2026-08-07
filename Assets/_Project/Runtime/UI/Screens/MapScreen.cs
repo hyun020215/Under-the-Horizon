@@ -1,1 +1,1 @@
-public sealed class MapScreen:ScreenBase { }
+public sealed class MapScreen : ScreenBase { }

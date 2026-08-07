@@ -1,1 +1,1 @@
-public sealed class ExplorationScreen:ScreenBase { }
+public sealed class ExplorationScreen : ScreenBase { }

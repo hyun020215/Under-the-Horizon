@@ -1,1 +1,13 @@
-using System;using System.Threading.Tasks;using UnityEngine; [Serializable]public sealed class DialogueCommand:SequenceCommand { [SerializeField]private DialogueSequence dialogue;public override Task ExecuteAsync(SequenceContext context)=>context.Narrative?.PlayAsync(dialogue)??Task.CompletedTask; }
+using System;
+using System.Threading.Tasks;
+using UnityEngine;
+
+[Serializable]
+public sealed class DialogueCommand : SequenceCommand
+{
+    [SerializeField]
+    private DialogueSequence dialogue;
+
+    public override Task ExecuteAsync(SequenceContext context) =>
+        context.Narrative?.PlayAsync(dialogue) ?? Task.CompletedTask;
+}
