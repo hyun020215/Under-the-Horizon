@@ -1,1 +1,0 @@
-Assets of each scene's character placement should be added!

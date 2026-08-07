@@ -1,7 +1,0 @@
-Following images should be added!
-MAP_DECK07.png
-MAP_DECK08.png
-MAP_DECK09.png
-MAP_DECK10.png
-MAP_ACCESS_ALLOWED.png
-MAP_ACCESS_RESTRICTED.png

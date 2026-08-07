@@ -1,1 +1,0 @@
-Default audio assets of each locations should be added!
