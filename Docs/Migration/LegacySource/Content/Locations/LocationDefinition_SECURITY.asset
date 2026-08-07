@@ -1,0 +1,22 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2580e2253d06483f804af34405ef6f19, type: 3}
+  m_Name: LocationDefinition_SECURITY
+  m_EditorClassIdentifier: Wake.Runtime::Wake.Exploration.LocationDefinition
+  locationCode: SECURITY
+  displayName: 보안실
+  deck: 8
+  roomCode: D8-3
+  backgroundSprite: {fileID: 21300000, guid: fedc476c37e04b2086b7a1771210ea2c, type: 3}
+  narrativeAliases: []
+  contentPrefab: {fileID: 0}
+  connectedLocations: []

@@ -1,0 +1,589 @@
+using System.Collections;
+using System.Linq;
+using NUnit.Framework;
+using TMPro;
+using UnityEngine;
+using UnityEngine.TestTools;
+using UnityEngine.UI;
+using Wake.Core;
+using Wake.Exploration;
+using Wake.Narrative;
+using Wake.UI;
+
+namespace Wake.Tests.PlayMode
+{
+    public sealed class SystemScreenFlowPlayModeTests :
+        UiBasicScenePlayModeFixture
+    {
+        [UnityTest]
+        public IEnumerator Title_UsesFourActionsAndHidesGameplayChrome()
+        {
+            yield return null;
+
+            Transform menu = Canvas.Find(
+                "StartScene/Title Presentation/Title Menu");
+            Assert.That(menu, Is.Not.Null);
+            TMP_Text[] labels = menu
+                .GetComponentsInChildren<TMP_Text>(false);
+
+            Assert.That(labels.Select(label => label.text), Is.EquivalentTo(
+                new[] { "시작", "설정", "크레딧", "종료" }));
+            RectTransform menuRect = menu as RectTransform;
+            RectTransform logoRect = Canvas.Find(
+                "StartScene/Title Presentation/Under the Horizon Logo")
+                as RectTransform;
+            RectTransform footer = Canvas.Find(
+                "StartScene/Title Presentation/Title Footer")
+                as RectTransform;
+            TMP_Text version = footer.Find("Version")
+                .GetComponent<TMP_Text>();
+            TMP_Text copyright = footer.Find("Copyright")
+                .GetComponent<TMP_Text>();
+            AssertResponsiveLayout(menuRect);
+            AssertResponsiveLayout(logoRect);
+            AssertResponsiveLayout(footer);
+            AssertInsideCanvas(menuRect);
+            AssertInsideCanvas(logoRect);
+            AssertInsideCanvas(footer);
+            Assert.That(version.alignment, Is.EqualTo(
+                TextAlignmentOptions.Right));
+            Assert.That(copyright.alignment, Is.EqualTo(
+                TextAlignmentOptions.Right));
+            Assert.That(
+                version.transform.GetSiblingIndex(),
+                Is.LessThan(copyright.transform.GetSiblingIndex()));
+            Assert.That(Ui.ActivePanel, Is.EqualTo(UiPrimaryPanel.Start));
+            Assert.That(
+                Ui.ActiveSystemScreen,
+                Is.EqualTo(SystemScreenState.Title));
+            Assert.That(RequireObject("Status HUD").activeSelf, Is.False);
+            Assert.That(RequireObject("Ingame").activeSelf, Is.False);
+            AssertNoRuntimeErrors("타이틀 시스템 화면");
+        }
+
+        [UnityTest]
+        public IEnumerator Start_OpensExactlyThreeAuthoredSlotCards()
+        {
+            Button start = Canvas.Find(
+                    "StartScene/Title Presentation/Title Menu/시작하기")
+                .GetComponent<Button>();
+            yield return InvokeAndSettle(start);
+
+            GameObject selection =
+                RequireObject("StartScene/Save Slot Selection");
+            Button[] slots = selection
+                .GetComponentsInChildren<Button>(true)
+                .Where(button => button.name.StartsWith("Save Slot"))
+                .ToArray();
+
+            Assert.That(selection.activeInHierarchy, Is.True);
+            Assert.That(slots, Has.Length.EqualTo(3));
+            Assert.That(
+                Ui.ActiveSystemScreen,
+                Is.EqualTo(SystemScreenState.SaveSlots));
+            Assert.That(RequireObject("Status HUD").activeSelf, Is.False);
+            AssertNoRuntimeErrors("저장 슬롯 시스템 화면");
+        }
+
+        [UnityTest]
+        public IEnumerator SaveSlots_ShowChapterOnlyForOccupiedRecords()
+        {
+            yield return StartNewGameFromVisibleButton(false);
+            Assert.That(
+                State.SaveDialogueCheckpoint(
+                    "D4-01",
+                    0,
+                    false,
+                    string.Empty),
+                Is.True);
+
+            Ui.ShowStartScene();
+            yield return null;
+            Button start = RequireComponent<Button>(
+                "StartScene/Title Presentation/Title Menu/시작하기");
+            yield return InvokeAndSettle(start);
+
+            GameObject selection =
+                RequireObject("StartScene/Save Slot Selection");
+            Assert.That(
+                selection.transform.Find("Guide"),
+                Is.Null,
+                "저장 슬롯의 동작을 설명하는 하단 안내 문구는 표시하지 않습니다.");
+            Assert.That(
+                selection.GetComponentsInChildren<TMP_Text>(true),
+                Has.None.Matches<TMP_Text>(text =>
+                    text.text.Contains(
+                        "저장된 기록은 이어서, 빈 기록은 처음부터 시작합니다")),
+                "제거한 안내 문구가 다른 텍스트에 남아서는 안 됩니다.");
+
+            Assert.That(
+                RequireSaveSlotText(1, "SlotTitle").text,
+                Is.EqualTo("항해 기록 1"));
+            TMP_Text occupiedChapter = RequireSaveSlotText(1, "Chapter");
+            Assert.That(occupiedChapter.gameObject.activeSelf, Is.True);
+            Assert.That(occupiedChapter.text, Is.EqualTo("DAY 4"));
+            Assert.That(
+                RequireSaveSlotText(1, "Status").gameObject.activeSelf,
+                Is.False);
+            Assert.That(
+                RequireSaveSlotText(1, "Action").text,
+                Is.EqualTo("이어하기"));
+
+            Assert.That(
+                RequireSaveSlotText(2, "SlotTitle").text,
+                Is.EqualTo("항해 기록 2"));
+            TMP_Text emptyChapter = RequireSaveSlotText(2, "Chapter");
+            Assert.That(emptyChapter.gameObject.activeSelf, Is.False);
+            Assert.That(emptyChapter.text, Is.Empty);
+            TMP_Text emptyStatus = RequireSaveSlotText(2, "Status");
+            Assert.That(emptyStatus.gameObject.activeSelf, Is.True);
+            Assert.That(emptyStatus.text, Is.EqualTo("비어 있는 기록"));
+            Assert.That(
+                RequireSaveSlotText(2, "Action").text,
+                Is.EqualTo("새로하기"));
+            AssertNoRuntimeErrors("저장 슬롯 챕터 진행도");
+        }
+
+        [UnityTest]
+        public IEnumerator SaveSlotBackButton_ClearsTheCardFrameAndReturnsToTitle()
+        {
+            Button start = RequireComponent<Button>(
+                "StartScene/Title Presentation/Title Menu/시작하기");
+            yield return InvokeAndSettle(start);
+
+            RectTransform selection = RequireComponent<RectTransform>(
+                "StartScene/Save Slot Selection");
+            float revealDeadline = Time.realtimeSinceStartup + 8f;
+            while (selection.anchoredPosition.sqrMagnitude > 0.01f &&
+                   Time.realtimeSinceStartup < revealDeadline)
+            {
+                yield return null;
+            }
+            Assert.That(
+                selection.anchoredPosition.sqrMagnitude,
+                Is.LessThanOrEqualTo(0.01f),
+                "저장 슬롯 화면이 완전히 나타난 뒤 레이아웃을 검증해야 합니다.");
+
+            RectTransform frame = RequireComponent<RectTransform>(
+                "StartScene/Save Slot Selection/Slot Frame");
+            Button back = RequireComponent<Button>(
+                "StartScene/Save Slot Selection/닫기");
+            UnityEngine.Canvas.ForceUpdateCanvases();
+
+            Rect frameBounds = ScreenRect(frame);
+            RectTransform backRect = back.transform as RectTransform;
+            Rect backBounds = ScreenRect(backRect);
+            Assert.That(
+                frameBounds.Overlaps(backBounds),
+                Is.False,
+                "저장 슬롯 프레임과 돌아가기 버튼의 클릭 영역이 겹치면 안 됩니다.");
+            Assert.That(
+                frameBounds.yMin - backBounds.yMax,
+                Is.GreaterThanOrEqualTo(24f),
+                "저장 슬롯 프레임과 돌아가기 버튼 사이에는 최소 24px 간격이 필요합니다.");
+            AssertInsideSafeArea(backRect, "저장 슬롯 돌아가기 버튼");
+
+            yield return InvokeAndSettle(back);
+            Assert.That(
+                Ui.ActiveSystemScreen,
+                Is.EqualTo(SystemScreenState.Title));
+            Assert.That(
+                RequireObject("StartScene/Title Presentation")
+                    .activeInHierarchy,
+                Is.True);
+            AssertNoRuntimeErrors("저장 슬롯 돌아가기");
+        }
+
+        [UnityTest]
+        public IEnumerator OccupiedSlot_RequiresConfirmationBeforeDeletion()
+        {
+            yield return StartNewGameFromVisibleButton();
+            Ui.ShowStartScene();
+            yield return null;
+
+            Button start = Canvas.Find(
+                    "StartScene/Title Presentation/Title Menu/시작하기")
+                .GetComponent<Button>();
+            yield return InvokeAndSettle(start);
+
+            Button delete = RequireComponent<Button>(
+                "StartScene/Save Slot Selection/Slot Frame/" +
+                "Slot Card 1/Delete Slot 1");
+            Assert.That(delete.gameObject.activeInHierarchy, Is.True);
+            Assert.That(GameStateManager.HasSaveDataInSlot(1), Is.True);
+
+            yield return InvokeAndSettle(delete);
+            GameObject confirmation = RequireObject(
+                "StartScene/Save Slot Selection/Start Confirmation");
+            Assert.That(confirmation.activeInHierarchy, Is.True);
+            Assert.That(GameStateManager.HasSaveDataInSlot(1), Is.True);
+
+            Button confirm = RequireComponent<Button>(
+                "StartScene/Save Slot Selection/" +
+                "Start Confirmation/Confirm");
+            yield return InvokeAndSettle(confirm);
+
+            Assert.That(GameStateManager.HasSaveDataInSlot(1), Is.False);
+            Assert.That(confirmation.activeSelf, Is.False);
+            Assert.That(delete.gameObject.activeSelf, Is.False);
+            TMP_Text status = RequireSaveSlotText(1, "Status");
+            Assert.That(status.gameObject.activeSelf, Is.True);
+            Assert.That(status.text, Is.EqualTo("비어 있는 기록"));
+            Assert.That(
+                RequireSaveSlotText(1, "Chapter").gameObject.activeSelf,
+                Is.False);
+            Assert.That(
+                RequireSaveSlotText(1, "Action").text,
+                Is.EqualTo("새로하기"));
+            AssertNoRuntimeErrors("저장 슬롯 삭제 확인");
+        }
+
+        [UnityTest]
+        public IEnumerator Credits_BlocksUnderlyingInputAndReturnsToTitle()
+        {
+            Button credits = Canvas.Find(
+                    "StartScene/Title Presentation/Title Menu/크레딧")
+                .GetComponent<Button>();
+            yield return InvokeAndSettle(credits);
+
+            GameObject creditsScreen =
+                RequireObject("System Screen Flow/Credits");
+            CanvasGroup titleInput =
+                RequireObject("StartScene").GetComponent<CanvasGroup>();
+            Assert.That(creditsScreen.activeInHierarchy, Is.True);
+            Assert.That(
+                Ui.ActiveSystemScreen,
+                Is.EqualTo(SystemScreenState.Credits));
+            Assert.That(titleInput.interactable, Is.False);
+            Assert.That(titleInput.blocksRaycasts, Is.False);
+
+            Button back = RequireComponent<Button>(
+                "System Screen Flow/Credits/타이틀로");
+            yield return InvokeAndSettle(back);
+
+            Assert.That(creditsScreen.activeSelf, Is.False);
+            Assert.That(
+                Ui.ActiveSystemScreen,
+                Is.EqualTo(SystemScreenState.Title));
+            Assert.That(titleInput.interactable, Is.True);
+            Assert.That(titleInput.blocksRaycasts, Is.True);
+            AssertNoRuntimeErrors("크레딧 왕복");
+        }
+
+        [UnityTest]
+        public IEnumerator PauseAndConfirmation_OwnInputAndReturnToGameplay()
+        {
+            yield return StartNewGameFromVisibleButton();
+            Dialogue.CancelActiveDialogue();
+            yield return null;
+
+            Ui.OpenPause();
+            yield return WaitForUiTransition();
+
+            GameObject pause =
+                RequireObject("System Screen Flow/Pause");
+            CanvasGroup ingameInput =
+                RequireObject("Ingame").GetComponent<CanvasGroup>();
+            Assert.That(pause.activeInHierarchy, Is.True);
+            Assert.That(
+                Ui.ActiveSystemScreen,
+                Is.EqualTo(SystemScreenState.Pause));
+            Assert.That(ingameInput.interactable, Is.False);
+            Assert.That(
+                LocationLoader.Instance.IsAmbientMotionPaused,
+                Is.True);
+
+            Button resume =
+                RequireComponent<Button>(
+                    "System Screen Flow/Pause/Pause Menu/계속");
+            yield return InvokeAndSettle(resume);
+
+            Assert.That(pause.activeSelf, Is.False);
+            Assert.That(
+                Ui.ActiveSystemScreen,
+                Is.EqualTo(SystemScreenState.None));
+            Assert.That(ingameInput.interactable, Is.True);
+            Assert.That(
+                LocationLoader.Instance.IsAmbientMotionPaused,
+                Is.False);
+
+            bool confirmed = false;
+            Ui.RequestConfirmation(
+                "확인",
+                "현재 행동을 계속하시겠습니까?",
+                () => confirmed = true);
+            yield return WaitForUiTransition();
+
+            GameObject confirmation =
+                RequireObject("System Screen Flow/Confirmation");
+            Assert.That(confirmation.activeInHierarchy, Is.True);
+            Assert.That(ingameInput.interactable, Is.False);
+            Assert.That(
+                LocationLoader.Instance.IsAmbientMotionPaused,
+                Is.True);
+            Button confirm = RequireComponent<Button>(
+                "System Screen Flow/Confirmation/확인");
+            yield return InvokeAndSettle(confirm);
+
+            Assert.That(confirmed, Is.True);
+            Assert.That(confirmation.activeSelf, Is.False);
+            Assert.That(
+                Ui.ActiveSystemScreen,
+                Is.EqualTo(SystemScreenState.None));
+            Assert.That(ingameInput.interactable, Is.True);
+            Assert.That(
+                LocationLoader.Instance.IsAmbientMotionPaused,
+                Is.False);
+            AssertNoRuntimeErrors("일시정지와 확인 모달");
+        }
+
+        [UnityTest]
+        public IEnumerator Settings_AnimatesAndReturnsToTitle()
+        {
+            Ui.OpenSettings();
+            yield return WaitForUiTransition();
+
+            GameObject settings = RequireObject("Settings Popup");
+            CanvasGroup titleInput =
+                RequireObject("StartScene").GetComponent<CanvasGroup>();
+            Assert.That(settings.activeInHierarchy, Is.True);
+            Assert.That(
+                Ui.ActiveSystemScreen,
+                Is.EqualTo(SystemScreenState.Settings));
+            Assert.That(titleInput.interactable, Is.False);
+
+            Button close = RequireComponent<Button>(
+                "Settings Popup/Close");
+            yield return InvokeAndSettle(close);
+
+            Assert.That(settings.activeSelf, Is.False);
+            Assert.That(
+                Ui.ActiveSystemScreen,
+                Is.EqualTo(SystemScreenState.Title));
+            Assert.That(titleInput.interactable, Is.True);
+            AssertNoRuntimeErrors("설정 화면 왕복");
+        }
+
+        [UnityTest]
+        public IEnumerator IngameSettings_PausesAmbientMotionAndPreservesPauseReason()
+        {
+            yield return StartNewGameFromVisibleButton();
+            Dialogue.CancelActiveDialogue();
+            yield return null;
+
+            Ui.OpenSettings();
+            yield return WaitForUiTransition();
+            Assert.That(
+                LocationLoader.Instance.IsAmbientMotionPaused,
+                Is.True);
+
+            Button close = RequireComponent<Button>(
+                "Settings Popup/Close");
+            yield return InvokeAndSettle(close);
+            Assert.That(
+                LocationLoader.Instance.IsAmbientMotionPaused,
+                Is.False);
+
+            Ui.OpenPause();
+            yield return WaitForUiTransition();
+            Ui.OpenSettings();
+            yield return WaitForUiTransition();
+            yield return InvokeAndSettle(close);
+
+            Assert.That(
+                LocationLoader.Instance.IsAmbientMotionPaused,
+                Is.True,
+                "Closing settings must not clear the underlying pause reason.");
+
+            Button resume = RequireComponent<Button>(
+                "System Screen Flow/Pause/Pause Menu/계속");
+            yield return InvokeAndSettle(resume);
+            Assert.That(
+                LocationLoader.Instance.IsAmbientMotionPaused,
+                Is.False);
+            AssertNoRuntimeErrors("인게임 설정 모션 일시정지");
+        }
+
+        [UnityTest]
+        public IEnumerator DayBoundary_ShowsChapterTransitionBeforeNextScene()
+        {
+            yield return StartNewGameFromVisibleButton(false);
+            GameObject transition = RequireObject(
+                "System Screen Flow/ChapterTransition");
+            Button continueButton = RequireComponent<Button>(
+                "System Screen Flow/ChapterTransition/계속");
+
+            foreach (ProductionDayBoundary boundary in
+                     ProductionDayBoundaryCatalog.All)
+            {
+                Assert.That(
+                    ProductionSceneCatalog.TryGet(
+                        boundary.NextSceneId,
+                        out ProductionSceneDefinition next),
+                    Is.True);
+                Assert.That(
+                    ProductionChapterTransitionCatalog.TryGet(
+                        boundary.CompletedSceneId,
+                        out ChapterTransitionRequest chapter),
+                    Is.True);
+                InvestigationEventHub.Publish(
+                    InvestigationEventKind.SceneCompleted,
+                    boundary.CompletedSceneId,
+                    boundary.NextSceneId);
+                yield return WaitForUiTransition();
+
+                Assert.That(
+                    transition.activeInHierarchy,
+                    Is.True,
+                    boundary.CompletedSceneId);
+                Assert.That(
+                    Ui.ActiveSystemScreen,
+                    Is.EqualTo(SystemScreenState.ChapterTransition),
+                    boundary.CompletedSceneId);
+                Assert.That(
+                    RequireText(
+                        "System Screen Flow/ChapterTransition/" +
+                        "Chapter Context").text,
+                    Does.Contain($"DAY {next.Day}"));
+                Assert.That(
+                    RequireText(
+                        "System Screen Flow/ChapterTransition/" +
+                        "Chapter Title").text,
+                    Is.EqualTo($"{next.Day}일 차"));
+                Assert.That(
+                    RequireText(
+                        "System Screen Flow/ChapterTransition/" +
+                        "Chapter Summary").text,
+                    Is.Not.Empty);
+
+                Assert.That(continueButton.interactable, Is.False);
+                continueButton.onClick.Invoke();
+                yield return null;
+                Assert.That(transition.activeInHierarchy, Is.True);
+
+                yield return new WaitForSecondsRealtime(
+                    chapter.MinimumDisplayTime + .1f);
+                Assert.That(continueButton.interactable, Is.True);
+                continueButton.onClick.Invoke();
+                continueButton.onClick.Invoke();
+                yield return new WaitForSecondsRealtime(0.6f);
+                yield return WaitForUiTransition();
+
+                Assert.That(transition.activeSelf, Is.False);
+                Assert.That(
+                    Ui.ActiveSystemScreen,
+                    Is.Not.EqualTo(SystemScreenState.ChapterTransition));
+            }
+
+            AssertNoRuntimeErrors("DAY 경계 챕터 전환");
+        }
+
+        [UnityTest]
+        public IEnumerator BodyDiscovery_PlaysOnceAndReturnsToD106Background()
+        {
+            yield return StartNewGameFromVisibleButton(false);
+            BodyDiscoveryPresenter presenter =
+                Ui.GetComponent<BodyDiscoveryPresenter>();
+            Assert.That(presenter, Is.Not.Null);
+            Assert.That(
+                State.HasFlag(BodyDiscoveryPresenter.SeenFlag),
+                Is.False);
+
+            InvestigationEventHub.Publish(
+                InvestigationEventKind.SceneEntered,
+                BodyDiscoveryPresenter.SceneId,
+                "HORIZON");
+            yield return null;
+
+            GameObject cinematic =
+                RequireObject("Body Discovery Cinematic");
+            CanvasGroup ingameInput =
+                RequireObject("Ingame").GetComponent<CanvasGroup>();
+            Assert.That(presenter.IsPlaying, Is.True);
+            Assert.That(presenter.LoadedFrameCount, Is.EqualTo(4));
+            Assert.That(presenter.HasStingerClip, Is.True);
+            Assert.That(cinematic.activeInHierarchy, Is.True);
+            Assert.That(ingameInput.interactable, Is.False);
+            Assert.That(Dialogue.IsInputSuppressed, Is.True);
+
+            yield return new WaitForSecondsRealtime(7.9f);
+
+            Assert.That(presenter.IsPlaying, Is.False);
+            Assert.That(cinematic.activeSelf, Is.False);
+            Assert.That(
+                cinematic.transform.Find("Discovery Frame")
+                    .GetComponent<RawImage>().texture,
+                Is.Null,
+                "The final frame must reveal the original D1-06 background.");
+            Assert.That(
+                State.HasFlag(BodyDiscoveryPresenter.SeenFlag),
+                Is.True);
+            Assert.That(ingameInput.interactable, Is.True);
+            Assert.That(Dialogue.IsInputSuppressed, Is.False);
+
+            InvestigationEventHub.Publish(
+                InvestigationEventKind.SceneEntered,
+                BodyDiscoveryPresenter.SceneId,
+                "HORIZON");
+            yield return null;
+            Assert.That(presenter.IsPlaying, Is.False);
+            Assert.That(cinematic.activeSelf, Is.False);
+            AssertNoRuntimeErrors("D1-06 body discovery cinematic");
+        }
+
+        private void AssertResponsiveLayout(RectTransform rect)
+        {
+            Assert.That(rect, Is.Not.Null);
+            Assert.That(rect.anchorMin.x, Is.LessThan(rect.anchorMax.x));
+            Assert.That(rect.anchorMin.y, Is.LessThan(rect.anchorMax.y));
+            const float subPixelTolerance = 0.1f;
+            Assert.That(
+                rect.anchoredPosition.x,
+                Is.EqualTo(0f).Within(subPixelTolerance),
+                $"{rect.name} anchoredPosition.x");
+            Assert.That(
+                rect.anchoredPosition.y,
+                Is.EqualTo(0f).Within(subPixelTolerance),
+                $"{rect.name} anchoredPosition.y");
+            Assert.That(
+                rect.sizeDelta.x,
+                Is.EqualTo(0f).Within(subPixelTolerance),
+                $"{rect.name} sizeDelta.x");
+            Assert.That(
+                rect.sizeDelta.y,
+                Is.EqualTo(0f).Within(subPixelTolerance),
+                $"{rect.name} sizeDelta.y");
+        }
+
+        private void AssertInsideCanvas(RectTransform rect)
+        {
+            RectTransform canvasRect = Canvas as RectTransform;
+            Bounds bounds =
+                RectTransformUtility.CalculateRelativeRectTransformBounds(
+                    canvasRect,
+                    rect);
+            Rect visible = canvasRect.rect;
+            const float tolerance = 0.5f;
+
+            Assert.That(bounds.min.x, Is.GreaterThanOrEqualTo(
+                visible.xMin - tolerance));
+            Assert.That(bounds.max.x, Is.LessThanOrEqualTo(
+                visible.xMax + tolerance));
+            Assert.That(bounds.min.y, Is.GreaterThanOrEqualTo(
+                visible.yMin - tolerance));
+            Assert.That(bounds.max.y, Is.LessThanOrEqualTo(
+                visible.yMax + tolerance));
+        }
+
+        private static Rect ScreenRect(RectTransform rect)
+        {
+            var corners = new Vector3[4];
+            rect.GetWorldCorners(corners);
+            return Rect.MinMaxRect(
+                corners[0].x,
+                corners[0].y,
+                corners[2].x,
+                corners[2].y);
+        }
+    }
+}

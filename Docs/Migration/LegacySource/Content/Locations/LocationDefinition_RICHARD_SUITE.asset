@@ -1,0 +1,23 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2580e2253d06483f804af34405ef6f19, type: 3}
+  m_Name: LocationDefinition_RICHARD_SUITE
+  m_EditorClassIdentifier: Wake.Runtime::Wake.Exploration.LocationDefinition
+  locationCode: RICHARD_SUITE
+  displayName: 리처드 스위트룸
+  deck: 10
+  roomCode: D10-1
+  backgroundSprite: {fileID: 21300000, guid: b3d56a4ebad292f44aa96d62a543dba6, type: 3}
+  narrativeAliases:
+  - DECK10_SUITE
+  contentPrefab: {fileID: 0}
+  connectedLocations: []

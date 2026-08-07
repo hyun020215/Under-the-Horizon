@@ -1,0 +1,403 @@
+using System;
+using System.Security.Cryptography;
+using System.Text;
+using UnityEngine;
+namespace Wake.Core
+{
+    [Serializable]
+    internal sealed class GameStateSaveEnvelope
+    {
+        public string format;
+        public int schemaVersion;
+        public long generation;
+        public GameStateSaveData payload;
+        public string checksum;
+    }
+    internal readonly struct GameStateSaveLoadResult
+    {
+        public GameStateSaveLoadResult(
+            GameStateSaveData data,
+            long generation,
+            bool needsRewrite,
+            string warning)
+        {
+            Data = data;
+            Generation = generation;
+            NeedsRewrite = needsRewrite;
+            Warning = warning;
+        }
+
+        public GameStateSaveData Data { get; }
+        public long Generation { get; }
+        public bool NeedsRewrite { get; }
+        public string Warning { get; }
+    }
+
+    internal readonly struct GameStateSavePreview
+    {
+        public GameStateSavePreview(GameStateSaveData data, bool isLegacy)
+        {
+            Data = data;
+            IsLegacy = isLegacy;
+        }
+
+        public GameStateSaveData Data { get; }
+        public bool IsLegacy { get; }
+        public bool HasData => Data != null;
+    }
+
+    internal static class GameStateSaveStore
+    {
+        public const string PrimaryKey = "UNDER_THE_HORIZON_GAME_STATE_V2";
+        public const string BackupKey = PrimaryKey + "_BACKUP";
+        public const string PendingKey = PrimaryKey + "_PENDING";
+        public const string LegacyPrimaryKey = "THE_WAKE_GAME_STATE_V1";
+        public const string LegacyBackupKey = LegacyPrimaryKey + "_BACKUP";
+        public const string LegacyPendingKey = LegacyPrimaryKey + "_PENDING";
+        private const string Format = "UNDER_THE_HORIZON_GAME_STATE";
+        private const string LegacyFormat = "THE_WAKE_GAME_STATE";
+        private const int SchemaVersion = 2;
+        private static int activeSlot = 1;
+        public static int ActiveSlot => activeSlot;
+        private static string ActivePrimaryKey => PrimaryKeyForSlot(activeSlot);
+        private static string ActiveBackupKey => ActivePrimaryKey + "_BACKUP";
+        private static string ActivePendingKey => ActivePrimaryKey + "_PENDING";
+        private const string InterruptedWarning = "중단된 저장 작업을 복구했습니다.";
+        private const string BackupWarning =
+            "저장 데이터가 손상되어 백업본으로 복구했습니다.";
+        private const string CorruptWarning =
+            "저장 데이터를 읽을 수 없어 안전한 초기 상태로 시작합니다. " +
+            "새 게임을 시작하기 전까지 손상된 저장본은 유지됩니다.";
+        private static readonly string[] LegacyFields =
+        {
+            "day", "timeBlock", "publicAnxiety", "evidenceIntegrity",
+            "trust", "flags",
+            "collectedEvidenceIds", "completedProductionSceneIds",
+            "completedObjectiveIds", "puzzleSessions", "unlockedDeductionIds",
+            "unlockedProductionSceneIds", "runtimeCounters",
+            "finalEndingId", "currentLocationCode", "dialogueCheckpoint"
+        };
+        private enum SaveSource
+        {
+            Primary,
+            Pending,
+            Backup,
+            LegacyPrimary,
+            LegacyPending
+        }
+
+        private sealed class Candidate
+        {
+            public GameStateSaveData Data;
+            public long Generation;
+            public bool Legacy;
+            public string Raw;
+            public SaveSource Source;
+        }
+
+        public static void SelectSlot(int slot)
+        {
+            activeSlot = Mathf.Clamp(slot, 1, 3);
+        }
+
+        public static bool HasRecoverableData(int slot)
+        {
+            return SelectCandidate(
+                Mathf.Clamp(slot, 1, 3),
+                out _,
+                out _) != null;
+        }
+
+        public static bool HasRecoverableData() =>
+            SelectCandidate(activeSlot, out _, out _) != null;
+
+        public static GameStateSavePreview Preview(int slot)
+        {
+            Candidate candidate = SelectCandidate(
+                Mathf.Clamp(slot, 1, 3),
+                out _,
+                out _);
+            return candidate == null
+                ? default
+                : new GameStateSavePreview(candidate.Data, candidate.Legacy);
+        }
+
+        public static GameStateSaveLoadResult Load()
+        {
+            Candidate candidate =
+                SelectCandidate(
+                    activeSlot,
+                    out bool corruption,
+                    out bool pendingPresent);
+            if (candidate == null)
+            {
+                return new GameStateSaveLoadResult(
+                    null, 0, false, corruption ? CorruptWarning : string.Empty);
+            }
+
+            bool rewrite =
+                candidate.Legacy ||
+                candidate.Source != SaveSource.Primary ||
+                pendingPresent;
+            string warning = candidate.Source switch
+            {
+                SaveSource.Backup => BackupWarning,
+                SaveSource.Pending => InterruptedWarning,
+                SaveSource.LegacyPending => InterruptedWarning,
+                _ when pendingPresent => InterruptedWarning,
+                _ => string.Empty
+            };
+            return new GameStateSaveLoadResult(
+                candidate.Data, candidate.Generation, rewrite, warning);
+        }
+
+        public static long Save(GameStateSaveData data, long currentGeneration)
+        {
+            long generation = Math.Max(0, currentGeneration) + 1;
+            string pending = Serialize(data, generation);
+            Write(ActivePendingKey, pending);
+            Candidate primary = Read(ActivePrimaryKey, SaveSource.Primary);
+            if (primary != null)
+            {
+                Write(ActiveBackupKey, primary.Raw);
+            }
+            else if (!PlayerPrefs.HasKey(ActivePrimaryKey) && currentGeneration == 0)
+            {
+                PlayerPrefs.DeleteKey(ActiveBackupKey);
+                PlayerPrefs.Save();
+            }
+            Write(ActivePrimaryKey, pending);
+            PlayerPrefs.DeleteKey(ActivePendingKey);
+            if (activeSlot == 1)
+            {
+                ClearLegacySlots();
+            }
+            PlayerPrefs.Save();
+            return generation;
+        }
+
+        public static void ClearAll()
+        {
+            PlayerPrefs.DeleteKey(ActivePrimaryKey);
+            PlayerPrefs.DeleteKey(ActiveBackupKey);
+            PlayerPrefs.DeleteKey(ActivePendingKey);
+            if (activeSlot == 1)
+            {
+                ClearLegacySlots();
+            }
+            PlayerPrefs.Save();
+        }
+        private static Candidate SelectCandidate(
+            int slot,
+            out bool activeCorruption,
+            out bool pendingPresent)
+        {
+            string primaryKey = PrimaryKeyForSlot(slot);
+            string pendingKey = primaryKey + "_PENDING";
+            string backupKey = primaryKey + "_BACKUP";
+            bool primaryPresent = PlayerPrefs.HasKey(primaryKey);
+            pendingPresent = PlayerPrefs.HasKey(pendingKey);
+            bool backupPresent = PlayerPrefs.HasKey(backupKey);
+            Candidate primary = Read(primaryKey, SaveSource.Primary);
+            Candidate pending = Read(pendingKey, SaveSource.Pending);
+            bool backupEligible = primaryPresent || pending != null;
+            Candidate backup = backupEligible
+                ? Read(backupKey, SaveSource.Backup)
+                : null;
+            activeCorruption =
+                (primaryPresent && primary == null) ||
+                (pendingPresent && pending == null) ||
+                (backupEligible && backupPresent && backup == null);
+            Candidate current = Newer(Newer(primary, pending), backup);
+            if (current != null)
+            {
+                return current;
+            }
+
+            if (slot != 1)
+            {
+                return null;
+            }
+            Candidate legacyPrimary =
+                ReadLegacy(LegacyPrimaryKey, SaveSource.LegacyPrimary);
+            Candidate legacyPending =
+                ReadLegacy(LegacyPendingKey, SaveSource.LegacyPending);
+            return Newer(legacyPrimary, legacyPending);
+        }
+
+        private static string PrimaryKeyForSlot(int slot)
+        {
+            int normalizedSlot = Mathf.Clamp(slot, 1, 3);
+            return normalizedSlot == 1
+                ? PrimaryKey
+                : $"{PrimaryKey}_SLOT_{normalizedSlot}";
+        }
+
+        private static Candidate Newer(Candidate current, Candidate candidate)
+        {
+            return candidate != null &&
+                   (current == null || candidate.Generation > current.Generation)
+                ? candidate
+                : current;
+        }
+
+        private static Candidate Read(string key, SaveSource source)
+        {
+            if (!PlayerPrefs.HasKey(key))
+            {
+                return null;
+            }
+
+            string raw = PlayerPrefs.GetString(key);
+            try
+            {
+                if (LooksLikeEnvelope(raw))
+                {
+                    GameStateSaveEnvelope envelope =
+                        JsonUtility.FromJson<GameStateSaveEnvelope>(raw);
+                    if (envelope == null ||
+                        envelope.format != Format ||
+                        envelope.schemaVersion != SchemaVersion ||
+                        envelope.generation < 1 ||
+                        envelope.payload == null ||
+                        !string.Equals(
+                            envelope.checksum,
+                            ComputeChecksum(envelope),
+                            StringComparison.OrdinalIgnoreCase))
+                    {
+                        return null;
+                    }
+                    return new Candidate
+                    {
+                        Data = envelope.payload,
+                        Generation = envelope.generation,
+                        Raw = raw,
+                        Source = source
+                    };
+                }
+
+                if (!LooksLikeLegacy(raw))
+                {
+                    return null;
+                }
+                GameStateSaveData legacy =
+                    JsonUtility.FromJson<GameStateSaveData>(raw);
+                return legacy == null ? null : new Candidate
+                {
+                    Data = legacy,
+                    Legacy = true,
+                    Raw = raw,
+                    Source = source
+                };
+            }
+            catch (Exception)
+            {
+                return null;
+            }
+        }
+
+        private static Candidate ReadLegacy(string key, SaveSource source)
+        {
+            if (!PlayerPrefs.HasKey(key))
+            {
+                return null;
+            }
+
+            string raw = PlayerPrefs.GetString(key);
+            try
+            {
+                if (LooksLikeEnvelope(raw))
+                {
+                    GameStateSaveEnvelope envelope =
+                        JsonUtility.FromJson<GameStateSaveEnvelope>(raw);
+                    if (envelope == null ||
+                        envelope.format != LegacyFormat ||
+                        envelope.schemaVersion != SchemaVersion ||
+                        envelope.generation < 1 ||
+                        envelope.payload == null ||
+                        !string.Equals(
+                            envelope.checksum,
+                            ComputeChecksum(envelope),
+                            StringComparison.OrdinalIgnoreCase))
+                    {
+                        return null;
+                    }
+                    return new Candidate
+                    {
+                        Data = envelope.payload,
+                        Generation = envelope.generation,
+                        Legacy = true,
+                        Raw = raw,
+                        Source = source
+                    };
+                }
+                if (!LooksLikeLegacy(raw))
+                {
+                    return null;
+                }
+                GameStateSaveData data =
+                    JsonUtility.FromJson<GameStateSaveData>(raw);
+                return data == null ? null : new Candidate
+                {
+                    Data = data,
+                    Generation = 0,
+                    Legacy = true,
+                    Raw = raw,
+                    Source = source
+                };
+            }
+            catch (Exception)
+            {
+                return null;
+            }
+        }
+
+        private static string Serialize(GameStateSaveData data, long generation)
+        {
+            var envelope = new GameStateSaveEnvelope
+            {
+                format = Format,
+                schemaVersion = SchemaVersion,
+                generation = generation,
+                payload = data
+            };
+            envelope.checksum = ComputeChecksum(envelope);
+            return JsonUtility.ToJson(envelope);
+        }
+
+        private static string ComputeChecksum(GameStateSaveEnvelope envelope)
+        {
+            string material =
+                $"{envelope.format}\n{envelope.schemaVersion}\n" +
+                $"{envelope.generation}\n{JsonUtility.ToJson(envelope.payload)}";
+            using SHA256 sha256 = SHA256.Create();
+            byte[] hash = sha256.ComputeHash(Encoding.UTF8.GetBytes(material));
+            return BitConverter.ToString(hash).Replace("-", "").ToLowerInvariant();
+        }
+
+        private static void Write(string key, string value)
+        {
+            PlayerPrefs.SetString(key, value);
+            PlayerPrefs.Save();
+        }
+
+        private static void ClearLegacySlots()
+        {
+            PlayerPrefs.DeleteKey(LegacyPrimaryKey);
+            PlayerPrefs.DeleteKey(LegacyBackupKey);
+            PlayerPrefs.DeleteKey(LegacyPendingKey);
+        }
+
+        private static bool LooksLikeEnvelope(string raw) =>
+            raw?.Contains("\"format\"") == true ||
+            raw?.Contains("\"schemaVersion\"") == true ||
+            raw?.Contains("\"payload\"") == true ||
+            raw?.Contains("\"checksum\"") == true;
+
+        private static bool LooksLikeLegacy(string raw) =>
+            !string.IsNullOrWhiteSpace(raw) &&
+            Array.Exists(
+                LegacyFields,
+                field => raw.Contains($"\"{field}\""));
+    }
+}

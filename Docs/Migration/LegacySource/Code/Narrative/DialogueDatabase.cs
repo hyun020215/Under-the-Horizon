@@ -1,0 +1,91 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using UnityEngine;
+
+namespace Wake.Narrative
+{
+    public class DialogueDatabase : MonoBehaviour
+    {
+        public static DialogueDatabase Instance { get; private set; }
+
+        [SerializeField] private TextAsset csvFile;
+
+        private readonly Dictionary<string, DialogueLine> lines = new();
+        private readonly Dictionary<string, DialogueRecord> records = new();
+        private readonly Dictionary<string, DialogueRecord> recordsByLineId =
+            new(StringComparer.Ordinal);
+
+        public TextAsset SourceAsset => csvFile;
+        public string SourceAssetName =>
+            csvFile != null ? csvFile.name : string.Empty;
+        public int RecordCount => records.Count;
+        public int SceneCount => records.Values
+            .Select(record => record.SceneId)
+            .Distinct(StringComparer.Ordinal)
+            .Count();
+        public IReadOnlyDictionary<string, DialogueRecord> Records => records;
+        public IReadOnlyList<string> LoadErrors { get; private set; } = new List<string>();
+
+        private void Awake()
+        {
+            Instance = this;
+            if (csvFile != null)
+            {
+                LoadFromText(csvFile.text);
+            }
+            else
+            {
+                Debug.LogWarning("DialogueDatabase has no CSV assigned.");
+            }
+        }
+
+        public bool LoadFromText(string csv)
+        {
+            lines.Clear();
+            records.Clear();
+            recordsByLineId.Clear();
+
+            DialogueCsvParseResult result = DialogueCsvParser.Parse(csv);
+            LoadErrors = result.Errors;
+            foreach (DialogueRecord record in result.Records)
+            {
+                records[record.StableLineId] = record;
+                if (!string.IsNullOrWhiteSpace(record.LineId))
+                {
+                    recordsByLineId[record.LineId] = record;
+                    lines.TryAdd(record.LineId, record.ToLegacyLine());
+                }
+                lines[record.StableLineId] = record.ToLegacyLine();
+                if (!string.IsNullOrWhiteSpace(record.ChoiceId) &&
+                    !record.ChoiceId.Contains(" / "))
+                {
+                    lines.TryAdd(record.ChoiceId, record.ToLegacyLine());
+                }
+            }
+            return result.Success;
+        }
+
+        public bool TryGetLine(string lineId, out DialogueLine line)
+        {
+            return lines.TryGetValue(lineId, out line);
+        }
+
+        public bool TryGetRecord(string stableLineId, out DialogueRecord record)
+        {
+            return records.TryGetValue(stableLineId, out record) ||
+                   recordsByLineId.TryGetValue(stableLineId, out record);
+        }
+
+        public bool ContainsScene(string sceneId)
+        {
+            string normalized = sceneId?.Trim().ToUpperInvariant() ?? string.Empty;
+            return normalized.Length > 0 &&
+                   records.Values.Any(record =>
+                       string.Equals(
+                           record.SceneId,
+                           normalized,
+                           StringComparison.Ordinal));
+        }
+    }
+}

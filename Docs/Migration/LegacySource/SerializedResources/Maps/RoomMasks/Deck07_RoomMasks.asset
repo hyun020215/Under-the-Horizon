@@ -1,0 +1,73 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d364ddb6f43d1f946a8d01d18ea6b683, type: 3}
+  m_Name: Deck07_RoomMasks
+  m_EditorClassIdentifier: Wake.Runtime::Wake.UI.RoomMasksAsset
+  deck: 7
+  sourceMap: {fileID: 21300000, guid: d7f8db20880831a44b870dd38e343725, type: 3}
+  authoredSourceHash: ccc031b1592964df4217a9f2f4d86f07
+  masks:
+  - locationCode: BALLAST_CONTROL_ANNEX
+    polygon:
+    - {x: 0.79, y: 0.617}
+    - {x: 0.909, y: 0.617}
+    - {x: 0.913, y: 0.598}
+    - {x: 0.913, y: 0.49400002}
+    - {x: 0.79, y: 0.49400002}
+    correctiveArtworkRecommended: 1
+  - locationCode: CABIN_DANIEL
+    polygon:
+    - {x: 0.067, y: 0.663}
+    - {x: 0.226, y: 0.663}
+    - {x: 0.226, y: 0.45200002}
+    - {x: 0.066, y: 0.45200002}
+    - {x: 0.056, y: 0.48400003}
+    - {x: 0.053, y: 0.556}
+    - {x: 0.058, y: 0.622}
+    correctiveArtworkRecommended: 0
+  - locationCode: CREW_STAIRS
+    polygon:
+    - {x: 0.762, y: 0.45599997}
+    - {x: 0.806, y: 0.45599997}
+    - {x: 0.806, y: 0.30900002}
+    - {x: 0.762, y: 0.30900002}
+    correctiveArtworkRecommended: 1
+  - locationCode: ENGINE_CONTROL
+    polygon:
+    - {x: 0.714, y: 0.662}
+    - {x: 0.776, y: 0.662}
+    - {x: 0.776, y: 0.49}
+    - {x: 0.714, y: 0.49}
+    correctiveArtworkRecommended: 1
+  - locationCode: SERVICE7
+    polygon:
+    - {x: 0.103, y: 0.81299996}
+    - {x: 0.744, y: 0.81299996}
+    - {x: 0.752, y: 0.803}
+    - {x: 0.752, y: 0.7}
+    - {x: 0.095, y: 0.7}
+    - {x: 0.093, y: 0.73}
+    - {x: 0.096, y: 0.779}
+    correctiveArtworkRecommended: 0
+  - locationCode: SERVICE_RAIL
+    polygon:
+    - {x: 0.752, y: 0.81200004}
+    - {x: 0.779, y: 0.805}
+    - {x: 0.831, y: 0.779}
+    - {x: 0.879, y: 0.737}
+    - {x: 0.906, y: 0.694}
+    - {x: 0.915, y: 0.65900004}
+    - {x: 0.795, y: 0.65900004}
+    - {x: 0.786, y: 0.675}
+    - {x: 0.781, y: 0.694}
+    - {x: 0.752, y: 0.694}
+    correctiveArtworkRecommended: 1

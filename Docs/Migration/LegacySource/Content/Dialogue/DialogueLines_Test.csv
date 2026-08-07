@@ -1,0 +1,13 @@
+line_id,scene_id,speaker_id,text,emotion,voice_required
+crew_intro,TEST,CREW,"이 구역은 승객 출입 제한입니다. 무슨 일이시죠?",neutral,N
+adrian_reply1,TEST,ADRIAN,"다니엘 머서 건으로 몇 가지 확인하러 왔습니다.",neutral,N
+crew_branch_q,TEST,CREW,"뭐부터 여쭤보시겠습니까?",neutral,N
+opt_exits,TEST,,"비상구 쪽부터",neutral,N
+opt_log,TEST,,"출입 기록부터",neutral,N
+crew_exits,TEST,CREW,"세 군데 다 봉인 상태 그대로입니다. 저희도 확인했습니다.",neutral,N
+crew_log,TEST,CREW,"출입 기록엔 이상 없습니다. 22시 이후 아무도 안 들어왔어요.",neutral,N
+crew_end,TEST,ADRIAN,"일단 알겠습니다. 직접 봐도 되겠습니까?",neutral,N
+c02_line,TEST,ADRIAN,"문은 잠겨 있지 않았다. 하지만 억지로 연 흔적도 없다.",thinking,N
+c03_line,TEST,ADRIAN,"외벽 발판의 염분막이 그대로다. 최근에 밟은 흔적이 없어.",thinking,N
+c04_line,TEST,ADRIAN,"덕트 내부 먼지가 고르게 쌓여 있다. 통과한 사람은 없었다.",thinking,N
+c05_line,TEST,ADRIAN,"점검구 먼지도 마찬가지다. 여기로도 아무도 드나들지 않았다.",thinking,N

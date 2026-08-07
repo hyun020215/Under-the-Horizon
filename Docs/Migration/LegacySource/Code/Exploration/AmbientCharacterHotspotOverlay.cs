@@ -1,0 +1,1355 @@
+using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
+using System.Security.Cryptography;
+using System.Text;
+using TMPro;
+using UnityEngine;
+using UnityEngine.EventSystems;
+using UnityEngine.UI;
+using Wake.Narrative;
+using Wake.UI;
+
+namespace Wake.Exploration
+{
+    [DisallowMultipleComponent]
+    public sealed class AmbientCharacterHotspotOverlay : MonoBehaviour
+    {
+        private sealed class WorldCharacterView
+        {
+            public string Speaker;
+            public string InteractionId;
+            public bool IsMainCharacter;
+            public bool IsFocusParticipant;
+            public GameObject Target;
+            public RectTransform Rect;
+            public RawImage Image;
+            public Shadow SilhouetteShadow;
+            public Button Button;
+            public GameObject GroundShadowObject;
+            public GameObject ObjectiveMarker;
+            public GameObject NoticeIndicator;
+            public RectTransform GroundShadowRect;
+            public RawImage GroundShadowImage;
+            public AmbientWorldCharacterAsset Asset;
+            public Rect AtlasUvRect;
+            public Material BlendMaterial;
+            public Color BaseTint;
+            public UiCharacterIdleMotion IdleMotion;
+            public bool SemanticVisible = true;
+            public BackgroundSemanticPlacementAssignment
+                SemanticAssignment;
+        }
+
+        private static readonly Dictionary<string, Texture2D> TextureCache =
+            new();
+        private static Texture2D groundShadowTexture;
+        private static Shader ambientBlendShader;
+
+        private readonly List<WorldCharacterView> spawned = new();
+        private RectTransform contentRect;
+        private RectTransform viewportRect;
+        private Vector2 lastContentSize;
+        private string currentLocationCode = string.Empty;
+        private string currentSceneId = string.Empty;
+        private string currentVariantKey = string.Empty;
+        private Sprite currentBackgroundSprite;
+        private BackgroundSemanticRuntimeResolution
+            activeSemanticResolution;
+        private BackgroundSemanticPlacementResult
+            activeSemanticPlacement;
+        private bool activeSceneLayoutFingerprintMatched;
+        private DialogueController boundDialogue;
+        private bool dialoguePresentationVisible;
+        private bool modalPresentationSuppressed;
+        private bool interactionPending;
+        private bool motionSuppressed;
+
+        public bool IsModalPresentationSuppressed =>
+            modalPresentationSuppressed;
+        public bool IsMotionSuppressed => motionSuppressed;
+        public bool UsesApprovedSemanticPlacement =>
+            activeSemanticResolution != null;
+        public string ActiveSemanticProfileId =>
+            activeSemanticResolution?.Profile?.ProfileId ?? string.Empty;
+        public bool HasApprovedSceneLayout =>
+            activeSemanticResolution?.HasFixedSceneLayout == true;
+        public bool ActiveSceneLayoutFingerprintMatched =>
+            activeSceneLayoutFingerprintMatched;
+        public IReadOnlyList<string> SemanticPlacementDiagnostics =>
+            activeSemanticPlacement?.Diagnostics ??
+            System.Array.Empty<string>();
+
+        public void Initialize(RectTransform backgroundContentRect)
+        {
+            Initialize(backgroundContentRect, null);
+        }
+
+        public void Initialize(
+            RectTransform backgroundContentRect,
+            RectTransform backgroundViewportRect)
+        {
+            contentRect = backgroundContentRect;
+            viewportRect = backgroundViewportRect;
+            BindDialogue();
+        }
+
+        public void Show(
+            string locationCode,
+            string narrativeSceneId = null)
+        {
+            ShowInternal(
+                locationCode,
+                narrativeSceneId,
+                variantKey: string.Empty,
+                backgroundSprite: null);
+        }
+
+        public void Show(
+            string locationCode,
+            string narrativeSceneId,
+            LocationBackgroundSelection backgroundSelection)
+        {
+            ShowInternal(
+                locationCode,
+                narrativeSceneId,
+                backgroundSelection.VariantKey,
+                backgroundSelection.Sprite);
+        }
+
+        private void ShowInternal(
+            string locationCode,
+            string narrativeSceneId,
+            string variantKey,
+            Sprite backgroundSprite)
+        {
+            Clear();
+            if (contentRect == null)
+                return;
+
+            currentLocationCode =
+                locationCode?.Trim().ToUpperInvariant() ?? string.Empty;
+            currentSceneId = !string.IsNullOrWhiteSpace(narrativeSceneId)
+                ? narrativeSceneId.Trim().ToUpperInvariant()
+                : AmbientBarkCatalog.ResolveCurrentSceneId(
+                    Wake.Core.GameStateManager.Instance,
+                    DialogueController.Instance?.ActiveProductionSceneId);
+            currentVariantKey = variantKey?.Trim() ?? string.Empty;
+            currentBackgroundSprite = backgroundSprite;
+            bool hasScenePresence = ScenePresenceCatalog.TryGet(
+                currentSceneId,
+                out ScenePresenceRecord scene);
+            // The scene selects the current story-time placement snapshot.
+            // The room that is actually loaded selects which members of that
+            // snapshot may be rendered. Using FocusLocation here would borrow
+            // the objective cast into every room the player visits.
+            string presentationLocationCode = currentLocationCode;
+            IReadOnlyList<SceneWorldCharacter> characters =
+                hasScenePresence
+                    ? ScenePresencePresentationPolicy.SelectVisible(
+                        scene,
+                        presentationLocationCode,
+                        visibleLimit: 5)
+                    : System.Array.Empty<SceneWorldCharacter>();
+            bool suppressFlavorActor =
+                presentationLocationCode == "VIP_LOUNGE" &&
+                characters.Count >= 2;
+            int ambientLimit =
+                suppressFlavorActor || characters.Count >= 5 ? 0 : 1;
+            IReadOnlyList<AmbientBarkRecord> barks =
+                AmbientBarkCatalog.GetAvailable(
+                    presentationLocationCode,
+                    Wake.Core.GameStateManager.Instance,
+                    currentSceneId,
+                    maximum: ambientLimit);
+            for (int index = 0; index < barks.Count; index++)
+            {
+                CreateAmbientCharacter(barks[index]);
+            }
+
+            if (hasScenePresence)
+            {
+                int mainLimit = Mathf.Max(0, 5 - spawned.Count);
+                foreach (SceneWorldCharacter character in
+                         characters.Take(mainLimit))
+                    CreateMainCharacter(character);
+            }
+
+            ResolveApprovedSemanticProfile();
+            RefreshLayout();
+            ApplyDialogueVisibility();
+        }
+
+        private void CreateAmbientCharacter(AmbientBarkRecord bark)
+        {
+            string interactionId = CreateInteractionId(
+                "bark",
+                currentSceneId,
+                currentLocationCode,
+                bark.Id);
+            CreateWorldCharacter(
+                bark.Speaker,
+                bark.Id,
+                interactionId,
+                isMainCharacter: false,
+                isFocusParticipant: false,
+                onClick: () => StartAmbientCharacterDialogue(
+                    bark,
+                    interactionId));
+        }
+
+        private void CreateMainCharacter(SceneWorldCharacter character)
+        {
+            string interactionId = CreateInteractionId(
+                "world",
+                currentSceneId,
+                currentLocationCode,
+                character.CharacterId);
+            CreateWorldCharacter(
+                character.CharacterId,
+                currentSceneId,
+                interactionId,
+                isMainCharacter: true,
+                isFocusParticipant: character.IsFocusParticipant,
+                onClick: () => StartMainCharacterDialogue(character));
+        }
+
+        private void CreateWorldCharacter(
+            string speaker,
+            string instanceId,
+            string interactionId,
+            bool isMainCharacter,
+            bool isFocusParticipant,
+            UnityEngine.Events.UnityAction onClick)
+        {
+            if (!AmbientWorldCharacterCatalog.TryGetAsset(
+                    speaker,
+                    out AmbientWorldCharacterAsset asset))
+            {
+                return;
+            }
+
+            Texture2D texture = LoadTexture(asset.ResourcePath);
+            if (texture == null)
+                return;
+
+            GameObject groundShadow =
+                CreateGroundShadow(speaker, instanceId);
+            GameObject target = new(
+                $"AmbientCharacter_{speaker}",
+                typeof(RectTransform),
+                typeof(CanvasRenderer),
+                typeof(RawImage),
+                typeof(Shadow),
+                typeof(Button));
+            target.transform.SetParent(contentRect, false);
+            target.transform.SetAsLastSibling();
+
+            RawImage image = target.GetComponent<RawImage>();
+            image.texture = texture;
+            image.uvRect = asset.UvRect;
+            image.color = Color.white;
+            image.raycastTarget = true;
+            Material blendMaterial = CreateBlendMaterial(asset.UvRect);
+            if (blendMaterial != null)
+                image.material = blendMaterial;
+
+            Shadow shadow = target.GetComponent<Shadow>();
+            shadow.useGraphicAlpha = true;
+
+            Button button = target.GetComponent<Button>();
+            button.targetGraphic = image;
+            button.transition = Selectable.Transition.ColorTint;
+            target.AddComponent<AlphaContourRaycastFilter>()
+                .Configure(image, texture);
+            target.AddComponent<ExplorationHotspotFeedback>()
+                .Configure();
+            UiCharacterIdleMotion idleMotion =
+                target.AddComponent<UiCharacterIdleMotion>();
+            idleMotion.Configure(
+                CreateStableMotionSeed(
+                    currentLocationCode,
+                    speaker,
+                    instanceId),
+                image,
+                unscaledTime: true);
+
+            target.name += $"_{spawned.Count}_{instanceId}";
+            var view = new WorldCharacterView
+            {
+                Speaker = speaker,
+                InteractionId = interactionId,
+                IsMainCharacter = isMainCharacter,
+                IsFocusParticipant = isFocusParticipant,
+                Target = target,
+                Rect = target.GetComponent<RectTransform>(),
+                Image = image,
+                SilhouetteShadow = shadow,
+                Button = button,
+                GroundShadowObject = groundShadow,
+                GroundShadowRect =
+                    groundShadow.GetComponent<RectTransform>(),
+                GroundShadowImage = groundShadow.GetComponent<RawImage>(),
+                Asset = asset,
+                AtlasUvRect = asset.UvRect,
+                BlendMaterial = blendMaterial,
+                BaseTint = Color.white,
+                IdleMotion = idleMotion
+            };
+            view.ObjectiveMarker = CreateDialogueBubble(
+                target.transform,
+                isMainCharacter);
+            view.NoticeIndicator = CreateNoticeIndicator(target.transform);
+            button.onClick.AddListener(
+                () => BeginCharacterInteraction(view, onClick));
+            spawned.Add(view);
+        }
+
+        private void ResolveApprovedSemanticProfile()
+        {
+            activeSemanticResolution = null;
+            activeSemanticPlacement = null;
+            activeSceneLayoutFingerprintMatched = false;
+            if (currentBackgroundSprite == null ||
+                string.IsNullOrEmpty(currentVariantKey))
+            {
+                return;
+            }
+
+            string castFingerprint = ComputeRuntimeCastFingerprint();
+            if (ApprovedBackgroundSemanticResolver.TryResolve(
+                currentLocationCode,
+                currentVariantKey,
+                currentBackgroundSprite,
+                currentSceneId,
+                expectedSourceImageHash: string.Empty,
+                expectedCastFingerprint: castFingerprint,
+                out activeSemanticResolution))
+            {
+                activeSceneLayoutFingerprintMatched =
+                    activeSemanticResolution.HasFixedSceneLayout;
+                return;
+            }
+
+            // A story/cast change invalidates only the fixed arrangement.
+            // Continue to use this background's approved candidate slots so
+            // stale narrative data can never reactivate hard-coded positions.
+            ApprovedBackgroundSemanticResolver.TryResolve(
+                currentLocationCode,
+                currentVariantKey,
+                currentBackgroundSprite,
+                sceneId: string.Empty,
+                out activeSemanticResolution);
+        }
+
+        private string ComputeRuntimeCastFingerprint()
+        {
+            string payload = string.Join(
+                "|",
+                spawned
+                    .Where(view => view != null)
+                    .Select(view =>
+                        $"{view.Speaker}/" +
+                        $"{(view.IsMainCharacter ? "Main" : "ContextNpc")}/" +
+                        $"{view.IsFocusParticipant.ToString().ToLowerInvariant()}")
+                    .OrderBy(value =>
+                        value,
+                        System.StringComparer.Ordinal));
+            using SHA256 sha = SHA256.Create();
+            byte[] hash = sha.ComputeHash(
+                Encoding.UTF8.GetBytes(payload));
+            var result = new StringBuilder(hash.Length * 2);
+            foreach (byte value in hash)
+                result.Append(value.ToString("x2"));
+            return result.ToString();
+        }
+
+        private void RefreshApprovedSemanticPlacement()
+        {
+            if (activeSemanticResolution == null)
+            {
+                activeSemanticPlacement = null;
+                foreach (WorldCharacterView view in spawned)
+                {
+                    if (view == null)
+                        continue;
+
+                    view.SemanticVisible = true;
+                    view.SemanticAssignment = null;
+                }
+                return;
+            }
+
+            var requests =
+                new List<BackgroundSemanticCharacterRequest>(
+                    spawned.Count);
+            foreach (WorldCharacterView view in spawned)
+            {
+                if (view == null)
+                    continue;
+
+                requests.Add(
+                    new BackgroundSemanticCharacterRequest(
+                        view.Speaker,
+                        ResolveSemanticRole(view),
+                        view.Asset));
+                view.SemanticVisible = false;
+                view.SemanticAssignment = null;
+            }
+
+            activeSemanticPlacement =
+                BackgroundSemanticPlacementResolver.Resolve(
+                    activeSemanticResolution,
+                    requests,
+                    CalculateVisibleNormalizedRect(),
+                    CalculateBackgroundAspectRatio());
+
+            var assignedViews = new HashSet<WorldCharacterView>();
+            foreach (BackgroundSemanticPlacementAssignment assignment in
+                     activeSemanticPlacement.Assignments)
+            {
+                WorldCharacterView view = spawned.FirstOrDefault(candidate =>
+                    candidate != null &&
+                    !assignedViews.Contains(candidate) &&
+                    string.Equals(
+                        candidate.Speaker,
+                        assignment.Character.CharacterId,
+                        System.StringComparison.OrdinalIgnoreCase));
+                if (view == null)
+                    continue;
+
+                view.SemanticVisible = true;
+                view.SemanticAssignment = assignment;
+                assignedViews.Add(view);
+            }
+        }
+
+        private static BackgroundSemanticCharacterRole ResolveSemanticRole(
+            WorldCharacterView view)
+        {
+            if (view?.IsFocusParticipant == true)
+                return BackgroundSemanticCharacterRole.Focus;
+            return view?.IsMainCharacter == true
+                ? BackgroundSemanticCharacterRole.Main
+                : BackgroundSemanticCharacterRole.Context;
+        }
+
+        private Rect CalculateVisibleNormalizedRect()
+        {
+            if (contentRect == null || viewportRect == null)
+                return new Rect(0f, 0f, 1f, 1f);
+
+            Vector2 contentSize = contentRect.rect.size;
+            Vector2 viewportSize = viewportRect.rect.size;
+            if (contentSize.x <= 0f ||
+                contentSize.y <= 0f ||
+                viewportSize.x <= 0f ||
+                viewportSize.y <= 0f)
+            {
+                return new Rect(0f, 0f, 1f, 1f);
+            }
+
+            Vector2 offset = contentRect.anchoredPosition;
+            Vector2 pivot = contentRect.pivot;
+            float xMin =
+                (-viewportSize.x * .5f - offset.x) /
+                contentSize.x +
+                pivot.x;
+            float xMax =
+                (viewportSize.x * .5f - offset.x) /
+                contentSize.x +
+                pivot.x;
+            float yMin =
+                (-viewportSize.y * .5f - offset.y) /
+                contentSize.y +
+                pivot.y;
+            float yMax =
+                (viewportSize.y * .5f - offset.y) /
+                contentSize.y +
+                pivot.y;
+            return Rect.MinMaxRect(
+                Mathf.Clamp01(xMin),
+                Mathf.Clamp01(yMin),
+                Mathf.Clamp01(xMax),
+                Mathf.Clamp01(yMax));
+        }
+
+        private float CalculateBackgroundAspectRatio()
+        {
+            Sprite sprite =
+                activeSemanticResolution?.Binding?.SourceSprite ??
+                currentBackgroundSprite;
+            return sprite != null &&
+                   sprite.rect.height > Mathf.Epsilon
+                ? sprite.rect.width / sprite.rect.height
+                : 16f / 9f;
+        }
+
+        private void PrioritizeInteractionTargets()
+        {
+            // Characters required by the current story beat must receive the
+            // pointer when painted silhouettes overlap. Ambient characters
+            // remain behind optional main characters, and focus participants
+            // are always the topmost interactive silhouettes.
+            BringMatchingTargetsToFront(
+                view => !view.IsMainCharacter);
+            BringMatchingTargetsToFront(
+                view => view.IsMainCharacter && !view.IsFocusParticipant);
+            BringMatchingTargetsToFront(
+                view => view.IsFocusParticipant);
+        }
+
+        private void BringMatchingTargetsToFront(
+            System.Predicate<WorldCharacterView> predicate)
+        {
+            foreach (WorldCharacterView view in spawned)
+            {
+                if (view?.Target != null && predicate(view))
+                    view.Target.transform.SetAsLastSibling();
+            }
+        }
+
+        private GameObject CreateDialogueBubble(
+            Transform parent,
+            bool isEligibleCharacter)
+        {
+            if (!isEligibleCharacter)
+                return null;
+
+            GameObject marker = new(
+                "Dialogue Speech Bubble",
+                typeof(RectTransform),
+                typeof(Canvas),
+                typeof(CanvasRenderer),
+                typeof(Image));
+            marker.transform.SetParent(parent, false);
+            RectTransform markerRect = marker.GetComponent<RectTransform>();
+            markerRect.anchorMin = new Vector2(0.78f, 0.86f);
+            markerRect.anchorMax = new Vector2(0.78f, 0.86f);
+            markerRect.pivot = new Vector2(0.5f, 0.5f);
+            markerRect.sizeDelta = new Vector2(72f, 72f);
+            Canvas markerCanvas = marker.GetComponent<Canvas>();
+            markerCanvas.overrideSorting = true;
+            markerCanvas.sortingOrder = 50;
+            Image bubble = marker.GetComponent<Image>();
+            bubble.sprite = Resources.Load<Sprite>(
+                "UI/Icons/Prompts/ui_icon_dialogue_prompt");
+            bubble.raycastTarget = false;
+            bubble.preserveAspect = true;
+            marker.transform.SetAsLastSibling();
+            return marker;
+        }
+
+        private static GameObject CreateNoticeIndicator(Transform parent)
+        {
+            GameObject marker = new(
+                "Character Notice Indicator",
+                typeof(RectTransform),
+                typeof(Canvas),
+                typeof(CanvasRenderer),
+                typeof(TextMeshProUGUI));
+            marker.transform.SetParent(parent, false);
+            RectTransform rect = marker.GetComponent<RectTransform>();
+            rect.anchorMin = new Vector2(0.5f, 0.94f);
+            rect.anchorMax = rect.anchorMin;
+            rect.pivot = new Vector2(0.5f, 0f);
+            rect.sizeDelta = new Vector2(72f, 96f);
+            Canvas canvas = marker.GetComponent<Canvas>();
+            canvas.overrideSorting = true;
+            canvas.sortingOrder = 60;
+            TMP_Text text = marker.GetComponent<TMP_Text>();
+            text.text = "!";
+            text.fontSize = 72f;
+            text.fontStyle = FontStyles.Bold;
+            text.alignment = TextAlignmentOptions.Center;
+            text.color = UiVisualThemeService.Resolve(UiColorToken.Brass);
+            text.raycastTarget = false;
+            text.outlineWidth = 0.18f;
+            text.outlineColor = Color.white;
+            // TMP's outline alone only gives the white ring - a second,
+            // wider black ring behind it (via the underlay layer, dilated
+            // and with zero offset/softness so it renders as a crisp
+            // outline rather than a soft drop shadow) keeps the mark
+            // legible against light backgrounds too.
+            Material material = text.fontMaterial;
+            material.EnableKeyword(ShaderUtilities.Keyword_Underlay);
+            material.SetColor(ShaderUtilities.ID_UnderlayColor, Color.black);
+            material.SetFloat(ShaderUtilities.ID_UnderlayOffsetX, 0f);
+            material.SetFloat(ShaderUtilities.ID_UnderlayOffsetY, 0f);
+            material.SetFloat(ShaderUtilities.ID_UnderlayDilate, 1f);
+            material.SetFloat(ShaderUtilities.ID_UnderlaySoftness, 0f);
+            marker.SetActive(false);
+            return marker;
+        }
+
+        private void BeginCharacterInteraction(
+            WorldCharacterView view,
+            UnityEngine.Events.UnityAction onClick)
+        {
+            if (interactionPending ||
+                dialoguePresentationVisible ||
+                modalPresentationSuppressed ||
+                view?.Target == null)
+            {
+                return;
+            }
+
+            StartCoroutine(NoticeThenTalk(view, onClick));
+        }
+
+        private IEnumerator NoticeThenTalk(
+            WorldCharacterView view,
+            UnityEngine.Events.UnityAction onClick)
+        {
+            string interactionSceneId = currentSceneId;
+            string interactionLocationCode = currentLocationCode;
+            interactionPending = true;
+            foreach (WorldCharacterView item in spawned)
+            {
+                if (item?.Button != null)
+                    item.Button.interactable = false;
+            }
+
+            if (view.NoticeIndicator != null)
+            {
+                view.NoticeIndicator.SetActive(true);
+                RectTransform rect =
+                    view.NoticeIndicator.transform as RectTransform;
+                rect.localScale = Vector3.zero;
+                float elapsed = 0f;
+                const float duration = 0.34f;
+                while (elapsed < duration)
+                {
+                    elapsed += Time.unscaledDeltaTime;
+                    float t = Mathf.Clamp01(elapsed / duration);
+                    float scale = 1f + Mathf.Sin(t * Mathf.PI) * 0.22f;
+                    if (rect != null)
+                    {
+                        rect.localScale = Vector3.one *
+                            Mathf.Lerp(
+                                0f,
+                                scale,
+                                Mathf.SmoothStep(0f, 1f, t));
+                    }
+                    yield return null;
+                }
+                yield return new WaitForSecondsRealtime(0.14f);
+                if (view.NoticeIndicator != null)
+                    view.NoticeIndicator.SetActive(false);
+            }
+
+            bool contextUnchanged =
+                string.Equals(
+                    interactionSceneId,
+                    currentSceneId,
+                    System.StringComparison.Ordinal) &&
+                string.Equals(
+                    interactionLocationCode,
+                    currentLocationCode,
+                    System.StringComparison.Ordinal);
+            if (contextUnchanged && !modalPresentationSuppressed)
+            {
+                onClick?.Invoke();
+            }
+
+            interactionPending = false;
+            if (!dialoguePresentationVisible &&
+                !modalPresentationSuppressed)
+            {
+                foreach (WorldCharacterView item in spawned)
+                {
+                    if (item?.Button != null &&
+                        item.SemanticVisible)
+                        item.Button.interactable = true;
+                }
+            }
+        }
+
+        private void StartMainCharacterDialogue(
+            SceneWorldCharacter character)
+        {
+            DialogueController dialogue = DialogueController.Instance;
+            if (dialogue == null)
+            {
+                Debug.LogWarning(
+                    $"Character interaction ignored: dialogue controller missing " +
+                    $"for {currentSceneId}/{character.CharacterId}.");
+                return;
+            }
+
+            Wake.Core.GameStateManager state =
+                Wake.Core.GameStateManager.Instance;
+            if (character.IsFocusParticipant)
+            {
+                if (state?.HasCompletedScene(currentSceneId) == true)
+                {
+                    dialogue.StartAmbientLine(
+                        character.CharacterId,
+                        MainCharacterWorldLineCatalog.GetCompleted(
+                            character.CharacterId,
+                            character.State,
+                            state?.Day ?? 1),
+                        MainCharacterWorldLineCatalog.GetEmotion(
+                            character.State));
+                    return;
+                }
+
+                if (dialogue.TalkToWorldCharacter(
+                        currentSceneId,
+                        character.CharacterId))
+                {
+                    return;
+                }
+
+                dialogue.StartAmbientLine(
+                    character.CharacterId,
+                    MainCharacterWorldLineCatalog.GetCompleted(
+                        character.CharacterId,
+                        character.State,
+                        state?.Day ?? 1),
+                    MainCharacterWorldLineCatalog.GetEmotion(character.State));
+                return;
+            }
+
+            string interactionId = CreateInteractionId(
+                "world",
+                currentSceneId,
+                currentLocationCode,
+                character.CharacterId);
+            if (state?.HasCompletedNpcInteraction(interactionId) == true)
+            {
+                dialogue.StartAmbientLine(
+                    character.CharacterId,
+                    MainCharacterWorldLineCatalog.GetCompleted(
+                        character.CharacterId,
+                        character.State,
+                        state?.Day ?? 1),
+                    MainCharacterWorldLineCatalog.GetEmotion(character.State));
+                return;
+            }
+
+            if (dialogue.StartAmbientLine(
+                    character.CharacterId,
+                    MainCharacterWorldLineCatalog.Get(
+                        character.CharacterId,
+                        character.State,
+                        state?.Day ?? 1),
+                    MainCharacterWorldLineCatalog.GetEmotion(character.State)))
+            {
+                state?.RecordCompletedNpcInteraction(interactionId);
+                RefreshCompletionPresentation();
+            }
+        }
+
+        private void StartAmbientCharacterDialogue(
+            AmbientBarkRecord bark,
+            string interactionId)
+        {
+            DialogueController dialogue = DialogueController.Instance;
+            if (dialogue == null)
+                return;
+
+            Wake.Core.GameStateManager state =
+                Wake.Core.GameStateManager.Instance;
+            if (IsContextBarkProductionEntry(bark, state))
+            {
+                Wake.Core.ProductionDialogueCheckpoint checkpoint =
+                    state?.DialogueCheckpoint;
+                if (checkpoint != null &&
+                    string.Equals(
+                        checkpoint.activeSceneId,
+                        currentSceneId,
+                        System.StringComparison.OrdinalIgnoreCase) &&
+                    dialogue.RestoreProductionScene(checkpoint))
+                {
+                    return;
+                }
+
+                if (dialogue.CanStartProductionScene(currentSceneId) &&
+                    dialogue.StartProductionScene(currentSceneId))
+                {
+                    return;
+                }
+            }
+
+            bool completed =
+                state?.HasCompletedNpcInteraction(interactionId) == true;
+            string text = completed
+                ? "앞서 말씀드린 내용이 전부입니다."
+                : bark.Text;
+            if (dialogue.StartAmbientLine(
+                    bark.Speaker,
+                    text,
+                    completed ? "neutral" : bark.Emotion) &&
+                !completed)
+            {
+                state?.RecordCompletedNpcInteraction(interactionId);
+                RefreshCompletionPresentation();
+            }
+        }
+
+        private bool IsContextBarkProductionEntry(
+            AmbientBarkRecord bark,
+            Wake.Core.GameStateManager state)
+        {
+            if (bark == null ||
+                state?.HasCompletedScene(currentSceneId) == true ||
+                !ScenePresenceCatalog.TryGet(
+                    currentSceneId,
+                    out ScenePresenceRecord scene) ||
+                !SamePhysicalLocation(
+                    currentLocationCode,
+                    scene.FocusLocation) ||
+                !string.Equals(
+                    scene.ContextBarkId,
+                    bark.Id,
+                    System.StringComparison.OrdinalIgnoreCase))
+            {
+                return false;
+            }
+
+            return !ScenePresencePresentationPolicy
+                .SelectVisible(
+                    scene,
+                    scene.FocusLocation,
+                    visibleLimit: 5)
+                .Any(character => character.IsFocusParticipant);
+        }
+
+        private void LateUpdate()
+        {
+            BindDialogue();
+            if (contentRect != null &&
+                spawned.Count > 0 &&
+                contentRect.rect.size != lastContentSize)
+            {
+                RefreshLayout();
+            }
+            RefreshCompletionPresentation();
+        }
+
+        private void BindDialogue()
+        {
+            DialogueController dialogue = DialogueController.Instance;
+            if (boundDialogue == dialogue)
+                return;
+
+            if (boundDialogue != null)
+                boundDialogue.PresentationChanged -=
+                    HandleDialoguePresentationChanged;
+
+            boundDialogue = dialogue;
+            if (boundDialogue == null)
+                return;
+
+            boundDialogue.PresentationChanged +=
+                HandleDialoguePresentationChanged;
+            dialoguePresentationVisible =
+                boundDialogue.ActivePresentation.IsVisible;
+            ApplyDialogueVisibility();
+        }
+
+        private void HandleDialoguePresentationChanged(
+            DialoguePresentationSpec presentation)
+        {
+            dialoguePresentationVisible = presentation.IsVisible;
+            ApplyDialogueVisibility();
+        }
+
+        public void SetModalPresentationSuppressed(bool suppressed)
+        {
+            if (modalPresentationSuppressed == suppressed)
+                return;
+
+            modalPresentationSuppressed = suppressed;
+            ApplyDialogueVisibility();
+        }
+
+        public void SetMotionSuppressed(bool suppressed)
+        {
+            if (motionSuppressed == suppressed)
+                return;
+
+            motionSuppressed = suppressed;
+            foreach (WorldCharacterView view in spawned)
+            {
+                UiCharacterIdleMotion motion =
+                    view?.IdleMotion;
+                if (motion == null)
+                    continue;
+
+                if (motionSuppressed)
+                {
+                    motion.StopAndRestore();
+                }
+                else
+                {
+                    motion.enabled = true;
+                    motion.Rebase();
+                }
+            }
+        }
+
+        private void ApplyDialogueVisibility()
+        {
+            bool visible =
+                !dialoguePresentationVisible &&
+                !modalPresentationSuppressed;
+            foreach (WorldCharacterView view in spawned)
+            {
+                bool characterVisible =
+                    visible &&
+                    (view?.SemanticVisible ?? false);
+                view?.Target?.SetActive(characterVisible);
+                view?.GroundShadowObject?.SetActive(characterVisible);
+                if (!characterVisible || view?.Target == null)
+                    continue;
+
+                if (view.Button != null)
+                    view.Button.interactable = !interactionPending;
+                view.Target
+                    .GetComponent<ExplorationHotspotFeedback>()
+                    ?.ResetTransientState();
+                if (EventSystem.current != null &&
+                    EventSystem.current.currentSelectedGameObject ==
+                    view.Target)
+                {
+                    EventSystem.current.SetSelectedGameObject(null);
+                }
+            }
+        }
+
+        private void RefreshLayout()
+        {
+            if (contentRect == null)
+                return;
+
+            Vector2 contentSize = contentRect.rect.size;
+            if (contentSize.x <= 0f || contentSize.y <= 0f)
+                return;
+
+            RefreshApprovedSemanticPlacement();
+            for (int index = 0; index < spawned.Count; index++)
+            {
+                WorldCharacterView view = spawned[index];
+                if (view?.Target == null)
+                    continue;
+
+                ApplyStage(view, index, spawned.Count);
+            }
+
+            if (UsesApprovedSemanticPlacement)
+                ApplySemanticDepthOrder();
+            else
+                PrioritizeInteractionTargets();
+            lastContentSize = contentSize;
+            ApplyDialogueVisibility();
+        }
+
+        private void ApplyStage(
+            WorldCharacterView view,
+            int index,
+            int count)
+        {
+            AmbientWorldStageProfile stage;
+            if (activeSemanticResolution != null)
+            {
+                if (!view.SemanticVisible ||
+                    view.SemanticAssignment == null ||
+                    !BackgroundSemanticStageAdapter.TryCreate(
+                        activeSemanticResolution.Binding,
+                        view.SemanticAssignment.Slot,
+                        out stage))
+                {
+                    view.SemanticVisible = false;
+                    view.Target?.SetActive(false);
+                    view.GroundShadowObject?.SetActive(false);
+                    return;
+                }
+            }
+            else if (count == 1 &&
+                AmbientWorldStageCatalog.TryGet(
+                    currentLocationCode,
+                    view.Speaker,
+                    out stage))
+            {
+                // Preserve the hand-authored single-actor composition.
+            }
+            else
+            {
+                stage = AmbientWorldStageCatalog.GetLocationProfile(
+                    currentLocationCode,
+                    index,
+                    count,
+                    view.IsMainCharacter);
+            }
+
+            if (activeSemanticResolution == null &&
+                count == 1 &&
+                RuntimeUiLayoutRegistry.TryGetNormalizedRect(
+                    $"location.{currentLocationCode}.character.{view.Speaker}",
+                    out Rect placeholder))
+            {
+                stage = new AmbientWorldStageProfile(
+                    placeholder.center,
+                    placeholder.height,
+                    stage.Mirror,
+                    stage.LightTint,
+                    stage.ShadowDirection,
+                    stage.ShadowOpacity,
+                    stage.GroundShadowScale,
+                    stage.Saturation,
+                    stage.Exposure,
+                    stage.Contrast,
+                    stage.Softness);
+            }
+
+            Vector2 anchor = stage.Anchor;
+            view.Rect.anchorMin = anchor;
+            view.Rect.anchorMax = anchor;
+            view.Rect.pivot = new Vector2(0.5f, 0f);
+
+            Vector2 contentSize = contentRect.rect.size;
+            AmbientWorldLayoutMetrics geometry =
+                AmbientWorldGeometry.Calculate(
+                    contentSize,
+                    stage,
+                    view.Asset);
+            view.Rect.anchoredPosition = new Vector2(
+                0f,
+                geometry.AnchoredOffsetY);
+            view.Rect.sizeDelta = geometry.RectSize;
+
+            Rect uv = view.Image.uvRect;
+            float width = Mathf.Abs(uv.width);
+            float baseX = uv.width < 0f ? uv.x + uv.width : uv.x;
+            view.Image.uvRect = stage.Mirror
+                ? new Rect(baseX + width, uv.y, -width, uv.height)
+                : new Rect(baseX, uv.y, width, uv.height);
+            view.Image.color = stage.LightTint;
+            view.BaseTint = stage.LightTint;
+            view.Button.colors =
+                AmbientInteractionPresentation.CharacterSpriteColors(
+                    stage.LightTint);
+            ApplyBlendMaterial(view, stage);
+
+            view.SilhouetteShadow.effectColor =
+                new Color(0f, 0f, 0f, stage.ShadowOpacity);
+            view.SilhouetteShadow.effectDistance = new Vector2(
+                stage.ShadowDirection.x * contentSize.x,
+                stage.ShadowDirection.y * contentSize.y);
+
+            view.GroundShadowRect.anchorMin = anchor;
+            view.GroundShadowRect.anchorMax = anchor;
+            view.GroundShadowRect.pivot = new Vector2(0.5f, 0.5f);
+            view.GroundShadowRect.anchoredPosition = new Vector2(
+                stage.ShadowDirection.x * contentSize.x * 0.3f,
+                0f);
+            view.GroundShadowRect.sizeDelta =
+                geometry.GroundShadowSize;
+            view.GroundShadowImage.color =
+                new Color(0f, 0f, 0f, stage.ShadowOpacity * 0.72f);
+            view.IdleMotion?.Rebase();
+            if (motionSuppressed)
+                view.IdleMotion?.StopAndRestore();
+        }
+
+        private void ApplySemanticDepthOrder()
+        {
+            foreach (WorldCharacterView view in spawned
+                         .Where(candidate =>
+                             candidate?.SemanticAssignment == null)
+                         .OrderBy(candidate =>
+                             candidate?.Speaker,
+                             System.StringComparer.Ordinal))
+            {
+                view.GroundShadowObject?.transform.SetAsLastSibling();
+                view.Target?.transform.SetAsLastSibling();
+            }
+
+            foreach (WorldCharacterView view in spawned
+                         .Where(candidate =>
+                             candidate?.SemanticAssignment != null)
+                         .OrderBy(candidate =>
+                             candidate.SemanticAssignment.Slot.Depth01)
+                         .ThenBy(candidate =>
+                             candidate.Speaker,
+                             System.StringComparer.Ordinal))
+            {
+                view.GroundShadowObject?.transform.SetAsLastSibling();
+                view.Target?.transform.SetAsLastSibling();
+            }
+        }
+
+        private void RefreshCompletionPresentation()
+        {
+            Wake.Core.GameStateManager state =
+                Wake.Core.GameStateManager.Instance;
+            if (state == null)
+                return;
+
+            foreach (WorldCharacterView view in spawned)
+            {
+                if (view?.Image == null || view.Button == null)
+                    continue;
+
+                bool completed =
+                    (view.IsFocusParticipant &&
+                     state.HasCompletedScene(currentSceneId)) ||
+                    state.HasCompletedNpcInteraction(view.InteractionId) ||
+                    (view.IsFocusParticipant &&
+                     state.HasFlag(
+                         ProductionConditionEvaluator.ChoiceFlag(
+                             $"{currentSceneId}_{view.Speaker}")));
+                Color tint = completed
+                    ? Color.Lerp(
+                        view.BaseTint,
+                        new Color(
+                            0.58f,
+                            0.58f,
+                            0.58f,
+                            view.BaseTint.a),
+                        0.32f)
+                    : view.BaseTint;
+                if (view.IdleMotion != null)
+                    view.IdleMotion.SetAuthoredGraphicColor(tint);
+                else
+                    view.Image.color = tint;
+                view.Button.colors =
+                    AmbientInteractionPresentation.CharacterSpriteColors(tint);
+                view.ObjectiveMarker?.SetActive(
+                    view.IsMainCharacter &&
+                    view.SemanticVisible &&
+                    !completed &&
+                    !dialoguePresentationVisible &&
+                    !modalPresentationSuppressed);
+            }
+        }
+
+        private static string CreateInteractionId(
+            string kind,
+            string sceneId,
+            string locationCode,
+            string sourceId)
+        {
+            return string.Join(
+                ":",
+                "npc",
+                kind ?? string.Empty,
+                sceneId ?? string.Empty,
+                locationCode ?? string.Empty,
+                sourceId ?? string.Empty);
+        }
+
+        private static bool SamePhysicalLocation(
+            string left,
+            string right)
+        {
+            string normalizedLeft =
+                CanonicalLocationCatalog.FindSpec(left)?.Code ??
+                left?.Trim().ToUpperInvariant() ??
+                string.Empty;
+            string normalizedRight =
+                CanonicalLocationCatalog.FindSpec(right)?.Code ??
+                right?.Trim().ToUpperInvariant() ??
+                string.Empty;
+            return normalizedLeft.Length > 0 &&
+                   string.Equals(
+                       normalizedLeft,
+                       normalizedRight,
+                       System.StringComparison.Ordinal);
+        }
+
+        private static int CreateStableMotionSeed(
+            string locationCode,
+            string speaker,
+            string instanceId)
+        {
+            unchecked
+            {
+                uint hash = 2166136261u;
+                AddStableHash(ref hash, locationCode);
+                AddStableHash(ref hash, "|");
+                AddStableHash(ref hash, speaker);
+                AddStableHash(ref hash, "|");
+                AddStableHash(ref hash, instanceId);
+                return (int)(hash & 0x7FFFFFFF);
+            }
+        }
+
+        private static void AddStableHash(
+            ref uint hash,
+            string value)
+        {
+            if (string.IsNullOrEmpty(value))
+                return;
+
+            for (int index = 0; index < value.Length; index++)
+            {
+                hash ^= value[index];
+                hash *= 16777619u;
+            }
+        }
+
+        private static Material CreateBlendMaterial(Rect uvRect)
+        {
+            ambientBlendShader ??=
+                Resources.Load<Shader>(
+                    "Shaders/AmbientCharacterBlend");
+            if (ambientBlendShader == null)
+                return null;
+
+            var material = new Material(ambientBlendShader)
+            {
+                name = "Ambient Character Blend (Runtime)",
+                hideFlags = HideFlags.HideAndDontSave
+            };
+            material.SetVector(
+                "_UvRect",
+                new Vector4(
+                    uvRect.x,
+                    uvRect.y,
+                    Mathf.Abs(uvRect.width),
+                    Mathf.Abs(uvRect.height)));
+            return material;
+        }
+
+        private static void ApplyBlendMaterial(
+            WorldCharacterView view,
+            AmbientWorldStageProfile stage)
+        {
+            Material material = view.BlendMaterial;
+            if (material == null)
+                return;
+
+            material.SetFloat("_Saturation", stage.Saturation);
+            material.SetFloat("_Exposure", stage.Exposure);
+            material.SetFloat("_Contrast", stage.Contrast);
+            material.SetFloat("_Softness", stage.Softness);
+            Vector2 lightDirection =
+                -stage.ShadowDirection.normalized;
+            if (stage.Mirror)
+                lightDirection.x *= -1f;
+            material.SetVector(
+                "_LightDirection",
+                new Vector4(
+                    lightDirection.x,
+                    lightDirection.y,
+                    0f,
+                    0f));
+            material.SetVector(
+                "_UvRect",
+                new Vector4(
+                    view.AtlasUvRect.x,
+                    view.AtlasUvRect.y,
+                    Mathf.Abs(view.AtlasUvRect.width),
+                    Mathf.Abs(view.AtlasUvRect.height)));
+        }
+
+        private GameObject CreateGroundShadow(
+            string speaker,
+            string instanceId)
+        {
+            GameObject shadow = new(
+                $"AmbientGroundShadow_{speaker}_{instanceId}",
+                typeof(RectTransform),
+                typeof(CanvasRenderer),
+                typeof(RawImage));
+            shadow.transform.SetParent(contentRect, false);
+            RawImage image = shadow.GetComponent<RawImage>();
+            image.texture = GetGroundShadowTexture();
+            image.raycastTarget = false;
+            return shadow;
+        }
+
+        private static Texture2D LoadTexture(string resourcePath)
+        {
+            if (TextureCache.TryGetValue(
+                    resourcePath,
+                    out Texture2D cached))
+            {
+                return cached;
+            }
+
+            Texture2D texture = Resources.Load<Texture2D>(resourcePath);
+            TextureCache[resourcePath] = texture;
+            return texture;
+        }
+
+        private static Texture2D GetGroundShadowTexture()
+        {
+            if (groundShadowTexture != null)
+                return groundShadowTexture;
+
+            const int width = 96;
+            const int height = 32;
+            var texture = new Texture2D(
+                width,
+                height,
+                TextureFormat.RGBA32,
+                false)
+            {
+                name = "Ambient Ground Shadow",
+                wrapMode = TextureWrapMode.Clamp,
+                filterMode = FilterMode.Bilinear,
+                hideFlags = HideFlags.HideAndDontSave
+            };
+            var pixels = new Color32[width * height];
+            for (int y = 0; y < height; y++)
+            {
+                float ny = (y + 0.5f) / height * 2f - 1f;
+                for (int x = 0; x < width; x++)
+                {
+                    float nx = (x + 0.5f) / width * 2f - 1f;
+                    float distance = nx * nx + ny * ny;
+                    byte alpha = (byte)Mathf.RoundToInt(
+                        Mathf.Clamp01(1f - distance) *
+                        Mathf.Clamp01(1f - distance) *
+                        255f);
+                    pixels[y * width + x] =
+                        new Color32(255, 255, 255, alpha);
+                }
+            }
+            texture.SetPixels32(pixels);
+            texture.Apply(false, true);
+            groundShadowTexture = texture;
+            return groundShadowTexture;
+        }
+
+        private void Clear()
+        {
+            foreach (WorldCharacterView view in spawned)
+            {
+                if (view?.Target != null)
+                    DestroyOwnedObject(view.Target);
+                if (view?.GroundShadowObject != null)
+                    DestroyOwnedObject(view.GroundShadowObject);
+                if (view?.BlendMaterial != null)
+                    DestroyOwnedObject(view.BlendMaterial);
+            }
+            spawned.Clear();
+            activeSemanticResolution = null;
+            activeSemanticPlacement = null;
+            activeSceneLayoutFingerprintMatched = false;
+            currentVariantKey = string.Empty;
+            currentBackgroundSprite = null;
+        }
+
+        private static void DestroyOwnedObject(UnityEngine.Object target)
+        {
+            if (Application.isPlaying)
+                Destroy(target);
+            else
+                DestroyImmediate(target);
+        }
+
+        private void OnDestroy()
+        {
+            if (boundDialogue != null)
+            {
+                boundDialogue.PresentationChanged -=
+                    HandleDialoguePresentationChanged;
+            }
+        }
+    }
+}
