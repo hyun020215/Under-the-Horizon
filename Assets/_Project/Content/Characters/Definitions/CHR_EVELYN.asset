@@ -14,5 +14,5 @@ MonoBehaviour:
   m_EditorClassIdentifier: UTH.Runtime::CharacterDefinition
   id: CHR_EVELYN
   displayName: Evelyn
-  portrait: {fileID: -4673797868466636078, guid: 6e999a15fb0739142a16846855f72132, type: 3}
+  portrait: {fileID: -4673797868466636078, guid: 01db3445661495a45bc0594ea1891830, type: 3}
   visuals: []

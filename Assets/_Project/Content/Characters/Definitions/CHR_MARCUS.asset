@@ -14,5 +14,5 @@ MonoBehaviour:
   m_EditorClassIdentifier: UTH.Runtime::CharacterDefinition
   id: CHR_MARCUS
   displayName: Marcus
-  portrait: {fileID: 5936914205427983744, guid: 560abfa145e83df47b88f5f2550cb584, type: 3}
+  portrait: {fileID: -2059995979980007086, guid: 5ce8c9dbdc6bfe94db0392a5cfceb17a, type: 3}
   visuals: []

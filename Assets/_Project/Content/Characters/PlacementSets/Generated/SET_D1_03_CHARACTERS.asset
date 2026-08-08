@@ -14,33 +14,33 @@ MonoBehaviour:
   m_EditorClassIdentifier: UTH.Runtime::CharacterPlacementSet
   placements:
   - character: {fileID: 11400000, guid: deea118744593fa4883b9fc7691a6c13, type: 2}
-    normalizedX: 0.18
-    normalizedY: 0.96
-    scale: 0.72
+    normalizedX: 0.58
+    normalizedY: 0.04
+    scale: 0.78
     sortingOrder: 0
     pose: 0
     expression: 0
     clickable: 1
   - character: {fileID: 11400000, guid: 8582caea0d2b3204bad2ba188e71e46d, type: 2}
-    normalizedX: 0.39333335
-    normalizedY: 0.96
-    scale: 0.72
+    normalizedX: 0.6933333
+    normalizedY: 0.04
+    scale: 0.78
     sortingOrder: 1
     pose: 0
     expression: 0
     clickable: 1
   - character: {fileID: 11400000, guid: fdd5bfea0f994cb4f83fdab6046bacb3, type: 2}
-    normalizedX: 0.6066667
-    normalizedY: 0.96
-    scale: 0.72
+    normalizedX: 0.8066667
+    normalizedY: 0.04
+    scale: 0.78
     sortingOrder: 2
     pose: 0
     expression: 0
     clickable: 1
   - character: {fileID: 11400000, guid: 27fd81a8d6a20df42936ea19be2665f7, type: 2}
-    normalizedX: 0.82
-    normalizedY: 0.96
-    scale: 0.72
+    normalizedX: 0.91999996
+    normalizedY: 0.04
+    scale: 0.78
     sortingOrder: 3
     pose: 0
     expression: 0

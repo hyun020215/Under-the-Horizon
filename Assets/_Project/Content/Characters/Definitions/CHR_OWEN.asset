@@ -14,5 +14,5 @@ MonoBehaviour:
   m_EditorClassIdentifier: UTH.Runtime::CharacterDefinition
   id: CHR_OWEN
   displayName: Owen
-  portrait: {fileID: -8991383443734413113, guid: ce1012950040b3c40a51a29cbcfad1ec, type: 3}
+  portrait: {fileID: -8991383443734413113, guid: f66226e980d9fd446922f6f7852cb3f4, type: 3}
   visuals: []

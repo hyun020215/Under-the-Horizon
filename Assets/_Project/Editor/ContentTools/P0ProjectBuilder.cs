@@ -220,9 +220,9 @@ public static class P0ProjectBuilder
                 SerializedProperty item = items.GetArrayElementAtIndex(index);
                 item.FindPropertyRelative("character").objectReferenceValue = sceneCharacters[index];
                 item.FindPropertyRelative("normalizedX").floatValue =
-                    sceneCharacters.Length == 1 ? 0.5f : 0.18f + 0.64f * index / (sceneCharacters.Length - 1f);
-                item.FindPropertyRelative("normalizedY").floatValue = 0.96f;
-                item.FindPropertyRelative("scale").floatValue = 0.72f;
+                    sceneCharacters.Length == 1 ? 0.78f : 0.58f + 0.34f * index / (sceneCharacters.Length - 1f);
+                item.FindPropertyRelative("normalizedY").floatValue = 0.04f;
+                item.FindPropertyRelative("scale").floatValue = sceneCharacters.Length > 2 ? 0.78f : 0.94f;
                 item.FindPropertyRelative("sortingOrder").intValue = index;
                 item.FindPropertyRelative("clickable").boolValue = true;
             }
@@ -414,7 +414,13 @@ public static class P0ProjectBuilder
     private static GameObject CreateCharacterView(string name)
     {
         GameObject root = new(name, typeof(RectTransform), typeof(CanvasRenderer), typeof(Image), typeof(CharacterView));
-        SetObject(root.GetComponent<CharacterView>(), "image", root.GetComponent<Image>());
+        Image image = root.GetComponent<Image>();
+        image.preserveAspect = true;
+        image.raycastTarget = false;
+        RectTransform rect = root.GetComponent<RectTransform>();
+        rect.pivot = new Vector2(0.5f, 0f);
+        rect.sizeDelta = new Vector2(680f, 980f);
+        SetObject(root.GetComponent<CharacterView>(), "image", image);
         return root;
     }
 
@@ -436,29 +442,65 @@ public static class P0ProjectBuilder
     private static void BuildDialogueScreen(Transform root, DialogueScreen screen)
     {
         Font font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
-        Text scene = CreateText("SceneLabel", root, font, 24, TextAnchor.MiddleLeft);
-        SetRect(scene.rectTransform, new Vector2(0.06f, 0.89f), new Vector2(0.94f, 0.96f));
+        Image rootImage = root.GetComponent<Image>();
+        rootImage.sprite = null;
+        rootImage.color = Color.clear;
+        rootImage.raycastTarget = false;
 
-        Text speaker = CreateText("SpeakerLabel", root, font, 34, TextAnchor.MiddleLeft);
-        speaker.color = new Color(0.88f, 0.72f, 0.35f);
-        SetRect(speaker.rectTransform, new Vector2(0.08f, 0.31f), new Vector2(0.92f, 0.39f));
+        GameObject dimObject = new("Dialogue Focus Dim", typeof(RectTransform), typeof(CanvasRenderer), typeof(Image));
+        dimObject.transform.SetParent(root, false);
+        Image dim = dimObject.GetComponent<Image>();
+        dim.color = new Color(0.005f, 0.008f, 0.025f, 0.32f);
+        dim.raycastTarget = false;
+        SetRect(dimObject.GetComponent<RectTransform>(), Vector2.zero, Vector2.one);
 
-        Text body = CreateText("BodyLabel", root, font, 32, TextAnchor.UpperLeft);
+        GameObject panelObject = new("Dialogue Panel", typeof(RectTransform), typeof(CanvasRenderer), typeof(Image));
+        panelObject.transform.SetParent(root, false);
+        Image panel = panelObject.GetComponent<Image>();
+        panel.sprite = AssetDatabase.LoadAssetAtPath<Sprite>(ProjectRoot + "/Art/UI/Panels/UI_panel_dialogue.png");
+        panel.color = Color.white;
+        panel.type = Image.Type.Sliced;
+        SetRect(panelObject.GetComponent<RectTransform>(), new Vector2(0.06f, 0.18f), new Vector2(0.60f, 0.68f));
+
+        Text scene = CreateText("SceneLabel", panelObject.transform, font, 18, TextAnchor.MiddleLeft);
+        scene.color = new Color(0.79f, 0.60f, 0.29f, 0.78f);
+        SetRect(scene.rectTransform, new Vector2(0.07f, 0.84f), new Vector2(0.93f, 0.94f));
+
+        GameObject nameplateObject = new("Speaker Nameplate", typeof(RectTransform), typeof(CanvasRenderer), typeof(Image));
+        nameplateObject.transform.SetParent(root, false);
+        Image nameplate = nameplateObject.GetComponent<Image>();
+        nameplate.sprite = AssetDatabase.LoadAssetAtPath<Sprite>(ProjectRoot + "/Art/UI/Panels/UI_label_nameplate.png");
+        nameplate.type = Image.Type.Sliced;
+        SetRect(nameplateObject.GetComponent<RectTransform>(), new Vector2(0.06f, 0.69f), new Vector2(0.31f, 0.75f));
+        Text speaker = CreateText("SpeakerLabel", nameplateObject.transform, font, 28, TextAnchor.MiddleCenter);
+        speaker.color = new Color(0.95f, 0.79f, 0.46f);
+        SetRect(speaker.rectTransform, Vector2.zero, Vector2.one);
+
+        Text body = CreateText("BodyLabel", panelObject.transform, font, 30, TextAnchor.UpperLeft);
         body.horizontalOverflow = HorizontalWrapMode.Wrap;
         body.verticalOverflow = VerticalWrapMode.Overflow;
-        SetRect(body.rectTransform, new Vector2(0.08f, 0.11f), new Vector2(0.92f, 0.31f));
+        body.color = new Color(0.93f, 0.95f, 1f);
+        SetRect(body.rectTransform, new Vector2(0.07f, 0.18f), new Vector2(0.91f, 0.78f));
 
-        Button advance = CreateButton("AdvanceButton", root, font, "계속", out Text advanceText);
-        SetRect((RectTransform)advance.transform, new Vector2(0.78f, 0.03f), new Vector2(0.92f, 0.10f));
+        Button advance = CreateSpriteButton(
+            "AdvanceButton", root, font, string.Empty,
+            ProjectRoot + "/Art/UI/Dialogue/UI_btn_dialogue_advance_normal.png",
+            ProjectRoot + "/Art/UI/Dialogue/UI_btn_dialogue_advance_pressed.png",
+            out Text advanceText);
+        SetRect((RectTransform)advance.transform, new Vector2(0.54f, 0.20f), new Vector2(0.59f, 0.28f));
 
         Button[] choices = new Button[3];
         Text[] choiceLabels = new Text[3];
         for (var i = 0; i < choices.Length; i++)
         {
-            choices[i] = CreateButton($"Choice{i + 1}", root, font, string.Empty, out choiceLabels[i]);
+            choices[i] = CreateSpriteButton(
+                $"Choice{i + 1}", root, font, string.Empty,
+                ProjectRoot + "/Art/UI/Buttons/UI_btn_choice_normal.png",
+                ProjectRoot + "/Art/UI/Buttons/UI_btn_choice_pressed.png",
+                out choiceLabels[i]);
             choices[i].gameObject.AddComponent<DialogueChoiceBinding>();
-            var top = 0.29f - (i * 0.075f);
-            SetRect((RectTransform)choices[i].transform, new Vector2(0.16f, top - 0.06f), new Vector2(0.84f, top));
+            var top = 0.19f - (i * 0.052f);
+            SetRect((RectTransform)choices[i].transform, new Vector2(0.06f, top - 0.045f), new Vector2(0.58f, top));
             choices[i].gameObject.SetActive(false);
         }
 
@@ -474,17 +516,41 @@ public static class P0ProjectBuilder
     private static void BuildTitleScreen(Transform root, TitleScreen screen)
     {
         Font font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
-        Text title = CreateText("GameTitle", root, font, 68, TextAnchor.MiddleCenter);
-        title.text = "UNDER THE HORIZON";
-        title.color = new Color(0.88f, 0.72f, 0.35f);
-        SetRect(title.rectTransform, new Vector2(0.12f, 0.57f), new Vector2(0.88f, 0.75f));
+        Image background = root.GetComponent<Image>();
+        background.sprite = AssetDatabase.LoadAssetAtPath<Sprite>(ProjectRoot + "/Art/UI/Overhaul/UI_title_background.png");
+        background.color = Color.white;
+        background.type = Image.Type.Simple;
 
-        Text subtitle = CreateText("Subtitle", root, font, 26, TextAnchor.MiddleCenter);
-        subtitle.text = "수평선 아래의 진실";
-        SetRect(subtitle.rectTransform, new Vector2(0.2f, 0.49f), new Vector2(0.8f, 0.57f));
+        GameObject shadeObject = new("Left Readability Shade", typeof(RectTransform), typeof(CanvasRenderer), typeof(Image));
+        shadeObject.transform.SetParent(root, false);
+        Image shade = shadeObject.GetComponent<Image>();
+        shade.color = new Color(0.005f, 0.008f, 0.025f, 0.22f);
+        shade.raycastTarget = false;
+        SetRect(shadeObject.GetComponent<RectTransform>(), Vector2.zero, Vector2.one);
 
-        Button start = CreateButton("StartButton", root, font, "새 게임", out _);
-        SetRect((RectTransform)start.transform, new Vector2(0.39f, 0.28f), new Vector2(0.61f, 0.36f));
+        GameObject logoObject = new("Under the Horizon Logo", typeof(RectTransform), typeof(CanvasRenderer), typeof(Image));
+        logoObject.transform.SetParent(root, false);
+        Image logo = logoObject.GetComponent<Image>();
+        logo.sprite = AssetDatabase.LoadAssetAtPath<Sprite>(ProjectRoot + "/Art/UI/Overhaul/UI_logo_transparent.png");
+        logo.preserveAspect = true;
+        logo.raycastTarget = false;
+        SetRect(logoObject.GetComponent<RectTransform>(), new Vector2(0f, 0.10f), new Vector2(0.50f, 1f));
+
+        Button start = CreateSpriteButton(
+            "StartButton", root, font, "시작하기",
+            ProjectRoot + "/Art/UI/Buttons/UI_btn_primary_normal.png",
+            ProjectRoot + "/Art/UI/Buttons/UI_btn_primary_pressed.png", out _);
+        SetRect((RectTransform)start.transform, new Vector2(0.02f, 0.145f), new Vector2(0.26f, 0.20f));
+        string[] secondaryLabels = { "설정", "크레딧", "종료" };
+        for (var i = 0; i < secondaryLabels.Length; i++)
+        {
+            Button secondary = CreateSpriteButton(
+                secondaryLabels[i] + " Button", root, font, secondaryLabels[i],
+                ProjectRoot + "/Art/UI/Buttons/UI_btn_standard_normal.png",
+                ProjectRoot + "/Art/UI/Buttons/UI_btn_standard_pressed.png", out _);
+            float top = 0.14f - i * 0.055f;
+            SetRect((RectTransform)secondary.transform, new Vector2(0.02f, top - 0.05f), new Vector2(0.26f, top));
+        }
         SetObject(screen, "startButton", start);
     }
 
@@ -524,6 +590,24 @@ public static class P0ProjectBuilder
         text = CreateText("Label", gameObject.transform, font, 24, TextAnchor.MiddleCenter);
         text.text = label;
         SetRect(text.rectTransform, Vector2.zero, Vector2.one);
+        return button;
+    }
+
+    private static Button CreateSpriteButton(
+        string name, Transform parent, Font font, string label,
+        string normalPath, string pressedPath, out Text text)
+    {
+        Button button = CreateButton(name, parent, font, label, out text);
+        Image image = button.GetComponent<Image>();
+        Sprite normal = AssetDatabase.LoadAssetAtPath<Sprite>(normalPath);
+        Sprite pressed = AssetDatabase.LoadAssetAtPath<Sprite>(pressedPath);
+        image.sprite = normal;
+        image.type = Image.Type.Sliced;
+        image.color = Color.white;
+        SpriteState state = button.spriteState;
+        state.pressedSprite = pressed;
+        state.selectedSprite = pressed;
+        button.spriteState = state;
         return button;
     }
 
@@ -944,7 +1028,24 @@ public static class P0ProjectBuilder
             .Replace("chr_", string.Empty)
             .Replace("_f01", string.Empty)
             .Replace("_m01", string.Empty);
-        return FindSprite("CHR_" + alias);
+        Dictionary<string, string> worldNames = new()
+        {
+            ["adrian"] = "adrian_vale",
+            ["claire"] = "claire_hawthorne",
+            ["daniel"] = "daniel_mercer",
+            ["evelyn"] = "evelyn_shaw",
+            ["helena"] = "helena_ward",
+            ["marcus"] = "marcus_bell",
+            ["owen"] = "owen_price",
+            ["richard"] = "richard_hawthorne",
+            ["thomas"] = "thomas_reed",
+        };
+        string worldName = worldNames.TryGetValue(alias, out string canonicalName)
+            ? canonicalName
+            : alias;
+        string path = $"{ProjectRoot}/Art/Characters/World/CHR_{worldName}.png";
+        Sprite worldSprite = AssetDatabase.LoadAssetAtPath<Sprite>(path);
+        return worldSprite != null ? worldSprite : FindSprite("CHR_" + alias);
     }
 
     private static CharacterDefinition FindCharacter(string name)

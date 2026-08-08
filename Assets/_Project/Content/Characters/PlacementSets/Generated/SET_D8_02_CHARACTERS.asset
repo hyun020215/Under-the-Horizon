@@ -14,17 +14,17 @@ MonoBehaviour:
   m_EditorClassIdentifier: UTH.Runtime::CharacterPlacementSet
   placements:
   - character: {fileID: 11400000, guid: fdd5bfea0f994cb4f83fdab6046bacb3, type: 2}
-    normalizedX: 0.18
-    normalizedY: 0.96
-    scale: 0.72
+    normalizedX: 0.58
+    normalizedY: 0.04
+    scale: 0.94
     sortingOrder: 0
     pose: 0
     expression: 0
     clickable: 1
   - character: {fileID: 11400000, guid: deea118744593fa4883b9fc7691a6c13, type: 2}
-    normalizedX: 0.82
-    normalizedY: 0.96
-    scale: 0.72
+    normalizedX: 0.91999996
+    normalizedY: 0.04
+    scale: 0.94
     sortingOrder: 1
     pose: 0
     expression: 0

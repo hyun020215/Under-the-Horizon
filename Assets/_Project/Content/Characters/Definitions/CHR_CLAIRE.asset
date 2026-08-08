@@ -14,5 +14,5 @@ MonoBehaviour:
   m_EditorClassIdentifier: UTH.Runtime::CharacterDefinition
   id: CHR_CLAIRE
   displayName: Claire
-  portrait: {fileID: -5664718598019131373, guid: cf30023870b591c4a902a125dd27b549, type: 3}
+  portrait: {fileID: -5664718598019131373, guid: 85695da86e7b8f44b9ab22f54e6bfe34, type: 3}
   visuals: []

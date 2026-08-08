@@ -14,5 +14,5 @@ MonoBehaviour:
   m_EditorClassIdentifier: UTH.Runtime::CharacterDefinition
   id: CHR_DANIEL
   displayName: Daniel
-  portrait: {fileID: 4347158012611181025, guid: 12e0f22b63740f4449de0b75c7d64192, type: 3}
+  portrait: {fileID: 4347158012611181025, guid: 1847b1cc7733e014a89c8f1125dd7ca0, type: 3}
   visuals: []

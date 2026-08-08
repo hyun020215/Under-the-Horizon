@@ -14,9 +14,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: UTH.Runtime::CharacterPlacementSet
   placements:
   - character: {fileID: 11400000, guid: deea118744593fa4883b9fc7691a6c13, type: 2}
-    normalizedX: 0.5
-    normalizedY: 0.96
-    scale: 0.72
+    normalizedX: 0.78
+    normalizedY: 0.04
+    scale: 0.94
     sortingOrder: 0
     pose: 0
     expression: 0
