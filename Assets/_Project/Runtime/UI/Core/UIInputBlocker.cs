@@ -11,6 +11,5 @@ public sealed class UIInputBlocker : MonoBehaviour
             return;
         group.blocksRaycasts = blocked;
         group.interactable = blocked;
-        group.alpha = blocked ? 1 : 0;
     }
 }

@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using NUnit.Framework;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -64,6 +65,14 @@ public sealed class BootstrapTests
         PersistentHud hud = Object.FindFirstObjectByType<PersistentHud>();
         Assert.That(hud, Is.Not.Null);
         Assert.That(hud.gameObject.activeInHierarchy, Is.True);
+        Assert.That(
+            hud.GetComponentsInParent<CanvasGroup>().All(group => group.alpha > 0.99f),
+            Is.True
+        );
+        Assert.That(
+            dialogue.GetComponentsInParent<CanvasGroup>().All(group => group.alpha > 0.99f),
+            Is.True
+        );
         ExplorationScreen exploration = Object.FindFirstObjectByType<ExplorationScreen>(
             FindObjectsInactive.Include
         );
@@ -75,6 +84,13 @@ public sealed class BootstrapTests
         Assert.That(
             uiCanvas.GetComponent<CanvasScaler>().matchWidthOrHeight,
             Is.EqualTo(0.5f).Within(0.001f)
+        );
+        Assert.That(uiCanvas.GetComponent<CanvasGroup>(), Is.Null);
+        AspectRatioFitter backgroundAspect = GameObject.Find("BackgroundLayer")
+            .GetComponent<AspectRatioFitter>();
+        Assert.That(
+            backgroundAspect.aspectMode,
+            Is.EqualTo(AspectRatioFitter.AspectMode.FitInParent)
         );
         Assert.That(
             dialogue.transform.Find("Choice2").GetComponent<DialogueChoiceBinding>(),
@@ -118,7 +134,8 @@ public sealed class BootstrapTests
         };
         var hits = new List<RaycastResult>();
         EventSystem.current.RaycastAll(pointer, hits);
-        Assert.That(hits.Exists(hit => hit.gameObject == character.gameObject), Is.True);
+        Assert.That(hits.Count, Is.GreaterThan(0));
+        Assert.That(hits[0].gameObject, Is.EqualTo(character.gameObject));
         ExecuteEvents.Execute(
             character.gameObject,
             pointer,

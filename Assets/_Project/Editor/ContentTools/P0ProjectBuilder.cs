@@ -36,6 +36,7 @@ public static class P0ProjectBuilder
     public static void BuildAll()
     {
         ConfigureTexture(ThemePanelPath, true);
+        ConfigureRuntimeVisualQuality();
         CreatePlaceholderAssets();
 
         List<SceneRow> scenes = ReadSceneRows();
@@ -538,7 +539,7 @@ public static class P0ProjectBuilder
         artwork.color = Color.white;
         artwork.raycastTarget = false;
         AspectRatioFitter artworkAspect = artwork.gameObject.AddComponent<AspectRatioFitter>();
-        artworkAspect.aspectMode = AspectRatioFitter.AspectMode.EnvelopeParent;
+        artworkAspect.aspectMode = AspectRatioFitter.AspectMode.FitInParent;
         artworkAspect.aspectRatio = titleSprite.rect.width / titleSprite.rect.height;
         artwork.transform.SetAsFirstSibling();
 
@@ -724,19 +725,23 @@ public static class P0ProjectBuilder
         world.sortingOrder = 0;
         Image background = CreateLayer("BackgroundLayer", world.transform).gameObject.AddComponent<Image>();
         AspectRatioFitter backgroundAspect = background.gameObject.AddComponent<AspectRatioFitter>();
-        backgroundAspect.aspectMode = AspectRatioFitter.AspectMode.EnvelopeParent;
+        backgroundAspect.aspectMode = AspectRatioFitter.AspectMode.FitInParent;
         background.raycastTarget = false;
         RectTransform characterLayer = CreateLayer("CharacterLayer", world.transform);
         CreateLayer("HotspotLayer", world.transform);
 
         Canvas ui = CreateCanvas("UICanvas", root.transform);
         ui.sortingOrder = 100;
-        CanvasGroup uiGroup = ui.gameObject.AddComponent<CanvasGroup>();
-        UIInputBlocker blocker = ui.gameObject.AddComponent<UIInputBlocker>();
-        SetObject(blocker, "group", uiGroup);
         RectTransform screenHost = CreateLayer("ScreenHost", ui.transform);
         RectTransform transitionRoot = CreateLayer("TransitionOverlay", ui.transform);
+        Image transitionBlocker = transitionRoot.gameObject.AddComponent<Image>();
+        transitionBlocker.color = Color.clear;
         CanvasGroup transitionGroup = transitionRoot.gameObject.AddComponent<CanvasGroup>();
+        transitionGroup.alpha = 0f;
+        transitionGroup.interactable = false;
+        transitionGroup.blocksRaycasts = false;
+        UIInputBlocker blocker = transitionRoot.gameObject.AddComponent<UIInputBlocker>();
+        SetObject(blocker, "group", transitionGroup);
         FadeTransitionPlayer fade = transitionRoot.gameObject.AddComponent<FadeTransitionPlayer>();
         SetObject(fade, "overlay", transitionGroup);
 
@@ -745,6 +750,7 @@ public static class P0ProjectBuilder
         router.transform.SetParent(root.transform);
         SetArray(router, "screens", screens.Cast<UnityEngine.Object>().ToArray());
         BuildPersistentHud(ui.transform, router);
+        transitionRoot.SetAsLastSibling();
 
         CharacterView characterPrefab = AssetDatabase.LoadAssetAtPath<CharacterView>(PrefabRoot + "/Characters/PF_CharacterView.prefab");
         CharacterStage characterStage = new GameObject("CharacterStage").AddComponent<CharacterStage>();
@@ -995,6 +1001,33 @@ public static class P0ProjectBuilder
         importer.mipmapEnabled = false;
         importer.spriteBorder = sliced ? new Vector4(90, 90, 90, 90) : Vector4.zero;
         importer.SaveAndReimport();
+    }
+
+    private static void ConfigureRuntimeVisualQuality()
+    {
+        string[] folders =
+        {
+            ProjectRoot + "/Art/Backgrounds",
+            ProjectRoot + "/Art/Characters/World",
+            ProjectRoot + "/Art/UI/Overhaul",
+        };
+        foreach (string guid in AssetDatabase.FindAssets("t:Texture2D", folders))
+        {
+            string path = AssetDatabase.GUIDToAssetPath(guid);
+            if (AssetImporter.GetAtPath(path) is not TextureImporter importer)
+                continue;
+            bool dirty = importer.textureCompression != TextureImporterCompression.Uncompressed
+                || importer.maxTextureSize < 4096
+                || importer.mipmapEnabled;
+            if (!dirty)
+                continue;
+            importer.textureCompression = TextureImporterCompression.Uncompressed;
+            importer.crunchedCompression = false;
+            importer.maxTextureSize = 4096;
+            importer.mipmapEnabled = false;
+            importer.filterMode = FilterMode.Bilinear;
+            importer.SaveAndReimport();
+        }
     }
 
     private static void ReplaceAsset(string path, ScriptableObject asset)
