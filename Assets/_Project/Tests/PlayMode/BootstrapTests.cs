@@ -1,6 +1,7 @@
 using System.Collections;
 using NUnit.Framework;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.SceneManagement;
 using UnityEngine.TestTools;
 using UnityEngine.UI;
@@ -32,6 +33,14 @@ public sealed class BootstrapTests
         Assert.That(title.gameObject.activeInHierarchy, Is.True);
         Button start = title.transform.Find("StartButton").GetComponent<Button>();
         start.onClick.Invoke();
+        yield return null;
+
+        SaveSlotScreen slots = Object.FindFirstObjectByType<SaveSlotScreen>(
+            FindObjectsInactive.Include
+        );
+        Assert.That(slots, Is.Not.Null);
+        Assert.That(slots.gameObject.activeInHierarchy, Is.True);
+        slots.transform.Find("Slot3Button").GetComponent<Button>().onClick.Invoke();
         yield return null;
 
         NarrativeDirector narrative = Object.FindFirstObjectByType<NarrativeDirector>();
@@ -68,5 +77,27 @@ public sealed class BootstrapTests
         yield return null;
 
         Assert.That(narrative.History.Lines.Count, Is.EqualTo(2));
+
+        StorySceneDirector story = Object.FindFirstObjectByType<StorySceneDirector>();
+        int lineCount = story.Current.EntryDialogue.Lines.Length;
+        for (var index = 2; index < lineCount; index++)
+        {
+            advance.onClick.Invoke();
+            yield return null;
+        }
+        advance.onClick.Invoke();
+        yield return null;
+
+        int historyBeforeClick = narrative.History.Lines.Count;
+        CharacterView character = Object.FindFirstObjectByType<CharacterView>();
+        Assert.That(character, Is.Not.Null);
+        ExecuteEvents.Execute(
+            character.gameObject,
+            new PointerEventData(EventSystem.current),
+            ExecuteEvents.pointerClickHandler
+        );
+        yield return null;
+
+        Assert.That(narrative.History.Lines.Count, Is.GreaterThan(historyBeforeClick));
     }
 }

@@ -9,6 +9,10 @@ public sealed class CharacterStage : MonoBehaviour
 
     [SerializeField]
     private RectTransform root;
+
+    [SerializeField]
+    private InteractionDirector interactions;
+
     private readonly List<CharacterView> views = new();
 
     public Task ApplyAsync(CharacterPlacementSet set)
@@ -20,6 +24,7 @@ public sealed class CharacterStage : MonoBehaviour
             {
                 CharacterView view = Instantiate(prefab, root);
                 view.Apply(placement);
+                view.Clicked += OnCharacterClicked;
                 views.Add(view);
             }
         }
@@ -30,7 +35,25 @@ public sealed class CharacterStage : MonoBehaviour
     {
         foreach (CharacterView view in views)
             if (view != null)
+            {
+                view.Clicked -= OnCharacterClicked;
                 Destroy(view.gameObject);
+            }
         views.Clear();
+    }
+
+    private async void OnCharacterClicked(CharacterView view)
+    {
+        if (interactions == null)
+            return;
+
+        try
+        {
+            await interactions.ExecuteFirstAvailableAsync(InteractionType.Character);
+        }
+        catch (System.Exception exception)
+        {
+            Debug.LogException(exception, view);
+        }
     }
 }

@@ -16,6 +16,25 @@ public sealed class InteractionDirector : MonoBehaviour
 
     public void Apply(InteractionSet set) => Current = set;
 
+    public async Task<InteractionResult> ExecuteFirstAvailableAsync(InteractionType preferredType)
+    {
+        InteractionDefinition fallback = null;
+        if (Current?.Interactions != null)
+        {
+            foreach (InteractionDefinition definition in Current.Interactions)
+            {
+                if (definition == null || !definition.IsAvailable(state))
+                    continue;
+                if (definition.Type == preferredType)
+                    return await ExecuteAsync(definition);
+                fallback ??= definition;
+            }
+        }
+        return fallback != null
+            ? await ExecuteAsync(fallback)
+            : new InteractionResult(false, "Unavailable");
+    }
+
     public async Task<InteractionResult> ExecuteAsync(InteractionDefinition definition)
     {
         if (definition == null || !definition.IsAvailable(state) || definition.Action == null)

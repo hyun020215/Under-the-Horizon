@@ -15,6 +15,12 @@ public sealed class GameStartup : MonoBehaviour
     [SerializeField]
     private TitleScreen titleScreen;
 
+    [SerializeField]
+    private SaveSlotScreen saveSlotScreen;
+
+    [SerializeField]
+    private GameStateStore state;
+
     private async void Start()
     {
         if (flow == null)
@@ -28,12 +34,25 @@ public sealed class GameStartup : MonoBehaviour
                 await titleScreen.WaitForStartAsync();
             }
 
-            await flow.StartAsync(firstStorySceneId);
-            while (flow.CanAdvance)
-                await flow.AdvanceAsync();
+            string sceneId = firstStorySceneId;
+            if (screens != null && saveSlotScreen != null)
+            {
+                await screens.OpenAsync(ScreenId.SaveSlot);
+                SaveSlot slot = await saveSlotScreen.WaitForSelectionAsync();
+                var saves = new SaveService();
+                if (saves.Exists(slot))
+                {
+                    state?.Replace(saves.Load(slot));
+                    if (!string.IsNullOrWhiteSpace(state?.State.currentStorySceneId))
+                        sceneId = state.State.currentStorySceneId;
+                }
+                else
+                {
+                    state?.Replace(new GameState());
+                }
+            }
 
-            if (screens != null)
-                await screens.OpenAsync(ScreenId.Ending);
+            await flow.StartAsync(sceneId);
         }
         catch (Exception exception)
         {

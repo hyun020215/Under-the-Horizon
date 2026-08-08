@@ -433,6 +433,8 @@ public static class P0ProjectBuilder
             BuildDialogueScreen(root.transform, dialogue);
         else if (screen is TitleScreen title)
             BuildTitleScreen(root.transform, title);
+        else if (screen is SaveSlotScreen saveSlot)
+            BuildSaveSlotScreen(root.transform, saveSlot);
         else if (screen is EndingScreen)
             BuildEndingScreen(root.transform);
         root.SetActive(false);
@@ -564,6 +566,39 @@ public static class P0ProjectBuilder
         Text message = CreateText("EndingMessage", root, font, 28, TextAnchor.MiddleCenter);
         message.text = "현재 구현된 스토리를 모두 진행했습니다.";
         SetRect(message.rectTransform, new Vector2(0.15f, 0.38f), new Vector2(0.85f, 0.48f));
+    }
+
+    private static void BuildSaveSlotScreen(Transform root, SaveSlotScreen screen)
+    {
+        Font font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
+        Image background = root.GetComponent<Image>();
+        background.color = new Color(0.015f, 0.02f, 0.055f, 1f);
+
+        Text title = CreateText("Save Slot Title", root, font, 42, TextAnchor.MiddleCenter);
+        title.text = "저장 슬롯 선택";
+        title.color = new Color(0.88f, 0.72f, 0.35f);
+        SetRect(title.rectTransform, new Vector2(0.25f, 0.70f), new Vector2(0.75f, 0.82f));
+
+        var buttons = new Button[3];
+        for (var index = 0; index < buttons.Length; index++)
+        {
+            buttons[index] = CreateSpriteButton(
+                $"Slot{index + 1}Button",
+                root,
+                font,
+                $"슬롯 {index + 1}",
+                ProjectRoot + "/Art/UI/Buttons/UI_btn_standard_normal.png",
+                ProjectRoot + "/Art/UI/Buttons/UI_btn_standard_pressed.png",
+                out _
+            );
+            float top = 0.64f - index * 0.13f;
+            SetRect(
+                (RectTransform)buttons[index].transform,
+                new Vector2(0.34f, top - 0.09f),
+                new Vector2(0.66f, top)
+            );
+        }
+        SetArray(screen, "slotButtons", buttons.Cast<UnityEngine.Object>().ToArray());
     }
 
     private static Text CreateText(
@@ -718,6 +753,7 @@ public static class P0ProjectBuilder
         SetObject(interactions, "state", state);
         SetObject(interactions, "narrative", narrative);
         SetObject(interactions, "puzzles", puzzles);
+        SetObject(characterStage, "interactions", interactions);
 
         SequenceDirector sequences = new GameObject("SequenceDirector").AddComponent<SequenceDirector>();
         sequences.transform.SetParent(root.transform);
@@ -749,6 +785,8 @@ public static class P0ProjectBuilder
         SetObject(startup, "flow", flow);
         SetObject(startup, "screens", router);
         SetObject(startup, "titleScreen", screens.OfType<TitleScreen>().FirstOrDefault());
+        SetObject(startup, "saveSlotScreen", screens.OfType<SaveSlotScreen>().FirstOrDefault());
+        SetObject(startup, "state", state);
         new GameObject("EventSystem", typeof(EventSystem), typeof(InputSystemUIInputModule))
             .transform.SetParent(root.transform);
         EditorSceneManager.SaveScene(scene, ProjectRoot + "/Scenes/Game.unity");
