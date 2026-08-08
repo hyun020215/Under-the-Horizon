@@ -92,6 +92,16 @@ public sealed class BootstrapTests
             backgroundAspect.aspectMode,
             Is.EqualTo(AspectRatioFitter.AspectMode.FitInParent)
         );
+        AspectRatioFitter worldFrame = GameObject.Find("WorldFrame")
+            .GetComponent<AspectRatioFitter>();
+        AspectRatioFitter uiFrame = GameObject.Find("UIFrame")
+            .GetComponent<AspectRatioFitter>();
+        Assert.That(worldFrame.aspectRatio, Is.EqualTo(16f / 9f).Within(0.001f));
+        Assert.That(uiFrame.aspectRatio, Is.EqualTo(worldFrame.aspectRatio).Within(0.001f));
+        Assert.That(
+            Object.FindFirstObjectByType<PersistentHud>().transform.parent.name,
+            Is.EqualTo("UIFrame")
+        );
         Assert.That(
             dialogue.transform.Find("Choice2").GetComponent<DialogueChoiceBinding>(),
             Is.Not.Null
@@ -105,20 +115,54 @@ public sealed class BootstrapTests
         Assert.That(dialogue.gameObject.activeInHierarchy, Is.True);
 
         Button advance = dialogue.transform.Find("AdvanceButton").GetComponent<Button>();
-        advance.onClick.Invoke();
-        yield return null;
-
-        Assert.That(narrative.History.Lines.Count, Is.EqualTo(2));
-
         StorySceneDirector story = Object.FindFirstObjectByType<StorySceneDirector>();
         int lineCount = story.Current.EntryDialogue.Lines.Length;
-        for (var index = 2; index < lineCount; index++)
+        for (var index = 1; index < lineCount; index++)
         {
+            elapsed = 0f;
+            while (!dialogue.IsRevealing && elapsed < SceneLoadTimeoutSeconds)
+            {
+                elapsed += Time.unscaledDeltaTime;
+                yield return null;
+            }
             advance.onClick.Invoke();
+            yield return null;
+            advance.onClick.Invoke();
+            elapsed = 0f;
+            while (narrative.History.Lines.Count < index + 1
+                   && elapsed < SceneLoadTimeoutSeconds)
+            {
+                elapsed += Time.unscaledDeltaTime;
+                yield return null;
+            }
+            Assert.That(narrative.History.Lines.Count, Is.EqualTo(index + 1));
+        }
+        elapsed = 0f;
+        while (!dialogue.IsRevealing && elapsed < SceneLoadTimeoutSeconds)
+        {
+            elapsed += Time.unscaledDeltaTime;
             yield return null;
         }
         advance.onClick.Invoke();
         yield return null;
+        advance.onClick.Invoke();
+        elapsed = 0f;
+        while (router.Current != ScreenId.Exploration
+               && elapsed < SceneLoadTimeoutSeconds)
+        {
+            elapsed += Time.unscaledDeltaTime;
+            yield return null;
+        }
+        Assert.That(router.Current, Is.EqualTo(ScreenId.Exploration));
+        CanvasGroup transitionOverlay = GameObject.Find("TransitionOverlay")
+            .GetComponent<CanvasGroup>();
+        elapsed = 0f;
+        while (transitionOverlay.blocksRaycasts && elapsed < SceneLoadTimeoutSeconds)
+        {
+            elapsed += Time.unscaledDeltaTime;
+            yield return null;
+        }
+        Assert.That(transitionOverlay.blocksRaycasts, Is.False);
 
         int historyBeforeClick = narrative.History.Lines.Count;
         CharacterView character = Object.FindFirstObjectByType<CharacterView>();
@@ -141,7 +185,13 @@ public sealed class BootstrapTests
             pointer,
             ExecuteEvents.pointerClickHandler
         );
-        yield return null;
+        elapsed = 0f;
+        while (narrative.History.Lines.Count == historyBeforeClick
+               && elapsed < SceneLoadTimeoutSeconds)
+        {
+            elapsed += Time.unscaledDeltaTime;
+            yield return null;
+        }
 
         Assert.That(narrative.History.Lines.Count, Is.GreaterThan(historyBeforeClick));
     }

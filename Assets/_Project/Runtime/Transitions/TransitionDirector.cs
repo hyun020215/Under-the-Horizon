@@ -9,6 +9,9 @@ public sealed class TransitionDirector : MonoBehaviour
     [SerializeField]
     private UIInputBlocker blocker;
 
+    [SerializeField]
+    private SfxController sfx;
+
     public Task BeginAsync(TransitionProfile profile) => Play(profile, true);
 
     public Task EndAsync(TransitionProfile profile) => Play(profile, false);
@@ -20,7 +23,7 @@ public sealed class TransitionDirector : MonoBehaviour
         if (blocker != null && profile.blockInput)
             blocker.SetBlocked(true);
         if (profile.stinger != null)
-            AudioSource.PlayClipAtPoint(profile.stinger, Vector3.zero);
+            sfx?.Play(profile.stinger);
         if (players != null)
             foreach (var player in players)
                 if (player != null && player.Supports(profile.type))

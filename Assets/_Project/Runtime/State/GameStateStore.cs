@@ -20,6 +20,14 @@ public sealed class GameStateStore : MonoBehaviour
         Notify();
     }
 
+    public void SetStoryContext(string sceneId, int day, TimeBlock timeBlock)
+    {
+        state.currentStorySceneId = Normalize(sceneId);
+        state.day = day;
+        state.timeBlock = timeBlock;
+        Notify();
+    }
+
     public void SetCurrentLocation(string locationId)
     {
         state.currentLocationId = Normalize(locationId);

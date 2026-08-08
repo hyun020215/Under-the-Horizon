@@ -22,6 +22,15 @@ public sealed class ScreenRouter : MonoBehaviour
 
     public async Task OpenAsync(ScreenId id, ScreenContext context = default)
     {
+        await OpenAsync(id, context, null, null);
+    }
+
+    public async Task OpenAsync(
+        ScreenId id,
+        ScreenContext context,
+        TransitionDirector transitions,
+        TransitionProfile transition)
+    {
         if (!index.TryGetValue(id, out var next))
             throw new InvalidOperationException($"Screen {id} is not registered.");
 
@@ -31,11 +40,22 @@ public sealed class ScreenRouter : MonoBehaviour
             return;
         }
 
-        if (Current.HasValue && index.TryGetValue(Current.Value, out var current))
-            await current.CloseAsync();
-        await next.OpenAsync(context);
-        Current = id;
-        Opened?.Invoke(id);
+        bool playTransition = transitions != null && transition != null;
+        if (playTransition)
+            await transitions.BeginAsync(transition);
+        try
+        {
+            if (Current.HasValue && index.TryGetValue(Current.Value, out var current))
+                await current.CloseAsync();
+            await next.OpenAsync(context);
+            Current = id;
+            Opened?.Invoke(id);
+        }
+        finally
+        {
+            if (playTransition)
+                await transitions.EndAsync(transition);
+        }
     }
 
     public Task OpenAsync(ScreenMode mode, ScreenContext context = default) =>

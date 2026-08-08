@@ -41,6 +41,7 @@ public static class P0ProjectBuilder
 
         List<SceneRow> scenes = ReadSceneRows();
         BuildLocationDefaults(scenes);
+        BuildUiAudio();
         BuildDialogue(scenes);
         BuildSceneSupportAssets(scenes);
         PopulateEvidence();
@@ -149,6 +150,21 @@ public static class P0ProjectBuilder
             SetObject(location, "defaultAudio", audio);
             SetArray(location, "states", new UnityEngine.Object[] { state });
         }
+    }
+
+    private static void BuildUiAudio()
+    {
+        AudioCueProfile title = GetOrCreate<AudioCueProfile>(
+            ContentRoot + "/Audio/AUDIO_TITLE.asset"
+        );
+        title.music = FindAudio("Mystery");
+        title.musicVolume = 0.65f;
+        title.ambienceA = null;
+        title.ambienceB = null;
+        title.ambienceAVolume = 0f;
+        title.ambienceBVolume = 0f;
+        title.crossfadeDuration = 1.2f;
+        EditorUtility.SetDirty(title);
     }
 
     private static void BuildDialogue(IReadOnlyList<SceneRow> scenes)
@@ -376,6 +392,8 @@ public static class P0ProjectBuilder
     private static void BuildPrefabs()
     {
         Sprite panel = AssetDatabase.LoadAssetAtPath<Sprite>(ThemePanelPath);
+        EnsureScreenPrefab("PF_SettingsScreen", typeof(SettingsScreen), ScreenId.Settings, panel);
+        EnsureScreenPrefab("PF_CreditsScreen", typeof(CreditsScreen), ScreenId.Credits, panel);
         foreach (string absolutePath in Directory.GetFiles(Path.GetFullPath(PrefabRoot), "*.prefab", SearchOption.AllDirectories))
         {
             string path = ToAssetPath(absolutePath);
@@ -393,6 +411,17 @@ public static class P0ProjectBuilder
             else
                 SavePrefab(path, CreateVisualPrefab(name, panel));
         }
+    }
+
+    private static void EnsureScreenPrefab(
+        string name,
+        Type type,
+        ScreenId id,
+        Sprite panel)
+    {
+        string path = PrefabRoot + "/UI/" + name + ".prefab";
+        if (AssetDatabase.LoadAssetAtPath<GameObject>(path) == null)
+            SavePrefab(path, CreateScreen(name, type, id, panel));
     }
 
     private static GameObject CreateAppBootstrap(string name)
@@ -445,13 +474,77 @@ public static class P0ProjectBuilder
         }
         else if (screen is EndingScreen)
             BuildEndingScreen(root.transform);
+        else if (screen is SettingsScreen || screen is CreditsScreen)
+            BuildSecondaryScreen(root.transform, screen);
         root.SetActive(false);
         return root;
     }
 
+    private static void BuildSecondaryScreen(Transform root, ScreenBase screen)
+    {
+        Font font = LoadUiFont("Pretendard/FONT_Pretendard-SemiBold.ttf");
+        bool credits = screen is CreditsScreen;
+        Text title = CreateText("Title", root, font, 48, TextAnchor.MiddleCenter);
+        title.text = credits ? "크레딧" : "설정";
+        title.color = new Color(0.965f, 0.827f, 0.529f, 1f);
+        SetRect(title.rectTransform, new Vector2(0.2f, 0.73f), new Vector2(0.8f, 0.85f));
+        Text body = CreateText("Body", root, font, 28, TextAnchor.UpperCenter);
+        body.text = credits
+            ? "UNDER THE HORIZON\n기획 · 아트 · 개발 크레딧"
+            : string.Empty;
+        body.color = new Color(0.965f, 0.941f, 0.867f, 1f);
+        SetRect(body.rectTransform, new Vector2(0.2f, 0.35f), new Vector2(0.8f, 0.68f));
+        if (screen is SettingsScreen settings)
+        {
+            Slider master = CreateSettingsSlider(root, font, "전체 음량", 0.62f);
+            Slider music = CreateSettingsSlider(root, font, "배경 음악", 0.49f);
+            Slider sfx = CreateSettingsSlider(root, font, "효과음", 0.36f);
+            SetObject(settings, "masterSlider", master);
+            SetObject(settings, "musicSlider", music);
+            SetObject(settings, "sfxSlider", sfx);
+        }
+        Button back = CreateTitleButton("BackButton", root, font, "뒤로", false);
+        SetRect((RectTransform)back.transform, new Vector2(0.05f, 0.06f), new Vector2(0.20f, 0.12f));
+        SetObject(screen, "backButton", back);
+    }
+
+    private static Slider CreateSettingsSlider(
+        Transform root,
+        Font font,
+        string label,
+        float centerY)
+    {
+        Text caption = CreateText(label + " Label", root, font, 26, TextAnchor.MiddleLeft);
+        caption.text = label;
+        caption.color = new Color(0.965f, 0.941f, 0.867f, 1f);
+        SetRect(caption.rectTransform, new Vector2(0.28f, centerY - 0.025f), new Vector2(0.43f, centerY + 0.025f));
+        GameObject sliderObject = new(label + " Slider", typeof(RectTransform), typeof(Slider));
+        sliderObject.transform.SetParent(root, false);
+        SetRect(
+            (RectTransform)sliderObject.transform,
+            new Vector2(0.44f, centerY - 0.02f),
+            new Vector2(0.72f, centerY + 0.02f)
+        );
+        Image track = CreateLayer("Track", sliderObject.transform).gameObject.AddComponent<Image>();
+        track.color = new Color(0.055f, 0.094f, 0.133f, 1f);
+        Image fill = CreateLayer("Fill", track.transform).gameObject.AddComponent<Image>();
+        fill.color = new Color(0.718f, 0.522f, 0.212f, 1f);
+        RectTransform handle = CreateLayer("Handle", sliderObject.transform);
+        Image handleImage = handle.gameObject.AddComponent<Image>();
+        handleImage.color = new Color(0.965f, 0.827f, 0.529f, 1f);
+        handle.anchorMin = handle.anchorMax = new Vector2(1f, 0.5f);
+        handle.sizeDelta = new Vector2(24f, 44f);
+        Slider slider = sliderObject.GetComponent<Slider>();
+        slider.fillRect = fill.rectTransform;
+        slider.handleRect = handle;
+        slider.targetGraphic = handleImage;
+        slider.value = 1f;
+        return slider;
+    }
+
     private static void BuildDialogueScreen(Transform root, DialogueScreen screen)
     {
-        Font font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
+        Font font = LoadUiFont("Pretendard/FONT_Pretendard-Regular.ttf");
         Image rootImage = root.GetComponent<Image>();
         rootImage.sprite = null;
         rootImage.color = Color.clear;
@@ -483,13 +576,13 @@ public static class P0ProjectBuilder
         nameplate.type = Image.Type.Sliced;
         SetRect(nameplateObject.GetComponent<RectTransform>(), new Vector2(0.06f, 0.69f), new Vector2(0.31f, 0.75f));
         Text speaker = CreateText("SpeakerLabel", nameplateObject.transform, font, 28, TextAnchor.MiddleCenter);
-        speaker.color = new Color(0.95f, 0.79f, 0.46f);
+        speaker.color = new Color(0.025f, 0.043f, 0.071f);
         SetRect(speaker.rectTransform, Vector2.zero, Vector2.one);
 
         Text body = CreateText("BodyLabel", panelObject.transform, font, 30, TextAnchor.UpperLeft);
         body.horizontalOverflow = HorizontalWrapMode.Wrap;
         body.verticalOverflow = VerticalWrapMode.Overflow;
-        body.color = new Color(0.93f, 0.95f, 1f);
+        body.color = new Color(0.025f, 0.043f, 0.071f);
         SetRect(body.rectTransform, new Vector2(0.07f, 0.18f), new Vector2(0.91f, 0.78f));
 
         Button advance = CreateSpriteButton(
@@ -521,11 +614,13 @@ public static class P0ProjectBuilder
         SetObject(screen, "advanceLabel", advanceText);
         SetArray(screen, "choiceButtons", choices.Cast<UnityEngine.Object>().ToArray());
         SetArray(screen, "choiceLabels", choiceLabels.Cast<UnityEngine.Object>().ToArray());
+        SetObject(screen, "typewriterClip", FindAudio("Type_Writer"));
+        SetFloat(screen, "charactersPerSecond", 45f);
     }
 
     private static void BuildTitleScreen(Transform root, TitleScreen screen)
     {
-        Font font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
+        Font font = LoadUiFont("Pretendard/FONT_Pretendard-SemiBold.ttf");
         Image background = root.GetComponent<Image>();
         background.sprite = null;
         background.color = Color.clear;
@@ -558,27 +653,63 @@ public static class P0ProjectBuilder
         logo.raycastTarget = false;
         SetRect(logoObject.GetComponent<RectTransform>(), new Vector2(0f, 0.10f), new Vector2(0.50f, 1f));
 
-        Button start = CreateSpriteButton(
-            "StartButton", root, font, "시작하기",
-            ProjectRoot + "/Art/UI/Buttons/UI_btn_primary_normal.png",
-            ProjectRoot + "/Art/UI/Buttons/UI_btn_primary_pressed.png", out _);
+        Button start = CreateTitleButton("StartButton", root, font, "시작", true);
         SetRect((RectTransform)start.transform, new Vector2(0.02f, 0.145f), new Vector2(0.26f, 0.20f));
         string[] secondaryLabels = { "설정", "크레딧", "종료" };
+        Button[] secondaryButtons = new Button[secondaryLabels.Length];
         for (var i = 0; i < secondaryLabels.Length; i++)
         {
-            Button secondary = CreateSpriteButton(
-                secondaryLabels[i] + " Button", root, font, secondaryLabels[i],
-                ProjectRoot + "/Art/UI/Buttons/UI_btn_standard_normal.png",
-                ProjectRoot + "/Art/UI/Buttons/UI_btn_standard_pressed.png", out _);
+            Button secondary = CreateTitleButton(
+                secondaryLabels[i] + " Button",
+                root,
+                font,
+                secondaryLabels[i],
+                false
+            );
+            secondaryButtons[i] = secondary;
             float top = 0.14f - i * 0.055f;
-            SetRect((RectTransform)secondary.transform, new Vector2(0.02f, top - 0.05f), new Vector2(0.26f, top));
+            SetRect(
+                (RectTransform)secondary.transform,
+                new Vector2(0.02f, top - 0.05f),
+                new Vector2(0.26f, top)
+            );
         }
         SetObject(screen, "startButton", start);
+        SetObject(screen, "settingsButton", secondaryButtons[0]);
+        SetObject(screen, "creditsButton", secondaryButtons[1]);
+        SetObject(screen, "quitButton", secondaryButtons[2]);
+    }
+
+    private static Button CreateTitleButton(
+        string name,
+        Transform parent,
+        Font font,
+        string label,
+        bool primary)
+    {
+        Button button = CreateButton(name, parent, font, label, out Text text);
+        button.transition = Selectable.Transition.ColorTint;
+        Image background = button.GetComponent<Image>();
+        background.color = primary
+            ? new Color(0.19f, 0.10f, 0.015f, 0.96f)
+            : new Color(0.055f, 0.094f, 0.133f, 0.94f);
+        Outline outline = button.gameObject.AddComponent<Outline>();
+        outline.effectColor = new Color(0.718f, 0.522f, 0.212f, 1f);
+        outline.effectDistance = new Vector2(2f, -2f);
+        text.fontSize = 26;
+        text.color = new Color(0.965f, 0.941f, 0.867f, 1f);
+        ColorBlock colors = button.colors;
+        colors.normalColor = Color.white;
+        colors.highlightedColor = new Color(1.1f, 1.1f, 1.1f, 1f);
+        colors.pressedColor = new Color(0.94f, 0.94f, 0.94f, 1f);
+        colors.fadeDuration = 0.08f;
+        button.colors = colors;
+        return button;
     }
 
     private static void BuildEndingScreen(Transform root)
     {
-        Font font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
+        Font font = LoadUiFont("Pretendard/FONT_Pretendard-SemiBold.ttf");
         Text title = CreateText("EndingTitle", root, font, 54, TextAnchor.MiddleCenter);
         title.text = "UNDER THE HORIZON";
         title.color = new Color(0.88f, 0.72f, 0.35f);
@@ -590,7 +721,7 @@ public static class P0ProjectBuilder
 
     private static void BuildSaveSlotScreen(Transform root, SaveSlotScreen screen)
     {
-        Font font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
+        Font font = LoadUiFont("Pretendard/FONT_Pretendard-SemiBold.ttf");
         Image background = root.GetComponent<Image>();
         background.color = new Color(0.015f, 0.02f, 0.055f, 1f);
 
@@ -663,6 +794,7 @@ public static class P0ProjectBuilder
         state.pressedSprite = pressed;
         state.selectedSprite = pressed;
         button.spriteState = state;
+        text.color = new Color(0.025f, 0.043f, 0.071f);
         return button;
     }
 
@@ -723,16 +855,18 @@ public static class P0ProjectBuilder
 
         Canvas world = CreateCanvas("WorldCanvas", root.transform);
         world.sortingOrder = 0;
-        Image background = CreateLayer("BackgroundLayer", world.transform).gameObject.AddComponent<Image>();
+        RectTransform worldFrame = CreateSafeFrame("WorldFrame", world.transform);
+        Image background = CreateLayer("BackgroundLayer", worldFrame).gameObject.AddComponent<Image>();
         AspectRatioFitter backgroundAspect = background.gameObject.AddComponent<AspectRatioFitter>();
         backgroundAspect.aspectMode = AspectRatioFitter.AspectMode.FitInParent;
         background.raycastTarget = false;
-        RectTransform characterLayer = CreateLayer("CharacterLayer", world.transform);
-        CreateLayer("HotspotLayer", world.transform);
+        RectTransform characterLayer = CreateLayer("CharacterLayer", worldFrame);
+        CreateLayer("HotspotLayer", worldFrame);
 
         Canvas ui = CreateCanvas("UICanvas", root.transform);
         ui.sortingOrder = 100;
-        RectTransform screenHost = CreateLayer("ScreenHost", ui.transform);
+        RectTransform uiFrame = CreateSafeFrame("UIFrame", ui.transform);
+        RectTransform screenHost = CreateLayer("ScreenHost", uiFrame);
         RectTransform transitionRoot = CreateLayer("TransitionOverlay", ui.transform);
         Image transitionBlocker = transitionRoot.gameObject.AddComponent<Image>();
         transitionBlocker.color = Color.clear;
@@ -749,7 +883,12 @@ public static class P0ProjectBuilder
         ScreenRouter router = new GameObject("ScreenRouter").AddComponent<ScreenRouter>();
         router.transform.SetParent(root.transform);
         SetArray(router, "screens", screens.Cast<UnityEngine.Object>().ToArray());
-        BuildPersistentHud(ui.transform, router);
+        foreach (ScreenBase screen in screens)
+        {
+            if (screen is TitleScreen || screen is SettingsScreen || screen is CreditsScreen)
+                SetObject(screen, "screens", router);
+        }
+        BuildPersistentHud(uiFrame, router, state);
         transitionRoot.SetAsLastSibling();
 
         CharacterView characterPrefab = AssetDatabase.LoadAssetAtPath<CharacterView>(PrefabRoot + "/Characters/PF_CharacterView.prefab");
@@ -764,20 +903,36 @@ public static class P0ProjectBuilder
         SetObject(location, "backgroundAspect", backgroundAspect);
         SetObject(location, "state", state);
 
-        AudioDirector audio = CreateAudioDirector(root.transform, out VoiceController voice);
+        AudioDirector audio = CreateAudioDirector(
+            root.transform,
+            out VoiceController voice,
+            out SfxController sfx
+        );
         TransitionDirector transitions = new GameObject("TransitionDirector").AddComponent<TransitionDirector>();
         transitions.transform.SetParent(root.transform);
         SetArray(transitions, "players", new UnityEngine.Object[] { fade });
         SetObject(transitions, "blocker", blocker);
+        SetObject(transitions, "sfx", sfx);
+
+        UiFeedbackInstaller feedback = uiFrame.gameObject.AddComponent<UiFeedbackInstaller>();
+        SetObject(feedback, "sfx", sfx);
+        SetObject(feedback, "hoverClip", FindAudio("Whoop_-_a_short_2"));
+        SetObject(feedback, "clickClip", FindAudio("finger snap"));
 
         NarrativeDirector narrative = new GameObject("NarrativeDirector").AddComponent<NarrativeDirector>();
         narrative.transform.SetParent(root.transform);
         SetObject(narrative, "state", state);
         SetObject(narrative, "screens", router);
         SetObject(narrative, "voice", voice);
+        SetObject(narrative, "transitions", transitions);
+        SetObject(narrative, "dialogueOpenTransition", FindTransition("TRANS_DIALOGUE_OPEN"));
+        SetObject(narrative, "dialogueCloseTransition", FindTransition("TRANS_DIALOGUE_CLOSE"));
         DialogueScreen dialogueScreen = screens.OfType<DialogueScreen>().FirstOrDefault();
         if (dialogueScreen != null)
+        {
             SetObject(dialogueScreen, "narrative", narrative);
+            SetObject(dialogueScreen, "sfx", sfx);
+        }
 
         PuzzleDirector puzzles = CreatePuzzleDirector(root.transform, router);
         InteractionDirector interactions = new GameObject("InteractionDirector").AddComponent<InteractionDirector>();
@@ -819,12 +974,24 @@ public static class P0ProjectBuilder
         SetObject(startup, "titleScreen", screens.OfType<TitleScreen>().FirstOrDefault());
         SetObject(startup, "saveSlotScreen", screens.OfType<SaveSlotScreen>().FirstOrDefault());
         SetObject(startup, "state", state);
+        SetObject(startup, "audioDirector", audio);
+        SetObject(
+            startup,
+            "titleAudio",
+            AssetDatabase.LoadAssetAtPath<AudioCueProfile>(ContentRoot + "/Audio/AUDIO_TITLE.asset")
+        );
+        SettingsScreen settingsScreen = screens.OfType<SettingsScreen>().FirstOrDefault();
+        if (settingsScreen != null)
+            SetObject(settingsScreen, "audioDirector", audio);
         new GameObject("EventSystem", typeof(EventSystem), typeof(InputSystemUIInputModule))
             .transform.SetParent(root.transform);
         EditorSceneManager.SaveScene(scene, ProjectRoot + "/Scenes/Game.unity");
     }
 
-    private static AudioDirector CreateAudioDirector(Transform parent, out VoiceController voice)
+    private static AudioDirector CreateAudioDirector(
+        Transform parent,
+        out VoiceController voice,
+        out SfxController sfx)
     {
         GameObject root = new("AudioDirector");
         root.transform.SetParent(parent);
@@ -833,7 +1000,8 @@ public static class P0ProjectBuilder
         ambience.transform.SetParent(root.transform);
         SetObject(ambience, "sourceA", ambience.gameObject.AddComponent<AudioSource>());
         SetObject(ambience, "sourceB", ambience.gameObject.AddComponent<AudioSource>());
-        SfxController sfx = AddAudioController<SfxController>("SFX", root.transform, "source");
+        sfx = AddAudioController<SfxController>("SFX", root.transform, "source");
+        SetObject(sfx, "loopSource", sfx.gameObject.AddComponent<AudioSource>());
         voice = AddAudioController<VoiceController>("Voice", root.transform, "source");
         AudioDirector director = root.AddComponent<AudioDirector>();
         SetObject(director, "music", music);
@@ -904,40 +1072,127 @@ public static class P0ProjectBuilder
         return canvas;
     }
 
-    private static void BuildPersistentHud(Transform parent, ScreenRouter router)
+    private static void BuildPersistentHud(
+        Transform parent,
+        ScreenRouter router,
+        GameStateStore state)
     {
-        Font font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
+        Font font = LoadUiFont("Pretendard/FONT_Pretendard-SemiBold.ttf");
         GameObject root = new("PersistentHUD", typeof(RectTransform), typeof(PersistentHud));
         root.transform.SetParent(parent, false);
         SetRect((RectTransform)root.transform, Vector2.zero, Vector2.one);
 
-        Image topBar = CreateLayer("TopBar", root.transform).gameObject.AddComponent<Image>();
-        topBar.color = new Color(0.015f, 0.02f, 0.055f, 0.82f);
+        Image topBar = CreateLayer("StatusBar", root.transform).gameObject.AddComponent<Image>();
+        topBar.color = new Color(0.035f, 0.075f, 0.12f, 0.96f);
         topBar.raycastTarget = false;
-        SetRect(topBar.rectTransform, new Vector2(0f, 0.925f), Vector2.one);
+        SetRect(topBar.rectTransform, new Vector2(0f, 0.844f), Vector2.one);
 
-        Text title = CreateText("GameTitle", topBar.transform, font, 24, TextAnchor.MiddleLeft);
-        title.text = "UNDER THE HORIZON";
-        title.color = new Color(0.88f, 0.72f, 0.35f);
-        SetRect(title.rectTransform, new Vector2(0.025f, 0f), new Vector2(0.35f, 1f));
+        Text time = CreateHudLabel(
+            "Time", topBar.transform, font, 34, TextAnchor.MiddleCenter,
+            "1일 차  ·  오전", 0.01f, 0.25f
+        );
+        Text anxiety = CreateHudLabel(
+            "Anxiety", topBar.transform, font, 28, TextAnchor.UpperLeft,
+            "승객 불안  0/100", 0.26f, 0.62f
+        );
+        Image anxietyFill = CreateHudMeter(
+            "AnxietyMeter", topBar.transform, 0.26f, 0.62f,
+            new Color(0.455f, 0.169f, 0.169f, 1f)
+        );
+        Text integrity = CreateHudLabel(
+            "Integrity", topBar.transform, font, 28, TextAnchor.UpperLeft,
+            "현장 보존도  100/100", 0.63f, 0.99f
+        );
+        Image integrityFill = CreateHudMeter(
+            "IntegrityMeter", topBar.transform, 0.63f, 0.99f,
+            new Color(0.216f, 0.412f, 0.412f, 1f)
+        );
 
         Button map = CreateSpriteButton(
             "MapButton", root.transform, font, "지도",
             ProjectRoot + "/Art/UI/Buttons/UI_btn_standard_normal.png",
             ProjectRoot + "/Art/UI/Buttons/UI_btn_standard_pressed.png", out _);
-        SetRect((RectTransform)map.transform, new Vector2(0.74f, 0.935f), new Vector2(0.85f, 0.988f));
+        SetRect((RectTransform)map.transform, new Vector2(0.74f, 0.79f), new Vector2(0.85f, 0.84f));
 
         Button record = CreateSpriteButton(
             "RecordButton", root.transform, font, "수사 기록",
             ProjectRoot + "/Art/UI/Buttons/UI_btn_standard_normal.png",
             ProjectRoot + "/Art/UI/Buttons/UI_btn_standard_pressed.png", out _);
-        SetRect((RectTransform)record.transform, new Vector2(0.86f, 0.935f), new Vector2(0.98f, 0.988f));
+        SetRect((RectTransform)record.transform, new Vector2(0.86f, 0.79f), new Vector2(0.98f, 0.84f));
 
         PersistentHud hud = root.GetComponent<PersistentHud>();
         SetObject(hud, "screens", router);
+        SetObject(hud, "state", state);
         SetObject(hud, "mapButton", map);
         SetObject(hud, "recordButton", record);
+        SetObject(hud, "timeLabel", time);
+        SetObject(hud, "anxietyLabel", anxiety);
+        SetObject(hud, "integrityLabel", integrity);
+        SetObject(hud, "anxietyFill", anxietyFill);
+        SetObject(hud, "integrityFill", integrityFill);
     }
+
+    private static Text CreateHudLabel(
+        string name,
+        Transform parent,
+        Font font,
+        int size,
+        TextAnchor alignment,
+        string value,
+        float minX,
+        float maxX)
+    {
+        Image panel = CreateLayer(name + "Panel", parent).gameObject.AddComponent<Image>();
+        panel.color = new Color(0.075f, 0.13f, 0.18f, 0.96f);
+        panel.raycastTarget = false;
+        SetRect(panel.rectTransform, new Vector2(minX, 0.08f), new Vector2(maxX, 0.92f));
+        Text label = CreateText(name + "Label", panel.transform, font, size, alignment);
+        label.text = value;
+        label.color = new Color(0.91f, 0.87f, 0.76f, 1f);
+        SetRect(label.rectTransform, new Vector2(0.06f, 0.22f), new Vector2(0.94f, 0.92f));
+        return label;
+    }
+
+    private static Image CreateHudMeter(
+        string name,
+        Transform parent,
+        float minX,
+        float maxX,
+        Color color)
+    {
+        RectTransform panel = parent.Find(
+            name.StartsWith("Anxiety") ? "AnxietyPanel" : "IntegrityPanel"
+        ) as RectTransform;
+        GameObject trackObject = new(name + "Track", typeof(RectTransform), typeof(CanvasRenderer), typeof(Image));
+        trackObject.transform.SetParent(panel, false);
+        Image track = trackObject.GetComponent<Image>();
+        track.color = new Color(0.018f, 0.027f, 0.043f, 0.82f);
+        track.raycastTarget = false;
+        SetRect(track.rectTransform, new Vector2(0.06f, 0.12f), new Vector2(0.94f, 0.28f));
+        GameObject fillObject = new(name + "Fill", typeof(RectTransform), typeof(CanvasRenderer), typeof(Image));
+        fillObject.transform.SetParent(trackObject.transform, false);
+        Image fill = fillObject.GetComponent<Image>();
+        fill.color = color;
+        fill.type = Image.Type.Filled;
+        fill.fillMethod = Image.FillMethod.Horizontal;
+        fill.fillOrigin = 0;
+        fill.raycastTarget = false;
+        SetRect(fill.rectTransform, Vector2.zero, Vector2.one);
+        return fill;
+    }
+
+    private static RectTransform CreateSafeFrame(string name, Transform parent)
+    {
+        RectTransform frame = CreateLayer(name, parent);
+        AspectRatioFitter aspect = frame.gameObject.AddComponent<AspectRatioFitter>();
+        aspect.aspectMode = AspectRatioFitter.AspectMode.FitInParent;
+        aspect.aspectRatio = 16f / 9f;
+        return frame;
+    }
+
+    private static Font LoadUiFont(string relativePath) =>
+        AssetDatabase.LoadAssetAtPath<Font>(ProjectRoot + "/Art/UI/Fonts/" + relativePath)
+        ?? Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
 
     private static RectTransform CreateLayer(string name, Transform parent)
     {
@@ -967,6 +1222,8 @@ public static class P0ProjectBuilder
             ["PF_ReconstructionScreen"] = (typeof(ReconstructionScreen), ScreenId.Reconstruction),
             ["PF_PuzzleScreen"] = (typeof(PuzzleScreen), ScreenId.Puzzle),
             ["PF_EndingScreen"] = (typeof(EndingScreen), ScreenId.Ending),
+            ["PF_SettingsScreen"] = (typeof(SettingsScreen), ScreenId.Settings),
+            ["PF_CreditsScreen"] = (typeof(CreditsScreen), ScreenId.Credits),
         };
         if (map.TryGetValue(name, out var value))
         {
@@ -1008,8 +1265,8 @@ public static class P0ProjectBuilder
         string[] folders =
         {
             ProjectRoot + "/Art/Backgrounds",
-            ProjectRoot + "/Art/Characters/World",
-            ProjectRoot + "/Art/UI/Overhaul",
+            ProjectRoot + "/Art/Characters",
+            ProjectRoot + "/Art/UI",
         };
         foreach (string guid in AssetDatabase.FindAssets("t:Texture2D", folders))
         {
@@ -1091,6 +1348,18 @@ public static class P0ProjectBuilder
         SerializedProperty property = serialized.FindProperty(field);
         if (property != null)
             property.boolValue = value;
+        serialized.ApplyModifiedPropertiesWithoutUndo();
+        EditorUtility.SetDirty(target);
+    }
+
+    private static void SetFloat(UnityEngine.Object target, string field, float value)
+    {
+        if (target == null)
+            return;
+        SerializedObject serialized = new(target);
+        SerializedProperty property = serialized.FindProperty(field);
+        if (property != null)
+            property.floatValue = value;
         serialized.ApplyModifiedPropertiesWithoutUndo();
         EditorUtility.SetDirty(target);
     }

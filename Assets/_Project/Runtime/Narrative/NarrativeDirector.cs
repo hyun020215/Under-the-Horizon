@@ -13,6 +13,15 @@ public sealed class NarrativeDirector : MonoBehaviour
 
     [SerializeField]
     private VoiceController voice;
+
+    [SerializeField]
+    private TransitionDirector transitions;
+
+    [SerializeField]
+    private TransitionProfile dialogueOpenTransition;
+
+    [SerializeField]
+    private TransitionProfile dialogueCloseTransition;
     private readonly DialogueHistory history = new();
     public event Func<DialogueLine, Task<DialogueChoice>> LinePresented;
     public DialogueHistory History => history;
@@ -22,10 +31,21 @@ public sealed class NarrativeDirector : MonoBehaviour
     {
         if (sequence == null)
             return;
+        ScreenId returnScreen = screens?.Current ?? ScreenId.Exploration;
+        if (returnScreen == ScreenId.Dialogue)
+            returnScreen = ScreenId.Exploration;
         if (screens != null)
-            await screens.OpenAsync(ScreenId.Dialogue, new ScreenContext(sequence));
+        {
+            await screens.OpenAsync(
+                ScreenId.Dialogue,
+                new ScreenContext(sequence),
+                transitions,
+                dialogueOpenTransition
+            );
+        }
         if (sequence.Lines == null)
             return;
+        bool cancelled = false;
         foreach (DialogueLine line in sequence.Lines)
         {
             if (!ConditionResolver.All(line.conditions, state))
@@ -42,7 +62,8 @@ public sealed class NarrativeDirector : MonoBehaviour
                 }
                 catch (TaskCanceledException)
                 {
-                    return;
+                    cancelled = true;
+                    break;
                 }
             }
             else
@@ -52,6 +73,15 @@ public sealed class NarrativeDirector : MonoBehaviour
                     effect?.Apply(state);
             if (selected != null)
                 selected.Apply(state);
+        }
+        if (!cancelled && screens != null)
+        {
+            await screens.OpenAsync(
+                returnScreen,
+                default,
+                transitions,
+                dialogueCloseTransition
+            );
         }
     }
 

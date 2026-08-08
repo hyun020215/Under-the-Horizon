@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Collections;
 using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.UI;
@@ -14,8 +15,16 @@ public sealed class DialogueScreen : ScreenBase
     [SerializeField] private Text advanceLabel;
     [SerializeField] private Button[] choiceButtons;
     [SerializeField] private Text[] choiceLabels;
+    [SerializeField] private SfxController sfx;
+    [SerializeField] private AudioClip typewriterClip;
+    [SerializeField, Min(1f)] private float charactersPerSecond = 45f;
 
     private TaskCompletionSource<DialogueChoice> pendingLine;
+    private Coroutine revealRoutine;
+    private string fullText = string.Empty;
+    private bool revealing;
+    private readonly List<DialogueChoice> availableChoices = new();
+    public bool IsRevealing => revealing;
 
     private void Awake()
     {
@@ -42,6 +51,7 @@ public sealed class DialogueScreen : ScreenBase
 
         pendingLine?.TrySetResult(null);
         pendingLine = null;
+        StopReveal();
     }
 
     public override Task OpenAsync(ScreenContext context)
@@ -55,47 +65,44 @@ public sealed class DialogueScreen : ScreenBase
     private Task<DialogueChoice> PresentLineAsync(DialogueLine line)
     {
         pendingLine?.TrySetResult(null);
-        pendingLine = new TaskCompletionSource<DialogueChoice>();
+        pendingLine = new TaskCompletionSource<DialogueChoice>(
+            TaskCreationOptions.RunContinuationsAsynchronously
+        );
 
         if (speakerLabel != null)
             speakerLabel.text = line.speaker?.DisplayName ?? string.Empty;
+        fullText = line.text ?? string.Empty;
         if (bodyLabel != null)
-            bodyLabel.text = line.text ?? string.Empty;
+            bodyLabel.text = string.Empty;
 
-        var available = new List<DialogueChoice>();
+        availableChoices.Clear();
         if (line.choices != null)
         {
             foreach (var choice in line.choices)
                 if (choice != null && choice.IsAvailable(narrative.State))
-                    available.Add(choice);
+                    availableChoices.Add(choice);
         }
 
-        var hasChoices = available.Count > 0;
-        if (advanceButton != null)
-            advanceButton.gameObject.SetActive(!hasChoices);
         if (advanceLabel != null)
             advanceLabel.text = "계속";
-
-        for (var i = 0; i < choiceButtons?.Length; i++)
-        {
-            var visible = i < available.Count;
-            choiceButtons[i].gameObject.SetActive(visible);
-            if (!visible)
-                continue;
-
-            choiceButtons[i].name = available[i].Id;
-            choiceButtons[i].GetComponent<DialogueChoiceBinding>().Choice = available[i];
-            if (choiceLabels != null && i < choiceLabels.Length)
-                choiceLabels[i].text = available[i].Text;
-        }
+        SetChoiceVisibility(false);
+        if (advanceButton != null)
+            advanceButton.gameObject.SetActive(true);
+        revealRoutine = StartCoroutine(RevealText());
 
         return pendingLine.Task;
     }
 
     private void Advance()
     {
-        pendingLine?.TrySetResult(null);
+        if (revealing)
+        {
+            FinishReveal();
+            return;
+        }
+        TaskCompletionSource<DialogueChoice> completedLine = pendingLine;
         pendingLine = null;
+        completedLine?.TrySetResult(null);
     }
 
     private void SelectChoice(int index)
@@ -104,7 +111,66 @@ public sealed class DialogueScreen : ScreenBase
             return;
 
         var binding = choiceButtons[index].GetComponent<DialogueChoiceBinding>();
-        pendingLine?.TrySetResult(binding != null ? binding.Choice : null);
+        TaskCompletionSource<DialogueChoice> completedLine = pendingLine;
         pendingLine = null;
+        completedLine?.TrySetResult(binding != null ? binding.Choice : null);
+    }
+
+    private IEnumerator RevealText()
+    {
+        revealing = true;
+        sfx?.PlayLoop(typewriterClip, 0.35f);
+
+        float visibleCharacters = 0f;
+        while (visibleCharacters < fullText.Length)
+        {
+            visibleCharacters += charactersPerSecond * Time.unscaledDeltaTime;
+            if (bodyLabel != null)
+                bodyLabel.text = fullText.Substring(
+                    0,
+                    Mathf.Min(fullText.Length, Mathf.FloorToInt(visibleCharacters))
+                );
+            yield return null;
+        }
+        FinishReveal();
+    }
+
+    private void FinishReveal()
+    {
+        StopReveal();
+        if (bodyLabel != null)
+            bodyLabel.text = fullText;
+        bool hasChoices = availableChoices.Count > 0;
+        if (advanceButton != null)
+            advanceButton.gameObject.SetActive(!hasChoices);
+        SetChoiceVisibility(hasChoices);
+    }
+
+    private void StopReveal()
+    {
+        revealing = false;
+        if (revealRoutine != null)
+        {
+            StopCoroutine(revealRoutine);
+            revealRoutine = null;
+        }
+        sfx?.StopLoop(typewriterClip);
+    }
+
+    private void SetChoiceVisibility(bool showAvailable)
+    {
+        for (var i = 0; i < choiceButtons?.Length; i++)
+        {
+            bool visible = showAvailable && i < availableChoices.Count;
+            choiceButtons[i].gameObject.SetActive(visible);
+            if (!visible)
+                continue;
+
+            DialogueChoice choice = availableChoices[i];
+            choiceButtons[i].name = choice.Id;
+            choiceButtons[i].GetComponent<DialogueChoiceBinding>().Choice = choice;
+            if (choiceLabels != null && i < choiceLabels.Length)
+                choiceLabels[i].text = choice.Text;
+        }
     }
 }

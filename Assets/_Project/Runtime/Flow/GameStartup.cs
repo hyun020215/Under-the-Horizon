@@ -21,6 +21,12 @@ public sealed class GameStartup : MonoBehaviour
     [SerializeField]
     private GameStateStore state;
 
+    [SerializeField]
+    private AudioDirector audioDirector;
+
+    [SerializeField]
+    private AudioCueProfile titleAudio;
+
     private async void Start()
     {
         if (flow == null)
@@ -30,6 +36,7 @@ public sealed class GameStartup : MonoBehaviour
         {
             if (screens != null && titleScreen != null)
             {
+                audioDirector?.Apply(titleAudio);
                 await screens.OpenAsync(ScreenId.Title);
                 await titleScreen.WaitForStartAsync();
             }

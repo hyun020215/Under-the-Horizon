@@ -27,4 +27,11 @@ public sealed class AudioDirector : MonoBehaviour
         if (profile.entryStinger != null)
             sfx?.Play(profile.entryStinger);
     }
+
+    public void SetMasterVolume(float value) => AudioListener.volume = Mathf.Clamp01(value);
+
+    public void SetMusicVolume(float value) =>
+        music?.SetVolume((Current?.musicVolume ?? 1f) * Mathf.Clamp01(value));
+
+    public void SetSfxVolume(float value) => sfx?.SetVolume(value);
 }

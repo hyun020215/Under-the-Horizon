@@ -42,9 +42,7 @@ public sealed class StorySceneDirector : MonoBehaviour
             throw new InvalidOperationException($"Entry conditions failed for '{scene.Id}'.");
         await transitions.BeginAsync(scene.EntryTransition);
         Current = scene;
-        state.SetCurrentScene(scene.Id);
-        state.State.day = (int)scene.Day;
-        state.State.timeBlock = scene.TimeBlock;
+        state.SetStoryContext(scene.Id, (int)scene.Day, scene.TimeBlock);
         await locations.ApplyAsync(scene.Location, scene.LocationState);
         await characters.ApplyAsync(scene.CharacterSet);
         interactions.Apply(scene.InteractionSet);

@@ -20,6 +20,7 @@ public sealed class AmbienceController : MonoBehaviour
             return;
         source.clip = clip;
         source.volume = volume;
+        source.loop = true;
         if (clip != null)
             source.Play();
         else

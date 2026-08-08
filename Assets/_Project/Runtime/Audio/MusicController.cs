@@ -16,6 +16,7 @@ public sealed class MusicController : MonoBehaviour
         }
         source.clip = clip;
         source.volume = volume;
+        source.loop = true;
         if (clip != null)
             source.Play();
         else
