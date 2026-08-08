@@ -12,4 +12,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b1e35231f09209a4d93ed6c4e5d56093, type: 3}
   m_Name: INT_D6_03
   m_EditorClassIdentifier: UTH.Runtime::InteractionSet
-  interactions: []
+  interactions:
+  - {fileID: 11400000, guid: 82ac0d1baa43f3d4698efacb34f1f063, type: 2}

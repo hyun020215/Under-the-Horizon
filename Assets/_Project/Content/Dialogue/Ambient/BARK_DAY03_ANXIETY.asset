@@ -12,5 +12,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 095a65fbf799fe24caef37230cb0482e, type: 3}
   m_Name: BARK_DAY03_ANXIETY
   m_EditorClassIdentifier: UTH.Runtime::DialogueSequence
-  id: 
+  id: BARK_DAY03_ANXIETY
   lines: []

@@ -13,6 +13,6 @@ MonoBehaviour:
   m_Name: CLAIRE_CABIN_Default
   m_EditorClassIdentifier: UTH.Runtime::LocationStateDefinition
   id: CLAIRE_CABIN_DEFAULT
-  background: {fileID: 0}
+  background: {fileID: 21300000, guid: d7983939103c83a4791186f1d2851c61, type: 3}
   tint: {r: 1, g: 1, b: 1, a: 1}
   audioOverride: {fileID: 0}

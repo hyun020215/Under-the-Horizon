@@ -31,7 +31,8 @@ MonoBehaviour:
   entryTransition: {fileID: 11400000, guid: dca78952fd04d4d4392054d9a3fc41e2, type: 2}
   exitTransition: {fileID: 11400000, guid: dca78952fd04d4d4392054d9a3fc41e2, type: 2}
   onEnterEffects: []
-  onCompleteEffects: []
+  onCompleteEffects:
+  - {fileID: 11400000, guid: deaec6a9abd2d5d4fa6a7853ccabd6d5, type: 2}
   routes:
   - targetSceneId: D4-02
     conditions: []

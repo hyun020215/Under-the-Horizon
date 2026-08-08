@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: UTH.Runtime::LocationDefinition
   id: LOC_CLAIRE_CABIN
   displayName: Claire Cabin
-  defaultBackground: {fileID: 0}
+  defaultBackground: {fileID: 21300000, guid: d7983939103c83a4791186f1d2851c61, type: 3}
   states:
   - {fileID: 11400000, guid: 03c3d248dde790b43bc77b3f6610c458, type: 2}
   exits: []

@@ -182,26 +182,45 @@ public static class P0ProjectBuilder
             serialized.ApplyModifiedPropertiesWithoutUndo();
             EditorUtility.SetDirty(sequence);
         }
+
+        foreach (DialogueSequence sequence in LoadAll<DialogueSequence>())
+            if (string.IsNullOrWhiteSpace(sequence.Id))
+                SetString(sequence, "id", sequence.name);
     }
 
     private static void BuildSceneSupportAssets(IReadOnlyList<SceneRow> scenes)
     {
+        const string legacyInteractionFolder = ContentRoot + "/Locations/InteractionS";
+        const string interactionFolder = ContentRoot + "/Locations/InteractionDefinitions";
+        if (AssetDatabase.IsValidFolder(legacyInteractionFolder)
+            && !AssetDatabase.IsValidFolder(interactionFolder))
+        {
+            string moveError = AssetDatabase.MoveAsset(legacyInteractionFolder, interactionFolder);
+            if (!string.IsNullOrEmpty(moveError))
+                throw new InvalidOperationException(moveError);
+        }
         EnsureFolder(ContentRoot + "/Characters/PlacementSets/Generated");
         EnsureFolder(ContentRoot + "/Locations/InteractionSets/Generated");
+        EnsureFolder(interactionFolder + "/Generated");
+        EnsureFolder(ContentRoot + "/Effects/Generated");
 
         foreach (SceneRow scene in scenes)
         {
             CharacterPlacementSet placements = GetOrCreate<CharacterPlacementSet>(PlacementPath(scene.Id));
-            string[] characterNames = SplitCharacters(scene.Characters);
+            CharacterDefinition[] sceneCharacters = SplitCharacters(scene.Characters)
+                .Select(FindCharacter)
+                .Where(character => character != null)
+                .Distinct()
+                .ToArray();
             SerializedObject placementObject = new(placements);
             SerializedProperty items = placementObject.FindProperty("placements");
-            items.arraySize = characterNames.Length;
-            for (int index = 0; index < characterNames.Length; index++)
+            items.arraySize = sceneCharacters.Length;
+            for (int index = 0; index < sceneCharacters.Length; index++)
             {
                 SerializedProperty item = items.GetArrayElementAtIndex(index);
-                item.FindPropertyRelative("character").objectReferenceValue = FindCharacter(characterNames[index]);
+                item.FindPropertyRelative("character").objectReferenceValue = sceneCharacters[index];
                 item.FindPropertyRelative("normalizedX").floatValue =
-                    characterNames.Length == 1 ? 0.5f : 0.18f + 0.64f * index / (characterNames.Length - 1f);
+                    sceneCharacters.Length == 1 ? 0.5f : 0.18f + 0.64f * index / (sceneCharacters.Length - 1f);
                 item.FindPropertyRelative("normalizedY").floatValue = 0.96f;
                 item.FindPropertyRelative("scale").floatValue = 0.72f;
                 item.FindPropertyRelative("sortingOrder").intValue = index;
@@ -211,7 +230,22 @@ public static class P0ProjectBuilder
             EditorUtility.SetDirty(placements);
 
             InteractionSet interactions = GetOrCreate<InteractionSet>(InteractionPath(scene.Id));
-            SetArray(interactions, "interactions", Array.Empty<UnityEngine.Object>());
+            DialogueSequence dialogue = AssetDatabase.LoadAssetAtPath<DialogueSequence>(
+                DialogueAssetPath(scene.Id)
+            );
+            string interactionRoot = interactionFolder + "/Generated/";
+            DialogueInteractionAction action = GetOrCreate<DialogueInteractionAction>(
+                interactionRoot + $"ACT_{NormalizeId(scene.Id)}_DIALOGUE.asset"
+            );
+            SetObject(action, "dialogue", dialogue);
+            InteractionDefinition interaction = GetOrCreate<InteractionDefinition>(
+                interactionRoot + $"INT_{NormalizeId(scene.Id)}_DIALOGUE.asset"
+            );
+            SetString(interaction, "id", $"INT_{NormalizeId(scene.Id)}_DIALOGUE");
+            SetEnum(interaction, "type", (int)InteractionType.Context);
+            SetObject(interaction, "action", action);
+            SetBool(interaction, "repeatable", true);
+            SetArray(interactions, "interactions", new UnityEngine.Object[] { interaction });
         }
     }
 
@@ -252,6 +286,13 @@ public static class P0ProjectBuilder
 
             PuzzleDefinition puzzle = FindPuzzleForScene(row.Id);
             serialized.FindProperty("puzzle").objectReferenceValue = puzzle;
+            CompleteSceneEffect complete = GetOrCreate<CompleteSceneEffect>(
+                $"{ContentRoot}/Effects/Generated/FX_{NormalizeId(row.Id)}_COMPLETE.asset"
+            );
+            SetString(complete, "sceneId", row.Id);
+            SerializedProperty completeEffects = serialized.FindProperty("onCompleteEffects");
+            completeEffects.arraySize = 1;
+            completeEffects.GetArrayElementAtIndex(0).objectReferenceValue = complete;
             serialized.ApplyModifiedPropertiesWithoutUndo();
             EditorUtility.SetDirty(definition);
         }
@@ -801,6 +842,18 @@ public static class P0ProjectBuilder
         EditorUtility.SetDirty(target);
     }
 
+    private static void SetBool(UnityEngine.Object target, string field, bool value)
+    {
+        if (target == null)
+            return;
+        SerializedObject serialized = new(target);
+        SerializedProperty property = serialized.FindProperty(field);
+        if (property != null)
+            property.boolValue = value;
+        serialized.ApplyModifiedPropertiesWithoutUndo();
+        EditorUtility.SetDirty(target);
+    }
+
     private static void SetEnum(UnityEngine.Object target, string field, int value)
     {
         SerializedObject serialized = new(target);
@@ -856,6 +909,8 @@ public static class P0ProjectBuilder
             ["ENGINE_CONTROL"] = "engine_control", ["NEWS_LOUNGE"] = "news_lounge",
             ["STAIR_B"] = "crew_stairs", ["HORIZON"] = "horizon_room",
             ["BALLAST"] = "ballast", ["GANGWAY"] = "gangway", ["PORT"] = "port",
+            ["CLAIRE_CABIN"] = "cabin_claire", ["DANIEL_CABIN"] = "cabin_daniel",
+            ["STERN"] = "open_deck",
         };
         return FindSprite(aliases.TryGetValue(token, out string alias) ? alias : token);
     }

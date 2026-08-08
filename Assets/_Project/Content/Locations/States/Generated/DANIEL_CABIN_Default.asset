@@ -13,6 +13,6 @@ MonoBehaviour:
   m_Name: DANIEL_CABIN_Default
   m_EditorClassIdentifier: UTH.Runtime::LocationStateDefinition
   id: DANIEL_CABIN_DEFAULT
-  background: {fileID: 0}
+  background: {fileID: 21300000, guid: 84630adeb5e59954896120b64537eea0, type: 3}
   tint: {r: 1, g: 1, b: 1, a: 1}
   audioOverride: {fileID: 0}

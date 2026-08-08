@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: UTH.Runtime::LocationDefinition
   id: LOC_DANIEL_CABIN
   displayName: Daniel Cabin
-  defaultBackground: {fileID: 0}
+  defaultBackground: {fileID: 21300000, guid: 84630adeb5e59954896120b64537eea0, type: 3}
   states:
   - {fileID: 11400000, guid: f332d8b2f0680db4daf135908c63240c, type: 2}
   exits: []
