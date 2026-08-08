@@ -16,6 +16,7 @@ public sealed class NarrativeDirector : MonoBehaviour
     private readonly DialogueHistory history = new();
     public event Func<DialogueLine, Task<DialogueChoice>> LinePresented;
     public DialogueHistory History => history;
+    public GameStateStore State => state;
 
     public async Task PlayAsync(DialogueSequence sequence)
     {

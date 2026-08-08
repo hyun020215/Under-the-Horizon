@@ -7,6 +7,7 @@ using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.InputSystem.UI;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
@@ -381,8 +382,97 @@ public static class P0ProjectBuilder
         GameObject root = CreateVisualPrefab(name, panel);
         ScreenBase screen = (ScreenBase)root.AddComponent(type);
         SetEnum(screen, "id", (int)id);
+        if (screen is DialogueScreen dialogue)
+            BuildDialogueScreen(root.transform, dialogue);
+        else if (screen is EndingScreen)
+            BuildEndingScreen(root.transform);
         root.SetActive(false);
         return root;
+    }
+
+    private static void BuildDialogueScreen(Transform root, DialogueScreen screen)
+    {
+        Font font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
+        Text scene = CreateText("SceneLabel", root, font, 24, TextAnchor.MiddleLeft);
+        SetRect(scene.rectTransform, new Vector2(0.06f, 0.89f), new Vector2(0.94f, 0.96f));
+
+        Text speaker = CreateText("SpeakerLabel", root, font, 34, TextAnchor.MiddleLeft);
+        speaker.color = new Color(0.88f, 0.72f, 0.35f);
+        SetRect(speaker.rectTransform, new Vector2(0.08f, 0.31f), new Vector2(0.92f, 0.39f));
+
+        Text body = CreateText("BodyLabel", root, font, 32, TextAnchor.UpperLeft);
+        body.horizontalOverflow = HorizontalWrapMode.Wrap;
+        body.verticalOverflow = VerticalWrapMode.Overflow;
+        SetRect(body.rectTransform, new Vector2(0.08f, 0.11f), new Vector2(0.92f, 0.31f));
+
+        Button advance = CreateButton("AdvanceButton", root, font, "계속", out Text advanceText);
+        SetRect((RectTransform)advance.transform, new Vector2(0.78f, 0.03f), new Vector2(0.92f, 0.10f));
+
+        Button[] choices = new Button[3];
+        Text[] choiceLabels = new Text[3];
+        for (var i = 0; i < choices.Length; i++)
+        {
+            choices[i] = CreateButton($"Choice{i + 1}", root, font, string.Empty, out choiceLabels[i]);
+            choices[i].gameObject.AddComponent<DialogueChoiceBinding>();
+            var top = 0.29f - (i * 0.075f);
+            SetRect((RectTransform)choices[i].transform, new Vector2(0.16f, top - 0.06f), new Vector2(0.84f, top));
+            choices[i].gameObject.SetActive(false);
+        }
+
+        SetObject(screen, "sceneLabel", scene);
+        SetObject(screen, "speakerLabel", speaker);
+        SetObject(screen, "bodyLabel", body);
+        SetObject(screen, "advanceButton", advance);
+        SetObject(screen, "advanceLabel", advanceText);
+        SetArray(screen, "choiceButtons", choices.Cast<UnityEngine.Object>().ToArray());
+        SetArray(screen, "choiceLabels", choiceLabels.Cast<UnityEngine.Object>().ToArray());
+    }
+
+    private static void BuildEndingScreen(Transform root)
+    {
+        Font font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
+        Text title = CreateText("EndingTitle", root, font, 54, TextAnchor.MiddleCenter);
+        title.text = "UNDER THE HORIZON";
+        title.color = new Color(0.88f, 0.72f, 0.35f);
+        SetRect(title.rectTransform, new Vector2(0.15f, 0.48f), new Vector2(0.85f, 0.62f));
+        Text message = CreateText("EndingMessage", root, font, 28, TextAnchor.MiddleCenter);
+        message.text = "현재 구현된 스토리를 모두 진행했습니다.";
+        SetRect(message.rectTransform, new Vector2(0.15f, 0.38f), new Vector2(0.85f, 0.48f));
+    }
+
+    private static Text CreateText(
+        string name, Transform parent, Font font, int size, TextAnchor alignment)
+    {
+        GameObject gameObject = new(name, typeof(RectTransform), typeof(CanvasRenderer), typeof(Text));
+        gameObject.transform.SetParent(parent, false);
+        Text text = gameObject.GetComponent<Text>();
+        text.font = font;
+        text.fontSize = size;
+        text.alignment = alignment;
+        text.color = Color.white;
+        return text;
+    }
+
+    private static Button CreateButton(
+        string name, Transform parent, Font font, string label, out Text text)
+    {
+        GameObject gameObject = new(name, typeof(RectTransform), typeof(CanvasRenderer), typeof(Image), typeof(Button));
+        gameObject.transform.SetParent(parent, false);
+        Image image = gameObject.GetComponent<Image>();
+        image.color = new Color(0.08f, 0.12f, 0.20f, 0.96f);
+        Button button = gameObject.GetComponent<Button>();
+        text = CreateText("Label", gameObject.transform, font, 24, TextAnchor.MiddleCenter);
+        text.text = label;
+        SetRect(text.rectTransform, Vector2.zero, Vector2.one);
+        return button;
+    }
+
+    private static void SetRect(RectTransform rect, Vector2 min, Vector2 max)
+    {
+        rect.anchorMin = min;
+        rect.anchorMax = max;
+        rect.offsetMin = Vector2.zero;
+        rect.offsetMax = Vector2.zero;
     }
 
     private static GameObject CreateVisualPrefab(string name, Sprite panel)
@@ -471,6 +561,9 @@ public static class P0ProjectBuilder
         SetObject(narrative, "state", state);
         SetObject(narrative, "screens", router);
         SetObject(narrative, "voice", voice);
+        DialogueScreen dialogueScreen = screens.OfType<DialogueScreen>().FirstOrDefault();
+        if (dialogueScreen != null)
+            SetObject(dialogueScreen, "narrative", narrative);
 
         PuzzleDirector puzzles = CreatePuzzleDirector(root.transform, router);
         InteractionDirector interactions = new GameObject("InteractionDirector").AddComponent<InteractionDirector>();
@@ -507,7 +600,9 @@ public static class P0ProjectBuilder
 
         GameStartup startup = root.AddComponent<GameStartup>();
         SetObject(startup, "flow", flow);
-        new GameObject("EventSystem", typeof(EventSystem)).transform.SetParent(root.transform);
+        SetObject(startup, "screens", router);
+        new GameObject("EventSystem", typeof(EventSystem), typeof(InputSystemUIInputModule))
+            .transform.SetParent(root.transform);
         EditorSceneManager.SaveScene(scene, ProjectRoot + "/Scenes/Game.unity");
     }
 

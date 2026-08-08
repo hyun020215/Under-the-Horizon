@@ -27,4 +27,8 @@ public sealed class GameFlowController : MonoBehaviour
     }
 
     public Task ResumeAsync() => StartAsync(state.State.currentStorySceneId);
+
+    public bool CanAdvance => scenes != null
+        && scenes.Current != null
+        && !string.IsNullOrWhiteSpace(scenes.Current.ResolveNext(state));
 }
