@@ -77,3 +77,18 @@ P0 자산은 `Under The Horizon > Build > P0 Project Content`에서 다시 생�
 - 새 할 일은 우선순위와 완료 조건을 함께 적는다.
 - 아키텍처 변경이 필요하면 구현 전에 `AGENTS.md`의 변경 절차를 따른다.
 - 기능 단위로 커밋하고 검증 후 원격 `main`에 푸시한다.
+
+## P1 현재 수행 결과 (2026-08-08)
+
+- [x] 41개 Story Scene의 `CharacterPlacementSet`을 원본 장면 인물 정보로 생성하고 정규화 좌표·스케일을 검증한다.
+- [x] 41개 Story Scene에 반복 가능한 내러티브 `InteractionDefinition`/`InteractionSet`과 완료 `GameEffect`를 연결한다.
+- [x] 모든 Location에 기본 State, 배경 및 기본 `AudioCueProfile`을 연결하고 Validator로 검사한다.
+- [x] 한국어 마스터 CSV의 전체 장면 대사를 `DialogueSequence`로 생성하고 대화 ID를 정규화한다.
+- [x] Story Scene·Location·Character Placement·Interaction·Audio Cue·Evidence·Sequence 편집창을 구현한다.
+- [x] Story Graph 및 Story Scene·Location·Character 미리보기 창을 구현한다.
+- [x] 중복 ID, 장면 경로, 필수 참조, 배치 좌표, 상호작용 Action, 완료 Effect, Location 배경·오디오, C-01~C-18을 검증한다.
+- [ ] 대사 선택지·조건·효과·다음 노드의 원본 컬럼 매핑은 원본 CSV에 구조화된 값이 부족한 행을 사람이 확정한 뒤 보강한다.
+- [ ] Story Recording 장면별 큐 연결은 녹음 파일과 대사 line ID의 최종 대응표 승인 후 수행한다.
+- [ ] 클릭·호버·확인·취소·증거 발견·이론 해금 공통 효과음은 최종 음원 선정 또는 라이선스 확인 후 연결한다.
+- [ ] 게임 로고와 앱 아이콘의 최종 승인본은 아트 디렉션 및 배포 플랫폼 규격 확정 후 제작한다.
+- [ ] Puzzle 직접 미리보기는 각 PuzzleDefinition의 세부 규칙 데이터와 공통 Preview 계약을 확정한 뒤 구현한다.
