@@ -435,6 +435,13 @@ public static class P0ProjectBuilder
             BuildTitleScreen(root.transform, title);
         else if (screen is SaveSlotScreen saveSlot)
             BuildSaveSlotScreen(root.transform, saveSlot);
+        else if (screen is ExplorationScreen)
+        {
+            Image image = root.GetComponent<Image>();
+            image.color = Color.clear;
+            image.sprite = null;
+            image.raycastTarget = false;
+        }
         else if (screen is EndingScreen)
             BuildEndingScreen(root.transform);
         root.SetActive(false);
@@ -519,9 +526,21 @@ public static class P0ProjectBuilder
     {
         Font font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
         Image background = root.GetComponent<Image>();
-        background.sprite = AssetDatabase.LoadAssetAtPath<Sprite>(ProjectRoot + "/Art/UI/Overhaul/UI_title_background.png");
-        background.color = Color.white;
-        background.type = Image.Type.Simple;
+        background.sprite = null;
+        background.color = Color.clear;
+        background.raycastTarget = false;
+
+        Sprite titleSprite = AssetDatabase.LoadAssetAtPath<Sprite>(
+            ProjectRoot + "/Art/UI/Overhaul/UI_title_background.png"
+        );
+        Image artwork = CreateLayer("Title Background", root).gameObject.AddComponent<Image>();
+        artwork.sprite = titleSprite;
+        artwork.color = Color.white;
+        artwork.raycastTarget = false;
+        AspectRatioFitter artworkAspect = artwork.gameObject.AddComponent<AspectRatioFitter>();
+        artworkAspect.aspectMode = AspectRatioFitter.AspectMode.EnvelopeParent;
+        artworkAspect.aspectRatio = titleSprite.rect.width / titleSprite.rect.height;
+        artwork.transform.SetAsFirstSibling();
 
         GameObject shadeObject = new("Left Readability Shade", typeof(RectTransform), typeof(CanvasRenderer), typeof(Image));
         shadeObject.transform.SetParent(root, false);
@@ -702,11 +721,16 @@ public static class P0ProjectBuilder
         state.transform.SetParent(root.transform);
 
         Canvas world = CreateCanvas("WorldCanvas", root.transform);
+        world.sortingOrder = 0;
         Image background = CreateLayer("BackgroundLayer", world.transform).gameObject.AddComponent<Image>();
+        AspectRatioFitter backgroundAspect = background.gameObject.AddComponent<AspectRatioFitter>();
+        backgroundAspect.aspectMode = AspectRatioFitter.AspectMode.EnvelopeParent;
+        background.raycastTarget = false;
         RectTransform characterLayer = CreateLayer("CharacterLayer", world.transform);
         CreateLayer("HotspotLayer", world.transform);
 
         Canvas ui = CreateCanvas("UICanvas", root.transform);
+        ui.sortingOrder = 100;
         CanvasGroup uiGroup = ui.gameObject.AddComponent<CanvasGroup>();
         UIInputBlocker blocker = ui.gameObject.AddComponent<UIInputBlocker>();
         SetObject(blocker, "group", uiGroup);
@@ -720,6 +744,7 @@ public static class P0ProjectBuilder
         ScreenRouter router = new GameObject("ScreenRouter").AddComponent<ScreenRouter>();
         router.transform.SetParent(root.transform);
         SetArray(router, "screens", screens.Cast<UnityEngine.Object>().ToArray());
+        BuildPersistentHud(ui.transform, router);
 
         CharacterView characterPrefab = AssetDatabase.LoadAssetAtPath<CharacterView>(PrefabRoot + "/Characters/PF_CharacterView.prefab");
         CharacterStage characterStage = new GameObject("CharacterStage").AddComponent<CharacterStage>();
@@ -730,6 +755,7 @@ public static class P0ProjectBuilder
         LocationPresenter location = new GameObject("LocationPresenter").AddComponent<LocationPresenter>();
         location.transform.SetParent(root.transform);
         SetObject(location, "background", background);
+        SetObject(location, "backgroundAspect", backgroundAspect);
         SetObject(location, "state", state);
 
         AudioDirector audio = CreateAudioDirector(root.transform, out VoiceController voice);
@@ -867,7 +893,44 @@ public static class P0ProjectBuilder
         CanvasScaler scaler = gameObject.GetComponent<CanvasScaler>();
         scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
         scaler.referenceResolution = new Vector2(1920, 1080);
+        scaler.screenMatchMode = CanvasScaler.ScreenMatchMode.MatchWidthOrHeight;
+        scaler.matchWidthOrHeight = 0.5f;
         return canvas;
+    }
+
+    private static void BuildPersistentHud(Transform parent, ScreenRouter router)
+    {
+        Font font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
+        GameObject root = new("PersistentHUD", typeof(RectTransform), typeof(PersistentHud));
+        root.transform.SetParent(parent, false);
+        SetRect((RectTransform)root.transform, Vector2.zero, Vector2.one);
+
+        Image topBar = CreateLayer("TopBar", root.transform).gameObject.AddComponent<Image>();
+        topBar.color = new Color(0.015f, 0.02f, 0.055f, 0.82f);
+        topBar.raycastTarget = false;
+        SetRect(topBar.rectTransform, new Vector2(0f, 0.925f), Vector2.one);
+
+        Text title = CreateText("GameTitle", topBar.transform, font, 24, TextAnchor.MiddleLeft);
+        title.text = "UNDER THE HORIZON";
+        title.color = new Color(0.88f, 0.72f, 0.35f);
+        SetRect(title.rectTransform, new Vector2(0.025f, 0f), new Vector2(0.35f, 1f));
+
+        Button map = CreateSpriteButton(
+            "MapButton", root.transform, font, "지도",
+            ProjectRoot + "/Art/UI/Buttons/UI_btn_standard_normal.png",
+            ProjectRoot + "/Art/UI/Buttons/UI_btn_standard_pressed.png", out _);
+        SetRect((RectTransform)map.transform, new Vector2(0.74f, 0.935f), new Vector2(0.85f, 0.988f));
+
+        Button record = CreateSpriteButton(
+            "RecordButton", root.transform, font, "수사 기록",
+            ProjectRoot + "/Art/UI/Buttons/UI_btn_standard_normal.png",
+            ProjectRoot + "/Art/UI/Buttons/UI_btn_standard_pressed.png", out _);
+        SetRect((RectTransform)record.transform, new Vector2(0.86f, 0.935f), new Vector2(0.98f, 0.988f));
+
+        PersistentHud hud = root.GetComponent<PersistentHud>();
+        SetObject(hud, "screens", router);
+        SetObject(hud, "mapButton", map);
+        SetObject(hud, "recordButton", record);
     }
 
     private static RectTransform CreateLayer(string name, Transform parent)

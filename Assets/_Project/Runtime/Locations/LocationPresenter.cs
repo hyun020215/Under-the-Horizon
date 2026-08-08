@@ -8,6 +8,9 @@ public sealed class LocationPresenter : MonoBehaviour
     private Image background;
 
     [SerializeField]
+    private AspectRatioFitter backgroundAspect;
+
+    [SerializeField]
     private GameStateStore state;
     public LocationDefinition Current { get; private set; }
 
@@ -21,6 +24,9 @@ public sealed class LocationPresenter : MonoBehaviour
                     ? locationState.Background
                     : location?.DefaultBackground;
             background.color = locationState != null ? locationState.Tint : Color.white;
+            if (backgroundAspect != null && background.sprite != null)
+                backgroundAspect.aspectRatio = background.sprite.rect.width
+                    / background.sprite.rect.height;
         }
         if (location != null)
             state?.SetCurrentLocation(location.Id);

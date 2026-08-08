@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Collections.Generic;
 using NUnit.Framework;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -60,6 +61,21 @@ public sealed class BootstrapTests
         Assert.That(dialogue, Is.Not.Null);
         Assert.That(dialogue.gameObject.activeInHierarchy, Is.True);
         Assert.That(narrative.History.Lines.Count, Is.EqualTo(1));
+        PersistentHud hud = Object.FindFirstObjectByType<PersistentHud>();
+        Assert.That(hud, Is.Not.Null);
+        Assert.That(hud.gameObject.activeInHierarchy, Is.True);
+        ExplorationScreen exploration = Object.FindFirstObjectByType<ExplorationScreen>(
+            FindObjectsInactive.Include
+        );
+        Assert.That(exploration.GetComponent<Image>().raycastTarget, Is.False);
+
+        Canvas worldCanvas = GameObject.Find("WorldCanvas").GetComponent<Canvas>();
+        Canvas uiCanvas = GameObject.Find("UICanvas").GetComponent<Canvas>();
+        Assert.That(uiCanvas.sortingOrder, Is.GreaterThan(worldCanvas.sortingOrder));
+        Assert.That(
+            uiCanvas.GetComponent<CanvasScaler>().matchWidthOrHeight,
+            Is.EqualTo(0.5f).Within(0.001f)
+        );
         Assert.That(
             dialogue.transform.Find("Choice2").GetComponent<DialogueChoiceBinding>(),
             Is.Not.Null
@@ -91,9 +107,21 @@ public sealed class BootstrapTests
         int historyBeforeClick = narrative.History.Lines.Count;
         CharacterView character = Object.FindFirstObjectByType<CharacterView>();
         Assert.That(character, Is.Not.Null);
+        var pointer = new PointerEventData(EventSystem.current)
+        {
+            position = RectTransformUtility.WorldToScreenPoint(
+                null,
+                ((RectTransform)character.transform).TransformPoint(
+                    ((RectTransform)character.transform).rect.center
+                )
+            ),
+        };
+        var hits = new List<RaycastResult>();
+        EventSystem.current.RaycastAll(pointer, hits);
+        Assert.That(hits.Exists(hit => hit.gameObject == character.gameObject), Is.True);
         ExecuteEvents.Execute(
             character.gameObject,
-            new PointerEventData(EventSystem.current),
+            pointer,
             ExecuteEvents.pointerClickHandler
         );
         yield return null;
