@@ -108,8 +108,3 @@ public sealed class DialogueScreen : ScreenBase
         pendingLine = null;
     }
 }
-
-public sealed class DialogueChoiceBinding : MonoBehaviour
-{
-    public DialogueChoice Choice { get; set; }
-}

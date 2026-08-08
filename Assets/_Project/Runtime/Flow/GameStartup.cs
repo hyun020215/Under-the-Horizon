@@ -12,6 +12,9 @@ public sealed class GameStartup : MonoBehaviour
     [SerializeField]
     private ScreenRouter screens;
 
+    [SerializeField]
+    private TitleScreen titleScreen;
+
     private async void Start()
     {
         if (flow == null)
@@ -19,6 +22,12 @@ public sealed class GameStartup : MonoBehaviour
 
         try
         {
+            if (screens != null && titleScreen != null)
+            {
+                await screens.OpenAsync(ScreenId.Title);
+                await titleScreen.WaitForStartAsync();
+            }
+
             await flow.StartAsync(firstStorySceneId);
             while (flow.CanAdvance)
                 await flow.AdvanceAsync();

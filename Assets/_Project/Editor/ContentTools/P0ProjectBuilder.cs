@@ -425,6 +425,8 @@ public static class P0ProjectBuilder
         SetEnum(screen, "id", (int)id);
         if (screen is DialogueScreen dialogue)
             BuildDialogueScreen(root.transform, dialogue);
+        else if (screen is TitleScreen title)
+            BuildTitleScreen(root.transform, title);
         else if (screen is EndingScreen)
             BuildEndingScreen(root.transform);
         root.SetActive(false);
@@ -467,6 +469,23 @@ public static class P0ProjectBuilder
         SetObject(screen, "advanceLabel", advanceText);
         SetArray(screen, "choiceButtons", choices.Cast<UnityEngine.Object>().ToArray());
         SetArray(screen, "choiceLabels", choiceLabels.Cast<UnityEngine.Object>().ToArray());
+    }
+
+    private static void BuildTitleScreen(Transform root, TitleScreen screen)
+    {
+        Font font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
+        Text title = CreateText("GameTitle", root, font, 68, TextAnchor.MiddleCenter);
+        title.text = "UNDER THE HORIZON";
+        title.color = new Color(0.88f, 0.72f, 0.35f);
+        SetRect(title.rectTransform, new Vector2(0.12f, 0.57f), new Vector2(0.88f, 0.75f));
+
+        Text subtitle = CreateText("Subtitle", root, font, 26, TextAnchor.MiddleCenter);
+        subtitle.text = "수평선 아래의 진실";
+        SetRect(subtitle.rectTransform, new Vector2(0.2f, 0.49f), new Vector2(0.8f, 0.57f));
+
+        Button start = CreateButton("StartButton", root, font, "새 게임", out _);
+        SetRect((RectTransform)start.transform, new Vector2(0.39f, 0.28f), new Vector2(0.61f, 0.36f));
+        SetObject(screen, "startButton", start);
     }
 
     private static void BuildEndingScreen(Transform root)
@@ -557,6 +576,9 @@ public static class P0ProjectBuilder
     {
         Scene scene = EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);
         GameObject root = new("GameRoot");
+        GameObject cameraObject = new("Main Camera", typeof(Camera), typeof(AudioListener));
+        cameraObject.tag = "MainCamera";
+        cameraObject.transform.SetParent(root.transform);
         GameStateStore state = new GameObject("GameStateStore").AddComponent<GameStateStore>();
         state.transform.SetParent(root.transform);
 
@@ -642,6 +664,7 @@ public static class P0ProjectBuilder
         GameStartup startup = root.AddComponent<GameStartup>();
         SetObject(startup, "flow", flow);
         SetObject(startup, "screens", router);
+        SetObject(startup, "titleScreen", screens.OfType<TitleScreen>().FirstOrDefault());
         new GameObject("EventSystem", typeof(EventSystem), typeof(InputSystemUIInputModule))
             .transform.SetParent(root.transform);
         EditorSceneManager.SaveScene(scene, ProjectRoot + "/Scenes/Game.unity");
