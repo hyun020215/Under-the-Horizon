@@ -22,10 +22,17 @@ public sealed class ScreenRouter : MonoBehaviour
 
     public async Task OpenAsync(ScreenId id, ScreenContext context = default)
     {
-        if (Current.HasValue && index.TryGetValue(Current.Value, out var current))
-            await current.CloseAsync();
         if (!index.TryGetValue(id, out var next))
             throw new InvalidOperationException($"Screen {id} is not registered.");
+
+        if (Current == id)
+        {
+            await next.OpenAsync(context);
+            return;
+        }
+
+        if (Current.HasValue && index.TryGetValue(Current.Value, out var current))
+            await current.CloseAsync();
         await next.OpenAsync(context);
         Current = id;
         Opened?.Invoke(id);

@@ -44,6 +44,13 @@ public sealed class BootstrapTests
         Assert.That(dialogue.gameObject.activeInHierarchy, Is.True);
         Assert.That(narrative.History.Lines.Count, Is.EqualTo(1));
 
+        ScreenRouter router = Object.FindFirstObjectByType<ScreenRouter>();
+        var reopen = router.OpenAsync(ScreenId.Dialogue);
+        while (!reopen.IsCompleted)
+            yield return null;
+        Assert.That(reopen.IsFaulted, Is.False);
+        Assert.That(dialogue.gameObject.activeInHierarchy, Is.True);
+
         Button advance = dialogue.transform.Find("AdvanceButton").GetComponent<Button>();
         advance.onClick.Invoke();
         yield return null;

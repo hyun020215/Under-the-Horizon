@@ -35,7 +35,16 @@ public sealed class NarrativeDirector : MonoBehaviour
                 voice?.Play(line.voiceClip);
             DialogueChoice selected = null;
             if (LinePresented != null)
-                selected = await LinePresented.Invoke(line);
+            {
+                try
+                {
+                    selected = await LinePresented.Invoke(line);
+                }
+                catch (TaskCanceledException)
+                {
+                    return;
+                }
+            }
             else
                 selected = FirstAvailable(line.choices);
             if (line.effects != null)

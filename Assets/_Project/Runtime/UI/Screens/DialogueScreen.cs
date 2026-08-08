@@ -40,7 +40,7 @@ public sealed class DialogueScreen : ScreenBase
         if (narrative != null)
             narrative.LinePresented -= PresentLineAsync;
 
-        pendingLine?.TrySetCanceled();
+        pendingLine?.TrySetResult(null);
         pendingLine = null;
     }
 
@@ -54,7 +54,7 @@ public sealed class DialogueScreen : ScreenBase
 
     private Task<DialogueChoice> PresentLineAsync(DialogueLine line)
     {
-        pendingLine?.TrySetCanceled();
+        pendingLine?.TrySetResult(null);
         pendingLine = new TaskCompletionSource<DialogueChoice>();
 
         if (speakerLabel != null)
