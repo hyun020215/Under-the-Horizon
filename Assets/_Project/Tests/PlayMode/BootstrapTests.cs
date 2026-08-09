@@ -29,6 +29,12 @@ public sealed class BootstrapTests
         Assert.That(GameObject.Find("GameRoot"), Is.Not.Null);
         Assert.That(Object.FindFirstObjectByType<GameFlowController>(), Is.Not.Null);
         Assert.That(Object.FindFirstObjectByType<AudioListener>(), Is.Not.Null);
+        Assert.That(AppContext.Services, Is.Not.Null);
+        Assert.That(AppContext.Services.Get<GameDefinition>(), Is.Not.Null);
+        Assert.That(AppContext.Services.Get<ContentDatabase>(), Is.Not.Null);
+        Assert.That(AppContext.Services.Get<ContentLoader>(), Is.Not.Null);
+        Assert.That(AppContext.Services.Get<SaveService>(), Is.Not.Null);
+        Assert.That(AppContext.Services.Get<AudioSettingsService>(), Is.Not.Null);
 
         TitleScreen title = Object.FindFirstObjectByType<TitleScreen>(FindObjectsInactive.Include);
         Assert.That(title, Is.Not.Null);
