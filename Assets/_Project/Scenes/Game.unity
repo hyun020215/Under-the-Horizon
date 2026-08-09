@@ -4969,6 +4969,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1826923162}
   - component: {fileID: 1826923161}
+  - component: {fileID: 1826923163}
   m_Layer: 0
   m_Name: SequenceDirector
   m_TagString: Untagged
@@ -4994,6 +4995,19 @@ MonoBehaviour:
   transitions: {fileID: 1697938801}
   screens: {fileID: 712869211}
   inputBlocker: {fileID: 1414039340}
+  cinematicOverlay: {fileID: 1826923163}
+--- !u!114 &1826923163
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1826923160}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d06c48f5f80f402e9c05eb7ee3930b8b, type: 3}
+  m_Name:
+  m_EditorClassIdentifier: UTH.Runtime::CinematicOverlayPresenter
 --- !u!4 &1826923162
 Transform:
   m_ObjectHideFlags: 0

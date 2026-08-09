@@ -1,3 +1,4 @@
+using System.Threading.Tasks;
 using UnityEngine;
 
 public sealed class SfxController : MonoBehaviour
@@ -7,6 +8,8 @@ public sealed class SfxController : MonoBehaviour
 
     [SerializeField]
     private AudioSource loopSource;
+
+    private float userVolume = 1f;
 
     public void Play(AudioClip clip, float volume = 1)
     {
@@ -21,7 +24,7 @@ public sealed class SfxController : MonoBehaviour
         if (loopSource.clip == clip && loopSource.isPlaying)
             return;
         loopSource.clip = clip;
-        loopSource.volume = volume;
+        loopSource.volume = userVolume * Mathf.Clamp01(volume);
         loopSource.loop = true;
         loopSource.Play();
     }
@@ -36,9 +39,46 @@ public sealed class SfxController : MonoBehaviour
 
     public void SetVolume(float value)
     {
+        userVolume = Mathf.Clamp01(value);
         if (source != null)
-            source.volume = Mathf.Clamp01(value);
+            source.volume = userVolume;
         if (loopSource != null)
-            loopSource.volume = Mathf.Clamp01(value);
+            loopSource.volume = userVolume;
+    }
+
+    public void PlayExclusive(AudioClip clip, float volume = 1f)
+    {
+        if (loopSource == null || clip == null)
+            return;
+        loopSource.Stop();
+        loopSource.clip = clip;
+        loopSource.loop = false;
+        loopSource.volume = userVolume * Mathf.Clamp01(volume);
+        loopSource.Play();
+    }
+
+    public async Task FadeOutExclusiveAsync(float duration)
+    {
+        if (loopSource == null || !loopSource.isPlaying)
+            return;
+
+        float startVolume = loopSource.volume;
+        float elapsed = 0f;
+        float safeDuration = Mathf.Max(0f, duration);
+        while (elapsed < safeDuration && loopSource != null)
+        {
+            elapsed += Time.unscaledDeltaTime;
+            loopSource.volume = Mathf.Lerp(
+                startVolume,
+                0f,
+                Mathf.Clamp01(elapsed / safeDuration));
+            await Task.Yield();
+        }
+
+        if (loopSource == null)
+            return;
+        loopSource.Stop();
+        loopSource.clip = null;
+        loopSource.volume = userVolume;
     }
 }

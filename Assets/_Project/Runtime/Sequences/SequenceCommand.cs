@@ -15,7 +15,8 @@ public readonly struct SequenceContext
         AudioDirector audio,
         TransitionDirector transitions,
         ScreenRouter screens,
-        UIInputBlocker inputBlocker
+        UIInputBlocker inputBlocker,
+        CinematicOverlayPresenter cinematicOverlay
     )
     {
         State = state;
@@ -24,6 +25,7 @@ public readonly struct SequenceContext
         Transitions = transitions;
         Screens = screens;
         InputBlocker = inputBlocker;
+        CinematicOverlay = cinematicOverlay;
     }
 
     public GameStateStore State { get; }
@@ -32,4 +34,5 @@ public readonly struct SequenceContext
     public TransitionDirector Transitions { get; }
     public ScreenRouter Screens { get; }
     public UIInputBlocker InputBlocker { get; }
+    public CinematicOverlayPresenter CinematicOverlay { get; }
 }

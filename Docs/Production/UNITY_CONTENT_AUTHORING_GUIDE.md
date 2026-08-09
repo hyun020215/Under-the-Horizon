@@ -129,6 +129,12 @@ Story Scene ID를 검사하는 `if`나 `switch`를 공용 런타임에 추가하
 
 페이드 시간이나 입력 차단을 장면 스크립트에 직접 넣지 않는다. 짧은 연출의 순서는 `SceneSequenceDefinition` 명령 배열로 작성한다.
 
+여러 이미지를 차례로 보여주는 연출은 `ImageMontageCommand`를 사용한다. `frames` 순서,
+프레임별 `holdSeconds`, fade와 시작 scale, stinger, 선택적인 `seenFlag`를 Sequence 자산에
+기록한다. `seenFlag`가 이미 설정되어 있으면 몽타주만 건너뛰고 뒤 명령은 계속 실행된다.
+D1-06 예시는 `SEQ_D1_06_BodyReveal.asset`이다. 입력 차단과 후속 대화는 각각
+`InputLockCommand`와 `DialogueCommand`로 분리한다.
+
 ## 10. 오디오와 녹음
 
 - 원본 오디오: `Assets/_Project/Audio/`

@@ -19,7 +19,7 @@
   - 문, 혈흔·시신, 세면대, 녹음기, 천장 패널의 월드 핫스팟
   - `Character`/`Context`/`Investigation` capability와 증거 획득 검증
   - 다섯 조사 완료 후 Richard 대화와 공식 선택지 개방
-  - Input Lock, Audio, Wait, Dialogue로 구성한 entry Sequence
+  - Input Lock, Audio, 4프레임 Image Montage, Dialogue로 구성한 entry Sequence
 - [x] 필수 Sequence가 `WaitCommand`만 포함하면 실패하도록 Validator를 강화했다.
 - [x] `AudioDirector` 아래 Music A/B, Voice Bark, Story Voice, crossfade와 대화 더킹을 연결했다.
 - [x] Content, 대화 선택지, Save/Load, 대표 Puzzle, Transition, 오디오 회귀 테스트를 추가했다.

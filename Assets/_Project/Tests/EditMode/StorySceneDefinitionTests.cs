@@ -80,4 +80,35 @@ public sealed class StorySceneDefinitionTests
             scene.InteractionSet.Interactions.Count(item => item.HasWorldHotspot),
             Is.EqualTo(5));
     }
+
+    [Test]
+    public void D106RecreatesTheFourFrameBodyDiscoveryMontage()
+    {
+        StorySceneDefinition scene = AssetDatabase
+            .FindAssets("D1_06_BodyDiscovery t:StorySceneDefinition")
+            .Select(AssetDatabase.GUIDToAssetPath)
+            .Select(AssetDatabase.LoadAssetAtPath<StorySceneDefinition>)
+            .Single();
+        ImageMontageCommand montage = scene.EntrySequence.Commands
+            .OfType<ImageMontageCommand>()
+            .Single();
+
+        Assert.That(montage.Frames, Has.Length.EqualTo(4));
+        Assert.That(montage.Frames, Has.All.Not.Null);
+        Assert.That(
+            montage.Frames.Select(frame => frame.name),
+            Is.EqualTo(new[]
+            {
+                "EVD_discovery1",
+                "EVD_discovery2",
+                "EVD_discovery3",
+                "EVD_discovery4"
+            }));
+        Assert.That(
+            montage.HoldSeconds,
+            Is.EqualTo(new[] { 1.2f, 1.35f, 1.3f, 1.75f }));
+        Assert.That(
+            montage.SeenFlag,
+            Is.EqualTo("cinematic.d1_06_body_discovery_seen"));
+    }
 }

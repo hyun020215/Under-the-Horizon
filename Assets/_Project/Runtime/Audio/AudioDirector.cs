@@ -55,4 +55,11 @@ public sealed class AudioDirector : MonoBehaviour
     public void PlayVoiceBark(AudioClip clip) => voice?.PlayBark(clip);
 
     public void PlayStoryVoice(AudioClip clip) => voice?.PlayStory(clip);
+
+    public void PlayCinematicStinger(AudioClip clip, float volume = 1f) =>
+        sfx?.PlayExclusive(clip, volume);
+
+    public System.Threading.Tasks.Task FadeOutCinematicStingerAsync(float duration) =>
+        sfx?.FadeOutExclusiveAsync(duration)
+        ?? System.Threading.Tasks.Task.CompletedTask;
 }

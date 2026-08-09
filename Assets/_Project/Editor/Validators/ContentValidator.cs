@@ -228,6 +228,22 @@ public static class ContentValidator
         if (sequence.Commands.Any(command => command == null))
             errors.Add($"{scene.Id} has a null command in its {label} Sequence.");
 
+        foreach (ImageMontageCommand montage in
+                 sequence.Commands.OfType<ImageMontageCommand>())
+        {
+            if (montage.Frames == null || montage.Frames.Length == 0)
+                errors.Add($"{scene.Id} has an empty image montage.");
+            else if (montage.Frames.Any(frame => frame == null))
+                errors.Add($"{scene.Id} has a missing image montage frame.");
+
+            if (montage.HoldSeconds == null
+                || montage.HoldSeconds.Length != montage.Frames?.Length)
+            {
+                errors.Add(
+                    $"{scene.Id} image montage frame and hold counts differ.");
+            }
+        }
+
         if (scene.AuthoringRequirements?.RequiresEntrySequence == true
             && label == "entry"
             && sequence.Commands.All(command => command is WaitCommand))

@@ -21,6 +21,9 @@ public sealed class SequenceDirector : MonoBehaviour
     [SerializeField]
     private UIInputBlocker inputBlocker;
 
+    [SerializeField]
+    private CinematicOverlayPresenter cinematicOverlay;
+
     public async Task PlayAsync(SceneSequenceDefinition definition)
     {
         if (definition?.Commands == null)
@@ -31,7 +34,8 @@ public sealed class SequenceDirector : MonoBehaviour
             audioDirector,
             transitions,
             screens,
-            inputBlocker);
+            inputBlocker,
+            cinematicOverlay);
         foreach (var command in definition.Commands)
             if (command != null)
                 await command.ExecuteAsync(context);

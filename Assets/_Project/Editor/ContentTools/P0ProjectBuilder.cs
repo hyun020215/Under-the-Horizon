@@ -956,11 +956,14 @@ public static class P0ProjectBuilder
 
         SequenceDirector sequences = new GameObject("SequenceDirector").AddComponent<SequenceDirector>();
         sequences.transform.SetParent(root.transform);
+        CinematicOverlayPresenter cinematicOverlay =
+            sequences.gameObject.AddComponent<CinematicOverlayPresenter>();
         SetObject(sequences, "state", state);
         SetObject(sequences, "narrative", narrative);
         SetObject(sequences, "audioDirector", audio);
         SetObject(sequences, "transitions", transitions);
         SetObject(sequences, "screens", router);
+        SetObject(sequences, "cinematicOverlay", cinematicOverlay);
 
         StorySceneDirector story = new GameObject("StorySceneDirector").AddComponent<StorySceneDirector>();
         story.transform.SetParent(root.transform);
