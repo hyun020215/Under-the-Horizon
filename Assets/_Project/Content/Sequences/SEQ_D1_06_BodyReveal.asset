@@ -14,10 +14,32 @@ MonoBehaviour:
   m_EditorClassIdentifier: UTH.Runtime::SceneSequenceDefinition
   commands:
   - rid: 1001
+  - rid: 1002
+  - rid: 1003
+  - rid: 1004
+  - rid: 1005
   references:
     version: 2
     RefIds:
     - rid: 1001
+      type: {class: InputLockCommand, ns: , asm: UTH.Runtime}
+      data:
+        locked: 1
+    - rid: 1002
+      type: {class: AudioCommand, ns: , asm: UTH.Runtime}
+      data:
+        profile: {fileID: 11400000, guid: b6cede6fe84473e4dbbf209311896600, type: 2}
+    - rid: 1003
       type: {class: WaitCommand, ns: , asm: UTH.Runtime}
       data:
         seconds: 0.35
+    - rid: 1004
+      type: {class: InputLockCommand, ns: , asm: UTH.Runtime}
+      data:
+        locked: 0
+    - rid: 1005
+      type: {class: DialogueCommand, ns: , asm: UTH.Runtime}
+      data:
+        dialogue: {fileID: 11400000, guid: 031343eb815e6ff4898cf073653e87d9, type: 2}
+        startLineId: D1-06_001
+        endLineId: D1-06_007

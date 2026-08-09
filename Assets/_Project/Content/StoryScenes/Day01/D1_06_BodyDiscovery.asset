@@ -19,11 +19,12 @@ MonoBehaviour:
   timeBlock: 4
   entryConditions: []
   location: {fileID: 11400000, guid: d4c15ea9358c6024ca6793677b4ff7db, type: 2}
-  locationState: {fileID: 11400000, guid: 891674ee7b2063546a445296d65bf11c, type: 2}
+  locationState: {fileID: 11400000, guid: feef69a14d766fd408479a4852e7b79c, type: 2}
   initialScreen: 2
   characterSet: {fileID: 11400000, guid: 0faf50cfc54d6974e8bae965f1e52122, type: 2}
   interactionSet: {fileID: 11400000, guid: d8f7d6a9ade27404896c0786769cdffc, type: 2}
   entryDialogue: {fileID: 11400000, guid: 031343eb815e6ff4898cf073653e87d9, type: 2}
+  deferEntryDialogue: 1
   puzzle: {fileID: 0}
   audioProfile: {fileID: 11400000, guid: b6cede6fe84473e4dbbf209311896600, type: 2}
   entrySequence: {fileID: 11400000, guid: 03bac07d1ddc7eb46afc6ffcaa550d80, type: 2}
@@ -33,7 +34,17 @@ MonoBehaviour:
   onEnterEffects: []
   onCompleteEffects:
   - {fileID: 11400000, guid: 1761c1dcfc0e7794893498c5eac7bac0, type: 2}
-  authoringRequirements: {minimumInteractionCount: 1, requiresPuzzle: 0, requiresEntrySequence: 1, requiresExitSequence: 0}
+  authoringRequirements:
+    minimumInteractionCount: 6
+    requiresPuzzle: 0
+    requiresEntrySequence: 1
+    requiresExitSequence: 0
+    requiredInteractionTypes:
+    - 0
+    - 2
+    - 3
+    requiresEvidenceAcquisition: 1
+    requiresSceneChoice: 1
   routes:
   - targetSceneId: D1-07
     conditions: []

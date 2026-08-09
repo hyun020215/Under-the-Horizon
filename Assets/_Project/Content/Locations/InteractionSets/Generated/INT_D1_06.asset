@@ -13,4 +13,9 @@ MonoBehaviour:
   m_Name: INT_D1_06
   m_EditorClassIdentifier: UTH.Runtime::InteractionSet
   interactions:
-  - {fileID: 11400000, guid: dd93bf9a24eda044e8ef87c0a4e889f5, type: 2}
+  - {fileID: 11400000, guid: cd7ed3a8ac6b405fb0e835b8975beae2, type: 2}
+  - {fileID: 11400000, guid: 5b696e61b216477194df63a42df756ef, type: 2}
+  - {fileID: 11400000, guid: ddf85dd10bcb489d88dd2a8e01b4f7a6, type: 2}
+  - {fileID: 11400000, guid: 75ce511550904237be979964b64d06e8, type: 2}
+  - {fileID: 11400000, guid: d394795a19a5418eb08cdf4ce84ffcae, type: 2}
+  - {fileID: 11400000, guid: 9b1b360ad8a04057bebf0c084ae6b413, type: 2}

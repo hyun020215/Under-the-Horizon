@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e19c4faf4d8ba0248b7060e7442721fe, type: 3}
   m_Name: HORIZON_CrimeScene
   m_EditorClassIdentifier: UTH.Runtime::LocationStateDefinition
-  id: 
-  background: {fileID: 0}
+  id: HORIZON_CRIME_SCENE
+  background: {fileID: 21300000, guid: e07053b65c3f8b14099ea36f4b678dc2, type: 3}
   tint: {r: 1, g: 1, b: 1, a: 1}
-  audioOverride: {fileID: 0}
+  audioOverride: {fileID: 11400000, guid: b6cede6fe84473e4dbbf209311896600, type: 2}

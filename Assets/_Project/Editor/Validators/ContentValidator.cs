@@ -137,7 +137,25 @@ public static class ContentValidator
         foreach (InteractionDefinition interaction in interactions)
         {
             if (interaction == null || interaction.Action == null)
+            {
                 errors.Add($"{scene.Id} has an invalid interaction reference.");
+                continue;
+            }
+
+            if (!interaction.HasWorldHotspot)
+                continue;
+
+            Rect rect = interaction.NormalizedRect;
+            if (rect.width <= 0f
+                || rect.height <= 0f
+                || rect.xMin < 0f
+                || rect.yMin < 0f
+                || rect.xMax > 1f
+                || rect.yMax > 1f)
+            {
+                errors.Add(
+                    $"{scene.Id}/{interaction.Id} has an invalid normalized hotspot.");
+            }
         }
     }
 
@@ -164,6 +182,32 @@ public static class ContentValidator
             errors.Add($"{scene.Id} requires an entry Sequence.");
         if (requirements.RequiresExitSequence && scene.ExitSequence == null)
             errors.Add($"{scene.Id} requires an exit Sequence.");
+
+        InteractionDefinition[] interactions =
+            scene.InteractionSet?.Interactions ?? Array.Empty<InteractionDefinition>();
+        if (requirements.RequiredInteractionTypes != null)
+        {
+            foreach (InteractionType requiredType in
+                     requirements.RequiredInteractionTypes.Distinct())
+            {
+                if (!interactions.Any(interaction =>
+                        interaction != null && interaction.Type == requiredType))
+                {
+                    errors.Add(
+                        $"{scene.Id} requires a {requiredType} interaction.");
+                }
+            }
+        }
+
+        if (requirements.RequiresEvidenceAcquisition
+            && !interactions.Any(interaction =>
+                interaction?.Action?.GrantsEvidence == true))
+        {
+            errors.Add($"{scene.Id} requires an evidence acquisition interaction.");
+        }
+
+        if (requirements.RequiresSceneChoice && !HasChoice(scene.EntryDialogue))
+            errors.Add($"{scene.Id} requires a dialogue choice.");
     }
 
     private static void ValidateSequence(
@@ -183,6 +227,20 @@ public static class ContentValidator
 
         if (sequence.Commands.Any(command => command == null))
             errors.Add($"{scene.Id} has a null command in its {label} Sequence.");
+
+        if (scene.AuthoringRequirements?.RequiresEntrySequence == true
+            && label == "entry"
+            && sequence.Commands.All(command => command is WaitCommand))
+        {
+            errors.Add($"{scene.Id} has a placeholder-only entry Sequence.");
+        }
+
+        if (scene.AuthoringRequirements?.RequiresExitSequence == true
+            && label == "exit"
+            && sequence.Commands.All(command => command is WaitCommand))
+        {
+            errors.Add($"{scene.Id} has a placeholder-only exit Sequence.");
+        }
     }
 
     private static void ValidateLocations(ICollection<string> errors)
@@ -375,6 +433,9 @@ public static class ContentValidator
             }
         }
     }
+
+    private static bool HasChoice(DialogueSequence dialogue) =>
+        dialogue?.Lines?.Any(line => line.choices?.Length > 0) == true;
 
     private static void ValidateCanonicalIds(
         IEnumerable<string> actualIds,

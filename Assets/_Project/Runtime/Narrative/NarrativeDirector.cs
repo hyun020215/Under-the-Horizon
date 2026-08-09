@@ -29,6 +29,14 @@ public sealed class NarrativeDirector : MonoBehaviour
 
     public async Task PlayAsync(DialogueSequence sequence)
     {
+        await PlayAsync(sequence, null, null);
+    }
+
+    public async Task PlayAsync(
+        DialogueSequence sequence,
+        string startLineId,
+        string endLineId)
+    {
         if (sequence == null)
             return;
         ScreenId returnScreen = screens?.Current ?? ScreenId.Exploration;
@@ -54,11 +62,17 @@ public sealed class NarrativeDirector : MonoBehaviour
                 lineIndexes[lines[index].id] = index;
         }
 
+        int startIndex = ResolveIndex(lineIndexes, startLineId, 0);
+        int endIndex = ResolveIndex(lineIndexes, endLineId, lines.Length - 1);
+        if (startIndex > endIndex)
+            throw new InvalidOperationException(
+                $"Dialogue {sequence.Id} has an invalid playback range.");
+
         bool cancelled = false;
-        var currentIndex = 0;
+        int currentIndex = startIndex;
         var executedSteps = 0;
         int maximumSteps = Mathf.Max(lines.Length * 4, 1);
-        while (currentIndex < lines.Length && executedSteps++ < maximumSteps)
+        while (currentIndex <= endIndex && executedSteps++ < maximumSteps)
         {
             DialogueLine line = lines[currentIndex];
             if (!ConditionResolver.All(line.conditions, state))
@@ -95,7 +109,9 @@ public sealed class NarrativeDirector : MonoBehaviour
                 && !string.IsNullOrWhiteSpace(selected.NextLineId)
                 && lineIndexes.TryGetValue(selected.NextLineId, out int nextIndex))
             {
-                currentIndex = nextIndex;
+                currentIndex = nextIndex >= startIndex && nextIndex <= endIndex
+                    ? nextIndex
+                    : endIndex + 1;
             }
             else
             {
@@ -124,5 +140,17 @@ public sealed class NarrativeDirector : MonoBehaviour
                 if (choice != null && choice.IsAvailable(state))
                     return choice;
         return null;
+    }
+
+    private static int ResolveIndex(
+        IReadOnlyDictionary<string, int> indexes,
+        string lineId,
+        int fallback)
+    {
+        if (string.IsNullOrWhiteSpace(lineId))
+            return fallback;
+        if (indexes.TryGetValue(lineId, out int index))
+            return index;
+        throw new InvalidOperationException($"Dialogue line '{lineId}' is missing.");
     }
 }

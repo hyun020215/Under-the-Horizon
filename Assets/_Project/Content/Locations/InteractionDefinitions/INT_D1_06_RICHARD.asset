@@ -1,0 +1,93 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400001
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0c8dd78888d443158a34d0bbbfcf3304, type: 3}
+  m_Name: COND_D1_06_DOOR_COMPLETE
+  m_EditorClassIdentifier: UTH.Runtime::InteractionCompletedCondition
+  interactionId: INT_D1_06_DOOR
+--- !u!114 &11400002
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0c8dd78888d443158a34d0bbbfcf3304, type: 3}
+  m_Name: COND_D1_06_BLOOD_COMPLETE
+  m_EditorClassIdentifier: UTH.Runtime::InteractionCompletedCondition
+  interactionId: INT_D1_06_BLOOD
+--- !u!114 &11400003
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0c8dd78888d443158a34d0bbbfcf3304, type: 3}
+  m_Name: COND_D1_06_SINK_COMPLETE
+  m_EditorClassIdentifier: UTH.Runtime::InteractionCompletedCondition
+  interactionId: INT_D1_06_SINK
+--- !u!114 &11400004
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0c8dd78888d443158a34d0bbbfcf3304, type: 3}
+  m_Name: COND_D1_06_RECORDER_COMPLETE
+  m_EditorClassIdentifier: UTH.Runtime::InteractionCompletedCondition
+  interactionId: INT_D1_06_RECORDER
+--- !u!114 &11400005
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0c8dd78888d443158a34d0bbbfcf3304, type: 3}
+  m_Name: COND_D1_06_CEILING_COMPLETE
+  m_EditorClassIdentifier: UTH.Runtime::InteractionCompletedCondition
+  interactionId: INT_D1_06_CEILING
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0eb5a31aeabd45947bf8c5b6c03af2ab, type: 3}
+  m_Name: INT_D1_06_RICHARD
+  m_EditorClassIdentifier: UTH.Runtime::InteractionDefinition
+  id: INT_D1_06_RICHARD
+  type: 0
+  displayName: 리처드와 현장 판단
+  targetId: CHR_RICHARD
+  hasWorldHotspot: 0
+  normalizedRect: {x: 0, y: 0, width: 0, height: 0}
+  conditions:
+  - {fileID: 11400001}
+  - {fileID: 11400002}
+  - {fileID: 11400003}
+  - {fileID: 11400004}
+  - {fileID: 11400005}
+  action: {fileID: 11400000, guid: 9915da7c6d6d44ca9bb0e918aa99648d, type: 2}
+  repeatable: 0

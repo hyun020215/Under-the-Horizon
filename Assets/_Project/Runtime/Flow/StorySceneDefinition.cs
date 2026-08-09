@@ -16,10 +16,22 @@ public sealed class StorySceneAuthoringRequirements
     [SerializeField]
     private bool requiresExitSequence;
 
+    [SerializeField]
+    private InteractionType[] requiredInteractionTypes;
+
+    [SerializeField]
+    private bool requiresEvidenceAcquisition;
+
+    [SerializeField]
+    private bool requiresSceneChoice;
+
     public int MinimumInteractionCount => minimumInteractionCount;
     public bool RequiresPuzzle => requiresPuzzle;
     public bool RequiresEntrySequence => requiresEntrySequence;
     public bool RequiresExitSequence => requiresExitSequence;
+    public InteractionType[] RequiredInteractionTypes => requiredInteractionTypes;
+    public bool RequiresEvidenceAcquisition => requiresEvidenceAcquisition;
+    public bool RequiresSceneChoice => requiresSceneChoice;
 }
 
 [CreateAssetMenu(fileName = "StoryScene", menuName = "Under The Horizon/Story/Story Scene")]
@@ -66,6 +78,9 @@ public sealed class StorySceneDefinition : ScriptableObject
     [Header("Narrative")]
     [SerializeField]
     private DialogueSequence entryDialogue;
+
+    [SerializeField]
+    private bool deferEntryDialogue;
 
     [Header("Puzzle")]
     [SerializeField]
@@ -122,6 +137,7 @@ public sealed class StorySceneDefinition : ScriptableObject
     public InteractionSet InteractionSet => interactionSet;
 
     public DialogueSequence EntryDialogue => entryDialogue;
+    public bool DeferEntryDialogue => deferEntryDialogue;
     public PuzzleDefinition Puzzle => puzzle;
 
     public AudioCueProfile AudioProfile => audioProfile;

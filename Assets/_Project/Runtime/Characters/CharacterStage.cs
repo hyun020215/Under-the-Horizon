@@ -49,7 +49,9 @@ public sealed class CharacterStage : MonoBehaviour
 
         try
         {
-            await interactions.ExecuteFirstAvailableAsync(InteractionType.Character);
+            await interactions.ExecuteFirstAvailableAsync(
+                InteractionType.Character,
+                view.Definition?.Id);
         }
         catch (System.Exception exception)
         {

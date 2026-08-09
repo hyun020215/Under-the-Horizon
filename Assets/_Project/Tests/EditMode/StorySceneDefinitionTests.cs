@@ -51,4 +51,33 @@ public sealed class StorySceneDefinitionTests
                 Assert.That(scene.ExitSequence, Is.Not.Null, scene.Id);
         }
     }
+
+    [Test]
+    public void D106UsesAuthoredInvestigationCapabilitiesAndCrimeSceneState()
+    {
+        StorySceneDefinition scene = AssetDatabase
+            .FindAssets("D1_06_BodyDiscovery t:StorySceneDefinition")
+            .Select(AssetDatabase.GUIDToAssetPath)
+            .Select(AssetDatabase.LoadAssetAtPath<StorySceneDefinition>)
+            .Single();
+
+        Assert.That(scene.LocationState.Id, Is.EqualTo("HORIZON_CRIME_SCENE"));
+        Assert.That(scene.DeferEntryDialogue, Is.True);
+        Assert.That(scene.InteractionSet.Interactions, Has.Length.EqualTo(6));
+        Assert.That(
+            scene.InteractionSet.Interactions.Select(item => item.Type),
+            Does.Contain(InteractionType.Character));
+        Assert.That(
+            scene.InteractionSet.Interactions.Select(item => item.Type),
+            Does.Contain(InteractionType.Context));
+        Assert.That(
+            scene.InteractionSet.Interactions.Select(item => item.Type),
+            Does.Contain(InteractionType.Investigation));
+        Assert.That(
+            scene.InteractionSet.Interactions.Any(item => item.Action.GrantsEvidence),
+            Is.True);
+        Assert.That(
+            scene.InteractionSet.Interactions.Count(item => item.HasWorldHotspot),
+            Is.EqualTo(5));
+    }
 }

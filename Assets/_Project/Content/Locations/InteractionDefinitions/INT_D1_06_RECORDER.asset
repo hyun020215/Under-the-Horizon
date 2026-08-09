@@ -1,0 +1,23 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0eb5a31aeabd45947bf8c5b6c03af2ab, type: 3}
+  m_Name: INT_D1_06_RECORDER
+  m_EditorClassIdentifier: UTH.Runtime::InteractionDefinition
+  id: INT_D1_06_RECORDER
+  type: 3
+  displayName: 휴대 녹음기
+  targetId: 
+  hasWorldHotspot: 1
+  normalizedRect: {x: 0.455, y: 0.13, width: 0.05, height: 0.07}
+  conditions: []
+  action: {fileID: 11400000, guid: 70464165822f46a4b30655deee2c902d, type: 2}
+  repeatable: 0

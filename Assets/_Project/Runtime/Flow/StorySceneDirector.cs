@@ -52,7 +52,7 @@ public sealed class StorySceneDirector : MonoBehaviour
         await transitions.EndAsync(scene.EntryTransition);
         if (scene.EntrySequence != null)
             await sequences.PlayAsync(scene.EntrySequence);
-        if (scene.EntryDialogue != null)
+        if (scene.EntryDialogue != null && !scene.DeferEntryDialogue)
             await narrative.PlayAsync(scene.EntryDialogue);
     }
 

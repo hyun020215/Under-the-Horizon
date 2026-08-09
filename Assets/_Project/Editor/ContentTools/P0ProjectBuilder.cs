@@ -43,6 +43,7 @@ public static class P0ProjectBuilder
         BuildLocationDefaults(scenes);
         BuildUiAudio();
         BuildDialogue(scenes);
+        DialogueCsvImporter.ImportAll();
         BuildSceneSupportAssets(scenes);
         PopulateEvidence();
         PopulateCharacters();
@@ -148,7 +149,13 @@ public static class P0ProjectBuilder
             AudioCueProfile audio = GetOrCreate<AudioCueProfile>(audioPath);
             ConfigureAudio(audio, token);
             SetObject(location, "defaultAudio", audio);
-            SetArray(location, "states", new UnityEngine.Object[] { state });
+            UnityEngine.Object[] states = (location.States ?? Array.Empty<LocationStateDefinition>())
+                .Where(item => item != null)
+                .Cast<UnityEngine.Object>()
+                .Append(state)
+                .Distinct()
+                .ToArray();
+            SetArray(location, "states", states);
         }
     }
 
@@ -247,6 +254,9 @@ public static class P0ProjectBuilder
             EditorUtility.SetDirty(placements);
 
             InteractionSet interactions = GetOrCreate<InteractionSet>(InteractionPath(scene.Id));
+            if (interactions.Interactions != null && interactions.Interactions.Length > 0)
+                continue;
+
             DialogueSequence dialogue = AssetDatabase.LoadAssetAtPath<DialogueSequence>(
                 DialogueAssetPath(scene.Id)
             );
@@ -287,7 +297,9 @@ public static class P0ProjectBuilder
 
             LocationDefinition location = FindLocation(row.Location);
             serialized.FindProperty("location").objectReferenceValue = location;
-            serialized.FindProperty("locationState").objectReferenceValue = location?.States?.FirstOrDefault();
+            SerializedProperty locationState = serialized.FindProperty("locationState");
+            if (locationState.objectReferenceValue == null)
+                locationState.objectReferenceValue = location?.States?.FirstOrDefault();
             serialized.FindProperty("characterSet").objectReferenceValue = AssetDatabase.LoadAssetAtPath<CharacterPlacementSet>(PlacementPath(row.Id));
             serialized.FindProperty("interactionSet").objectReferenceValue = AssetDatabase.LoadAssetAtPath<InteractionSet>(InteractionPath(row.Id));
             serialized.FindProperty("entryDialogue").objectReferenceValue = AssetDatabase.LoadAssetAtPath<DialogueSequence>(DialogueAssetPath(row.Id));

@@ -4959,6 +4959,7 @@ MonoBehaviour:
   audioDirector: {fileID: 543669127}
   transitions: {fileID: 1697938801}
   screens: {fileID: 712869211}
+  inputBlocker: {fileID: 1414039340}
 --- !u!4 &1826923162
 Transform:
   m_ObjectHideFlags: 0
@@ -5006,6 +5007,8 @@ MonoBehaviour:
   state: {fileID: 752936245}
   narrative: {fileID: 1382825533}
   puzzles: {fileID: 1607134439}
+  hotspotPrefab: {fileID: 8174279445771892240, guid: 42be2e85c6243fa4e8177066cb1e93f1, type: 3}
+  hotspotRoot: {fileID: 1650080753}
 --- !u!4 &1836233689
 Transform:
   m_ObjectHideFlags: 0

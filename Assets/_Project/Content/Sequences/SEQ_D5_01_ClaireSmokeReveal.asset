@@ -14,10 +14,15 @@ MonoBehaviour:
   m_EditorClassIdentifier: UTH.Runtime::SceneSequenceDefinition
   commands:
   - rid: 1001
+  - rid: 1002
   references:
     version: 2
     RefIds:
     - rid: 1001
+      type: {class: AudioCommand, ns: , asm: UTH.Runtime}
+      data:
+        profile: {fileID: 11400000, guid: b6cede6fe84473e4dbbf209311896600, type: 2}
+    - rid: 1002
       type: {class: WaitCommand, ns: , asm: UTH.Runtime}
       data:
         seconds: 0.35

@@ -14,7 +14,8 @@ public readonly struct SequenceContext
         NarrativeDirector narrative,
         AudioDirector audio,
         TransitionDirector transitions,
-        ScreenRouter screens
+        ScreenRouter screens,
+        UIInputBlocker inputBlocker
     )
     {
         State = state;
@@ -22,6 +23,7 @@ public readonly struct SequenceContext
         Audio = audio;
         Transitions = transitions;
         Screens = screens;
+        InputBlocker = inputBlocker;
     }
 
     public GameStateStore State { get; }
@@ -29,4 +31,5 @@ public readonly struct SequenceContext
     public AudioDirector Audio { get; }
     public TransitionDirector Transitions { get; }
     public ScreenRouter Screens { get; }
+    public UIInputBlocker InputBlocker { get; }
 }

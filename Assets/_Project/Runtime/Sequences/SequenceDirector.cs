@@ -18,11 +18,20 @@ public sealed class SequenceDirector : MonoBehaviour
     [SerializeField]
     private ScreenRouter screens;
 
+    [SerializeField]
+    private UIInputBlocker inputBlocker;
+
     public async Task PlayAsync(SceneSequenceDefinition definition)
     {
         if (definition?.Commands == null)
             return;
-        var context = new SequenceContext(state, narrative, audioDirector, transitions, screens);
+        var context = new SequenceContext(
+            state,
+            narrative,
+            audioDirector,
+            transitions,
+            screens,
+            inputBlocker);
         foreach (var command in definition.Commands)
             if (command != null)
                 await command.ExecuteAsync(context);

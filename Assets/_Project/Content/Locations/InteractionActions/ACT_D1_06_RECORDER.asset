@@ -1,0 +1,33 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400001
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e713369a9b2175746ad2fcf7c6909209, type: 3}
+  m_Name: FX_D1_06_DYING_MESSAGE
+  m_EditorClassIdentifier: UTH.Runtime::SetFlagEffect
+  flagId: dying_message_R
+  value: 1
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bfbdad7ea28fb0c4e96d79dcae003a59, type: 3}
+  m_Name: ACT_D1_06_RECORDER
+  m_EditorClassIdentifier: UTH.Runtime::InvestigationInteractionAction
+  dialogue: {fileID: 11400000, guid: 031343eb815e6ff4898cf073653e87d9, type: 2}
+  startLineId: D1-06_017
+  endLineId: D1-06_019
+  effects:
+  - {fileID: 11400001}
