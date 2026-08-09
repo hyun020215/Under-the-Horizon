@@ -24,6 +24,8 @@ public sealed class NarrativeDirector : MonoBehaviour
     private TransitionProfile dialogueCloseTransition;
     private readonly DialogueHistory history = new();
     public event Func<DialogueLine, Task<DialogueChoice>> LinePresented;
+    public event Action DialogueStarted;
+    public event Action DialogueEnded;
     public DialogueHistory History => history;
     public GameStateStore State => state;
 
@@ -39,6 +41,22 @@ public sealed class NarrativeDirector : MonoBehaviour
     {
         if (sequence == null)
             return;
+        DialogueStarted?.Invoke();
+        try
+        {
+            await PlayCoreAsync(sequence, startLineId, endLineId);
+        }
+        finally
+        {
+            DialogueEnded?.Invoke();
+        }
+    }
+
+    private async Task PlayCoreAsync(
+        DialogueSequence sequence,
+        string startLineId,
+        string endLineId)
+    {
         ScreenId returnScreen = screens?.Current ?? ScreenId.Exploration;
         if (returnScreen == ScreenId.Dialogue)
             returnScreen = ScreenId.Exploration;
@@ -48,8 +66,7 @@ public sealed class NarrativeDirector : MonoBehaviour
                 ScreenId.Dialogue,
                 new ScreenContext(sequence),
                 transitions,
-                dialogueOpenTransition
-            );
+                dialogueOpenTransition);
         }
         if (sequence.Lines == null)
             return;
@@ -65,8 +82,10 @@ public sealed class NarrativeDirector : MonoBehaviour
         int startIndex = ResolveIndex(lineIndexes, startLineId, 0);
         int endIndex = ResolveIndex(lineIndexes, endLineId, lines.Length - 1);
         if (startIndex > endIndex)
+        {
             throw new InvalidOperationException(
                 $"Dialogue {sequence.Id} has an invalid playback range.");
+        }
 
         bool cancelled = false;
         int currentIndex = startIndex;
@@ -98,7 +117,10 @@ public sealed class NarrativeDirector : MonoBehaviour
                 }
             }
             else
+            {
                 selected = FirstAvailable(line.choices);
+            }
+
             if (line.effects != null)
                 foreach (GameEffect effect in line.effects)
                     effect?.Apply(state);
@@ -120,7 +142,11 @@ public sealed class NarrativeDirector : MonoBehaviour
         }
 
         if (!cancelled && executedSteps > maximumSteps)
-            Debug.LogError($"Dialogue {sequence.Id} exceeded its execution step limit.", this);
+        {
+            Debug.LogError(
+                $"Dialogue {sequence.Id} exceeded its execution step limit.",
+                this);
+        }
 
         if (!cancelled && screens != null)
         {
@@ -128,8 +154,7 @@ public sealed class NarrativeDirector : MonoBehaviour
                 returnScreen,
                 default,
                 transitions,
-                dialogueCloseTransition
-            );
+                dialogueCloseTransition);
         }
     }
 

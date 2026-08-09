@@ -25,12 +25,18 @@ public sealed class DialogueFlowTests
                 ?.SetValue(sequence, lines);
 
             NarrativeDirector director = gameObject.AddComponent<NarrativeDirector>();
+            var started = 0;
+            var ended = 0;
+            director.DialogueStarted += () => started++;
+            director.DialogueEnded += () => ended++;
             var task = director.PlayAsync(sequence);
             while (!task.IsCompleted)
                 yield return null;
 
             Assert.That(task.IsFaulted, Is.False);
             Assert.That(director.History.Lines, Is.EqualTo(new[] { "line-1", "line-2" }));
+            Assert.That(started, Is.EqualTo(1));
+            Assert.That(ended, Is.EqualTo(1));
         }
         finally
         {
@@ -114,6 +120,31 @@ public sealed class DialogueFlowTests
         finally
         {
             Object.Destroy(sequence);
+            Object.Destroy(gameObject);
+        }
+    }
+
+    [UnityTest]
+    public IEnumerator AudioCrossfadeCreatesAndAlternatesTwoMusicBuses()
+    {
+        var gameObject = new GameObject("AudioCrossfadeTest");
+
+        try
+        {
+            gameObject.AddComponent<AudioSource>();
+            AudioCrossfade crossfade = gameObject.AddComponent<AudioCrossfade>();
+            yield return null;
+
+            Assert.That(gameObject.GetComponents<AudioSource>(), Has.Length.EqualTo(2));
+            AudioSource initial = crossfade.ActiveSource;
+            crossfade.Play(null, 0.6f, 0f);
+            yield return null;
+
+            Assert.That(crossfade.ActiveSource, Is.Not.SameAs(initial));
+            Assert.That(crossfade.ActiveSource.volume, Is.EqualTo(0.6f).Within(0.001f));
+        }
+        finally
+        {
             Object.Destroy(gameObject);
         }
     }
