@@ -32,7 +32,7 @@
 
 - 프리팹: `Assets/_Project/Prefabs/UI/PF_TitleScreen.prefab`
 - 화면 클래스: `Assets/_Project/Runtime/UI/Screens/TitleScreen.cs`
-- 로고 원본: `Assets/_Project/Art/UI/Overhaul/UI_logo_transparent.png`
+- 로고 원본: `Assets/_Project/Art/Branding/UI_logo_transparent.png`
 - 테마: `Assets/_Project/Content/UI/UITheme.asset`
 
 레이아웃과 이미지 교체는 프리팹에서 수행한다. 시작·불러오기·설정 같은 동작은 `TitleScreen`이 서비스를 호출하도록 구현하고, 다른 패널을 직접 `SetActive`하지 않는다. 화면 전환은 `ScreenRouter.OpenAsync`를 사용한다.

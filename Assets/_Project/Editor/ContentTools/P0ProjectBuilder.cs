@@ -627,7 +627,7 @@ public static class P0ProjectBuilder
         background.raycastTarget = false;
 
         Sprite titleSprite = AssetDatabase.LoadAssetAtPath<Sprite>(
-            ProjectRoot + "/Art/UI/Overhaul/UI_title_background.png"
+            ProjectRoot + "/Art/UI/Screens/UI_title_background.png"
         );
         Image artwork = CreateLayer("Title Background", root).gameObject.AddComponent<Image>();
         artwork.sprite = titleSprite;
@@ -648,7 +648,7 @@ public static class P0ProjectBuilder
         GameObject logoObject = new("Under the Horizon Logo", typeof(RectTransform), typeof(CanvasRenderer), typeof(Image));
         logoObject.transform.SetParent(root, false);
         Image logo = logoObject.GetComponent<Image>();
-        logo.sprite = AssetDatabase.LoadAssetAtPath<Sprite>(ProjectRoot + "/Art/UI/Overhaul/UI_logo_transparent.png");
+        logo.sprite = AssetDatabase.LoadAssetAtPath<Sprite>(ProjectRoot + "/Art/Branding/UI_logo_transparent.png");
         logo.preserveAspect = true;
         logo.raycastTarget = false;
         SetRect(logoObject.GetComponent<RectTransform>(), new Vector2(0f, 0.10f), new Vector2(0.50f, 1f));
