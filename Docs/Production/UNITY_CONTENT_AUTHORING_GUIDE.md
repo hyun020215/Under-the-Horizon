@@ -138,6 +138,7 @@ D1-06 예시는 `SEQ_D1_06_BodyReveal.asset`이다. 입력 차단과 후속 대�
 ## 10. 오디오와 녹음
 
 - 원본 오디오: `Assets/_Project/Audio/`
+- 오디오 정리 기준: `Docs/Production/AUDIO_ASSET_GUIDE.md`
 - Cue 자산: `Assets/_Project/Content/Audio/`
 - 편집 메뉴: `Under The Horizon > Content > Audio Cues`
 - 런타임: `Assets/_Project/Runtime/Audio/AudioDirector.cs`

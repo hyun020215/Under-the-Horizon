@@ -22,6 +22,8 @@
   - Input Lock, Audio, 4프레임 Image Montage, Dialogue로 구성한 entry Sequence
 - [x] 필수 Sequence가 `WaitCommand`만 포함하면 실패하도록 Validator를 강화했다.
 - [x] `AudioDirector` 아래 Music A/B, Voice Bark, Story Voice, crossfade와 대화 더킹을 연결했다.
+- [x] Audio 원본을 Music·Ambience·SFX·VoiceBarks·StoryRecordings 역할로 정리하고,
+  Story Recording 16개를 Story Scene별 `REC_` 자산으로 분리했다.
 - [x] Content, 대화 선택지, Save/Load, 대표 Puzzle, Transition, 오디오 회귀 테스트를 추가했다.
 
 ## P1 — 플레이 가능한 콘텐츠 완성

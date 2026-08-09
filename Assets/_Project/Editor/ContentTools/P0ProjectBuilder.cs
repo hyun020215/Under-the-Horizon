@@ -626,7 +626,7 @@ public static class P0ProjectBuilder
         SetObject(screen, "advanceLabel", advanceText);
         SetArray(screen, "choiceButtons", choices.Cast<UnityEngine.Object>().ToArray());
         SetArray(screen, "choiceLabels", choiceLabels.Cast<UnityEngine.Object>().ToArray());
-        SetObject(screen, "typewriterClip", FindAudio("Type_Writer"));
+        SetObject(screen, "typewriterClip", FindAudio("Typewriter"));
         SetFloat(screen, "charactersPerSecond", 45f);
     }
 
@@ -928,8 +928,8 @@ public static class P0ProjectBuilder
 
         UiFeedbackInstaller feedback = uiFrame.gameObject.AddComponent<UiFeedbackInstaller>();
         SetObject(feedback, "sfx", sfx);
-        SetObject(feedback, "hoverClip", FindAudio("Whoop_-_a_short_2"));
-        SetObject(feedback, "clickClip", FindAudio("finger snap"));
+        SetObject(feedback, "hoverClip", FindAudio("UIWhoop_02"));
+        SetObject(feedback, "clickClip", FindAudio("FingerSnap"));
 
         NarrativeDirector narrative = new GameObject("NarrativeDirector").AddComponent<NarrativeDirector>();
         narrative.transform.SetParent(root.transform);
