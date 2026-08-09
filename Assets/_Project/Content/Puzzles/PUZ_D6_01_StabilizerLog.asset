@@ -12,6 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 62502b5ae7880434b8dde707009f6c87, type: 3}
   m_Name: PUZ_D6_01_StabilizerLog
   m_EditorClassIdentifier: UTH.Runtime::PuzzleDefinition
-  id: 
-  controllerKey: 
-  completionEffects: []
+  id: PUZ_D6_01
+  controllerKey: StabilizerPuzzleController
+  completionEffects:
+  - {fileID: 11400000, guid: ad41f05cb87f6444390f54f39f0f0cc5, type: 2}

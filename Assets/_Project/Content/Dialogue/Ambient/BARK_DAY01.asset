@@ -13,4 +13,26 @@ MonoBehaviour:
   m_Name: BARK_DAY01
   m_EditorClassIdentifier: UTH.Runtime::DialogueSequence
   id: BARK_DAY01
-  lines: []
+  lines:
+  - id: DAY01_01
+    speaker:
+      character: {fileID: 0}
+      overrideName: 악단원
+    text: "악단은 리허설을 마쳤어요. 무대 왼쪽 마이크가 자꾸 잡음을 내긴 하지만요."
+    expression: 0
+    voiceRequired: 0
+    voiceClip: {fileID: 0}
+    conditions: []
+    effects: []
+    choices: []
+  - id: DAY01_02
+    speaker:
+      character: {fileID: 0}
+      overrideName: 승객
+    text: "출항 전 선체가 가장 잘 보이는 곳이 여기예요. 사진 한 장 남기시겠어요?"
+    expression: 0
+    voiceRequired: 0
+    voiceClip: {fileID: 0}
+    conditions: []
+    effects: []
+    choices: []

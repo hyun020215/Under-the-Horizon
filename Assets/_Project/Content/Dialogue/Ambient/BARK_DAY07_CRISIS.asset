@@ -13,4 +13,26 @@ MonoBehaviour:
   m_Name: BARK_DAY07_CRISIS
   m_EditorClassIdentifier: UTH.Runtime::DialogueSequence
   id: BARK_DAY07_CRISIS
-  lines: []
+  lines:
+  - id: DAY07_CRISIS_01
+    speaker:
+      character: {fileID: 0}
+      overrideName: 승객
+    text: "다들 이 방보다 회의실 쪽 소식을 더 궁금해합니다. 좌석표 확인하는 분도 줄었어요."
+    expression: 0
+    voiceRequired: 0
+    voiceClip: {fileID: 0}
+    conditions: []
+    effects: []
+    choices: []
+  - id: DAY07_CRISIS_02
+    speaker:
+      character: {fileID: 0}
+      overrideName: 보안 승무원
+    text: "보관고 근처엔 이제 혼자 오는 분이 없습니다. 다들 둘씩 짝지어 다니시더군요."
+    expression: 0
+    voiceRequired: 0
+    voiceClip: {fileID: 0}
+    conditions: []
+    effects: []
+    choices: []

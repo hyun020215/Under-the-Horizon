@@ -1,4 +1,26 @@
+using System;
 using UnityEngine;
+
+[Serializable]
+public sealed class StorySceneAuthoringRequirements
+{
+    [SerializeField, Min(0)]
+    private int minimumInteractionCount;
+
+    [SerializeField]
+    private bool requiresPuzzle;
+
+    [SerializeField]
+    private bool requiresEntrySequence;
+
+    [SerializeField]
+    private bool requiresExitSequence;
+
+    public int MinimumInteractionCount => minimumInteractionCount;
+    public bool RequiresPuzzle => requiresPuzzle;
+    public bool RequiresEntrySequence => requiresEntrySequence;
+    public bool RequiresExitSequence => requiresExitSequence;
+}
 
 [CreateAssetMenu(fileName = "StoryScene", menuName = "Under The Horizon/Story/Story Scene")]
 public sealed class StorySceneDefinition : ScriptableObject
@@ -78,6 +100,10 @@ public sealed class StorySceneDefinition : ScriptableObject
     [SerializeField]
     private StorySceneRoute[] routes;
 
+    [Header("Authoring Validation")]
+    [SerializeField]
+    private StorySceneAuthoringRequirements authoringRequirements;
+
     public string Id => id;
     public string DisplayName => displayName;
 
@@ -110,6 +136,7 @@ public sealed class StorySceneDefinition : ScriptableObject
     public GameEffect[] OnCompleteEffects => onCompleteEffects;
 
     public StorySceneRoute[] Routes => routes;
+    public StorySceneAuthoringRequirements AuthoringRequirements => authoringRequirements;
 
     public string ResolveNext(GameStateStore state)
     {

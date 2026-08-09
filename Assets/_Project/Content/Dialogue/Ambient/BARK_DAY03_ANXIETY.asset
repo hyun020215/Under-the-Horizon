@@ -13,4 +13,26 @@ MonoBehaviour:
   m_Name: BARK_DAY03_ANXIETY
   m_EditorClassIdentifier: UTH.Runtime::DialogueSequence
   id: BARK_DAY03_ANXIETY
-  lines: []
+  lines:
+  - id: DAY03_ANXIETY_01
+    speaker:
+      character: {fileID: 0}
+      overrideName: 승객
+    text: "요즘은 커피보다 송고 단말기 앞 줄이 더 길어요. 다들 최신 기사부터 확인하죠."
+    expression: 0
+    voiceRequired: 0
+    voiceClip: {fileID: 0}
+    conditions: []
+    effects: []
+    choices: []
+  - id: DAY03_ANXIETY_02
+    speaker:
+      character: {fileID: 0}
+      overrideName: 의무관
+    text: "면회 제한이 더 엄격해졌습니다. 접수대에서 방문 사유부터 확인합니다."
+    expression: 0
+    voiceRequired: 0
+    voiceClip: {fileID: 0}
+    conditions: []
+    effects: []
+    choices: []

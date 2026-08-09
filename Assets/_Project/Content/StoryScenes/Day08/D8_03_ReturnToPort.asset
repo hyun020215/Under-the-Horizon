@@ -26,11 +26,12 @@ MonoBehaviour:
   entryDialogue: {fileID: 11400000, guid: c7280dd518fac5c48999d585acf0d2ad, type: 2}
   puzzle: {fileID: 0}
   audioProfile: {fileID: 11400000, guid: 749189f0fb863304c97a8be3f61cc946, type: 2}
-  entrySequence: {fileID: 0}
+  entrySequence: {fileID: 11400000, guid: a072b2ad3b32ef54d9d5b2ac05c34132, type: 2}
   exitSequence: {fileID: 0}
   entryTransition: {fileID: 11400000, guid: dca78952fd04d4d4392054d9a3fc41e2, type: 2}
   exitTransition: {fileID: 11400000, guid: dca78952fd04d4d4392054d9a3fc41e2, type: 2}
   onEnterEffects: []
   onCompleteEffects:
   - {fileID: 11400000, guid: 9ee9242f9a16f4a40b6254ed3f7a3a17, type: 2}
+  authoringRequirements: {minimumInteractionCount: 1, requiresPuzzle: 0, requiresEntrySequence: 1, requiresExitSequence: 0}
   routes: []

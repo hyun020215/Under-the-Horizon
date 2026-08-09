@@ -5,6 +5,8 @@ public abstract class PuzzleControllerBase : MonoBehaviour
 {
     [SerializeField]
     private string controllerKey;
-    public string ControllerKey => controllerKey;
+    public string ControllerKey => string.IsNullOrWhiteSpace(controllerKey)
+        ? GetType().Name
+        : controllerKey;
     public abstract Task<PuzzleResult> PlayAsync(PuzzleContext context);
 }

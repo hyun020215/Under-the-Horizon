@@ -13,4 +13,26 @@ MonoBehaviour:
   m_Name: BARK_PASSENGER_GENERAL
   m_EditorClassIdentifier: UTH.Runtime::DialogueSequence
   id: BARK_PASSENGER_GENERAL
-  lines: []
+  lines:
+  - id: PASSENGER_GENERAL_01
+    speaker:
+      character: {fileID: 0}
+      overrideName: 승객
+    text: "제 카메라 가방도 다시 검사하더군요. 평소보다 경비가 삼엄한 것 같아요."
+    expression: 0
+    voiceRequired: 0
+    voiceClip: {fileID: 0}
+    conditions: []
+    effects: []
+    choices: []
+  - id: PASSENGER_GENERAL_02
+    speaker:
+      character: {fileID: 0}
+      overrideName: 승객
+    text: "수평선을 보기엔 이 방이 가장 좋습니다. 유리 반사 때문에 사진은 조금 어렵지만요."
+    expression: 0
+    voiceRequired: 0
+    voiceClip: {fileID: 0}
+    conditions: []
+    effects: []
+    choices: []

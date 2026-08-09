@@ -12,7 +12,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3749c3b1236ec854d922b95f882ddeb5, type: 3}
   m_Name: SEQ_D8_03_Epilogue
   m_EditorClassIdentifier: UTH.Runtime::SceneSequenceDefinition
-  commands: []
+  commands:
+  - rid: 1001
   references:
     version: 2
-    RefIds: []
+    RefIds:
+    - rid: 1001
+      type: {class: WaitCommand, ns: , asm: UTH.Runtime}
+      data:
+        seconds: 0.35

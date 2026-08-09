@@ -12,6 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 62502b5ae7880434b8dde707009f6c87, type: 3}
   m_Name: PUZ_D5_02_ClaireHoax
   m_EditorClassIdentifier: UTH.Runtime::PuzzleDefinition
-  id: 
-  controllerKey: 
-  completionEffects: []
+  id: PUZ_D5_02
+  controllerKey: ClaireContradictionPuzzleController
+  completionEffects:
+  - {fileID: 11400000, guid: 01eae7c0240b08745a6c6490bbada2d4, type: 2}

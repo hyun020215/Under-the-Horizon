@@ -13,6 +13,7 @@ public sealed class PuzzleDefinition : ScriptableObject
     private GameEffect[] completionEffects;
     public string Id => id;
     public string ControllerKey => controllerKey;
+    public GameEffect[] CompletionEffects => completionEffects;
 
     public void ApplyCompletion(GameStateStore state)
     {

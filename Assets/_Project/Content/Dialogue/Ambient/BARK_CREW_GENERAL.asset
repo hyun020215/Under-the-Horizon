@@ -13,4 +13,26 @@ MonoBehaviour:
   m_Name: BARK_CREW_GENERAL
   m_EditorClassIdentifier: UTH.Runtime::DialogueSequence
   id: BARK_CREW_GENERAL
-  lines: []
+  lines:
+  - id: CREW_GENERAL_01
+    speaker:
+      character: {fileID: 0}
+      overrideName: 승무원
+    text: "승선표와 신분증을 함께 보여 주십시오. 이 통로의 출입은 모두 기록됩니다."
+    expression: 0
+    voiceRequired: 0
+    voiceClip: {fileID: 0}
+    conditions: []
+    effects: []
+    choices: []
+  - id: CREW_GENERAL_02
+    speaker:
+      character: {fileID: 0}
+      overrideName: 승무원
+    text: "행사 일정과 선내 안내는 저쪽 안내 단말기에서 확인하실 수 있습니다."
+    expression: 0
+    voiceRequired: 0
+    voiceClip: {fileID: 0}
+    conditions: []
+    effects: []
+    choices: []
