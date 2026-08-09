@@ -14,4 +14,17 @@ public sealed class AppServiceRegistry
         services.TryGetValue(typeof(T), out object value)
             ? (T)value
             : throw new InvalidOperationException($"Service {typeof(T).Name} is not registered.");
+
+    public bool TryGet<T>(out T service)
+        where T : class
+    {
+        if (services.TryGetValue(typeof(T), out object value))
+        {
+            service = (T)value;
+            return true;
+        }
+
+        service = null;
+        return false;
+    }
 }

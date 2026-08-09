@@ -41,12 +41,12 @@ public sealed class GameStartup : MonoBehaviour
                 await titleScreen.WaitForStartAsync();
             }
 
-            string sceneId = firstStorySceneId;
+            string sceneId = ResolveFirstStorySceneId();
             if (screens != null && saveSlotScreen != null)
             {
                 await screens.OpenAsync(ScreenId.SaveSlot);
                 SaveSlot slot = await saveSlotScreen.WaitForSelectionAsync();
-                var saves = new SaveService();
+                SaveService saves = ResolveSaveService();
                 if (saves.Exists(slot))
                 {
                     state?.Replace(saves.Load(slot));
@@ -65,5 +65,28 @@ public sealed class GameStartup : MonoBehaviour
         {
             Debug.LogException(exception, this);
         }
+    }
+
+    private string ResolveFirstStorySceneId()
+    {
+        if (AppContext.Services != null
+            && AppContext.Services.TryGet(out GameDefinition game)
+            && !string.IsNullOrWhiteSpace(game.FirstStorySceneId))
+        {
+            return game.FirstStorySceneId;
+        }
+
+        return firstStorySceneId;
+    }
+
+    private static SaveService ResolveSaveService()
+    {
+        if (AppContext.Services != null
+            && AppContext.Services.TryGet(out SaveService saves))
+        {
+            return saves;
+        }
+
+        return new SaveService();
     }
 }

@@ -11,6 +11,17 @@ public sealed class SaveCheckpoint : MonoBehaviour
     public void Capture()
     {
         if (stateStore != null)
-            new SaveService().Save(new SaveSlot(slot), stateStore.State);
+            ResolveSaveService().Save(new SaveSlot(slot), stateStore.State);
+    }
+
+    private static SaveService ResolveSaveService()
+    {
+        if (AppContext.Services != null
+            && AppContext.Services.TryGet(out SaveService saves))
+        {
+            return saves;
+        }
+
+        return new SaveService();
     }
 }
