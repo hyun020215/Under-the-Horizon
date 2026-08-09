@@ -1,0 +1,89 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &-8512855840131123661
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e713369a9b2175746ad2fcf7c6909209, type: 3}
+  m_Name: FX_CHOICE_D4_04_C1_00
+  m_EditorClassIdentifier: UTH.Runtime::SetFlagEffect
+  flagId: DIALOGUE_CHOICE_D4-04_C1
+  value: 1
+--- !u!114 &-6308062393950559644
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e4454eb07779c2744bd766e4b5ee4afc, type: 3}
+  m_Name: FX_CHOICE_D4_04_C1_03
+  m_EditorClassIdentifier: UTH.Runtime::ChangeAnxietyEffect
+  amount: 4
+--- !u!114 &-1935528993287053522
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e713369a9b2175746ad2fcf7c6909209, type: 3}
+  m_Name: FX_CHOICE_D4_04_C1_01
+  m_EditorClassIdentifier: UTH.Runtime::SetFlagEffect
+  flagId: DIALOGUE_CHOICE_D4-04_C2
+  value: 0
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f525133768f9d4b458dd37037f703fcf, type: 3}
+  m_Name: FX_CHOICE_D4_04_C1
+  m_EditorClassIdentifier: UTH.Runtime::CompositeEffect
+  effects:
+  - {fileID: -8512855840131123661}
+  - {fileID: -1935528993287053522}
+  - {fileID: 3059714187315727907}
+  - {fileID: -6308062393950559644}
+  - {fileID: 2286982208835890450}
+--- !u!114 &2286982208835890450
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e713369a9b2175746ad2fcf7c6909209, type: 3}
+  m_Name: FX_CHOICE_D4_04_C1_04
+  m_EditorClassIdentifier: UTH.Runtime::SetFlagEffect
+  flagId: d4_04_overquestioned_marcus
+  value: 1
+--- !u!114 &3059714187315727907
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fbbfd3b646642ae4c897aa50f3e5bf6a, type: 3}
+  m_Name: FX_CHOICE_D4_04_C1_02
+  m_EditorClassIdentifier: UTH.Runtime::ModifyTrustEffect
+  characterId: CHR_MARCUS
+  amount: -1

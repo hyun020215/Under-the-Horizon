@@ -124,29 +124,19 @@ MonoBehaviour:
     voiceClip: {fileID: 0}
     conditions: []
     effects: []
-    choices: []
-  - id: D3-03_010
-    speaker:
-      character: {fileID: 0}
-      overrideName: PLAYER_CHOICE
-    text: "\uC120\uC7A5\uC744 \uACF5\uBC94\uC73C\uB85C \uC9C0\uBAA9"
-    expression: 0
-    voiceRequired: 0
-    voiceClip: {fileID: 0}
-    conditions: []
-    effects: []
-    choices: []
-  - id: D3-03_011
-    speaker:
-      character: {fileID: 0}
-      overrideName: PLAYER_CHOICE
-    text: "\uC99D\uC778\uC73C\uB85C \uC124\uB4DD"
-    expression: 0
-    voiceRequired: 0
-    voiceClip: {fileID: 0}
-    conditions: []
-    effects: []
-    choices: []
+    choices:
+    - id: D3-03_C1
+      text: "\uC120\uC7A5\uC744 \uACF5\uBC94\uC73C\uB85C \uC9C0\uBAA9"
+      conditions: []
+      effects:
+      - {fileID: 11400000, guid: 6aecde9659105624da436760b6af8ba6, type: 2}
+      nextLineId: D3-03_012
+    - id: D3-03_C2
+      text: "\uC99D\uC778\uC73C\uB85C \uC124\uB4DD"
+      conditions: []
+      effects:
+      - {fileID: 11400000, guid: ba70905ec80a0b34b9e442fbae5c26dc, type: 2}
+      nextLineId: D3-03_014
   - id: D3-03_012
     speaker:
       character: {fileID: 11400000, guid: deea118744593fa4883b9fc7691a6c13, type: 2}
@@ -157,7 +147,8 @@ MonoBehaviour:
     expression: 0
     voiceRequired: 1
     voiceClip: {fileID: 0}
-    conditions: []
+    conditions:
+    - {fileID: 11400000, guid: ad12b2540f7e8e44e9f87ceddd3996fa, type: 2}
     effects: []
     choices: []
   - id: D3-03_013
@@ -171,7 +162,8 @@ MonoBehaviour:
     expression: 0
     voiceRequired: 1
     voiceClip: {fileID: 0}
-    conditions: []
+    conditions:
+    - {fileID: 11400000, guid: ad12b2540f7e8e44e9f87ceddd3996fa, type: 2}
     effects: []
     choices: []
   - id: D3-03_014
@@ -185,7 +177,8 @@ MonoBehaviour:
     expression: 0
     voiceRequired: 1
     voiceClip: {fileID: 0}
-    conditions: []
+    conditions:
+    - {fileID: 11400000, guid: 00190faef7b716540a8c16102badfab4, type: 2}
     effects: []
     choices: []
   - id: D3-03_015
@@ -197,7 +190,8 @@ MonoBehaviour:
     expression: 0
     voiceRequired: 1
     voiceClip: {fileID: 0}
-    conditions: []
+    conditions:
+    - {fileID: 11400000, guid: 00190faef7b716540a8c16102badfab4, type: 2}
     effects: []
     choices: []
   - id: D3-03_016

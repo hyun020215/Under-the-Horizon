@@ -1,0 +1,90 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &-8656056914236222451
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e713369a9b2175746ad2fcf7c6909209, type: 3}
+  m_Name: FX_CHOICE_D8_01_A2_VAULT_03
+  m_EditorClassIdentifier: UTH.Runtime::SetFlagEffect
+  flagId: DIALOGUE_CHOICE_D8-01_A2_SERVICE
+  value: 0
+--- !u!114 &-7836496925376425049
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e713369a9b2175746ad2fcf7c6909209, type: 3}
+  m_Name: FX_CHOICE_D8_01_A2_VAULT_02
+  m_EditorClassIdentifier: UTH.Runtime::SetFlagEffect
+  flagId: DIALOGUE_CHOICE_D8-01_A2_VAULT
+  value: 1
+--- !u!114 &-1023430418408047279
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e713369a9b2175746ad2fcf7c6909209, type: 3}
+  m_Name: FX_CHOICE_D8_01_A2_VAULT_01
+  m_EditorClassIdentifier: UTH.Runtime::SetFlagEffect
+  flagId: DIALOGUE_CHOICE_D8-01_A2_HORIZON
+  value: 0
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f525133768f9d4b458dd37037f703fcf, type: 3}
+  m_Name: FX_CHOICE_D8_01_A2_VAULT
+  m_EditorClassIdentifier: UTH.Runtime::CompositeEffect
+  effects:
+  - {fileID: 3718785013515544573}
+  - {fileID: -1023430418408047279}
+  - {fileID: -7836496925376425049}
+  - {fileID: -8656056914236222451}
+  - {fileID: 2676159816412444083}
+--- !u!114 &2676159816412444083
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e713369a9b2175746ad2fcf7c6909209, type: 3}
+  m_Name: FX_CHOICE_D8_01_A2_VAULT_04
+  m_EditorClassIdentifier: UTH.Runtime::SetFlagEffect
+  flagId: DIALOGUE_EFFECT_accusation2:wrong
+  value: 1
+--- !u!114 &3718785013515544573
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e713369a9b2175746ad2fcf7c6909209, type: 3}
+  m_Name: FX_CHOICE_D8_01_A2_VAULT_00
+  m_EditorClassIdentifier: UTH.Runtime::SetFlagEffect
+  flagId: DIALOGUE_CHOICE_D8-01_A2_BALLAST
+  value: 0

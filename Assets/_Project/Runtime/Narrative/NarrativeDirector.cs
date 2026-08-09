@@ -45,11 +45,28 @@ public sealed class NarrativeDirector : MonoBehaviour
         }
         if (sequence.Lines == null)
             return;
-        bool cancelled = false;
-        foreach (DialogueLine line in sequence.Lines)
+
+        DialogueLine[] lines = sequence.Lines;
+        var lineIndexes = new Dictionary<string, int>(StringComparer.Ordinal);
+        for (var index = 0; index < lines.Length; index++)
         {
+            if (!string.IsNullOrWhiteSpace(lines[index].id))
+                lineIndexes[lines[index].id] = index;
+        }
+
+        bool cancelled = false;
+        var currentIndex = 0;
+        var executedSteps = 0;
+        int maximumSteps = Mathf.Max(lines.Length * 4, 1);
+        while (currentIndex < lines.Length && executedSteps++ < maximumSteps)
+        {
+            DialogueLine line = lines[currentIndex];
             if (!ConditionResolver.All(line.conditions, state))
+            {
+                currentIndex++;
                 continue;
+            }
+
             history.Add(line.id);
             if (line.voiceClip != null)
                 voice?.Play(line.voiceClip);
@@ -73,7 +90,22 @@ public sealed class NarrativeDirector : MonoBehaviour
                     effect?.Apply(state);
             if (selected != null)
                 selected.Apply(state);
+
+            if (selected != null
+                && !string.IsNullOrWhiteSpace(selected.NextLineId)
+                && lineIndexes.TryGetValue(selected.NextLineId, out int nextIndex))
+            {
+                currentIndex = nextIndex;
+            }
+            else
+            {
+                currentIndex++;
+            }
         }
+
+        if (!cancelled && executedSteps > maximumSteps)
+            Debug.LogError($"Dialogue {sequence.Id} exceeded its execution step limit.", this);
+
         if (!cancelled && screens != null)
         {
             await screens.OpenAsync(

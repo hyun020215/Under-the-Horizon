@@ -188,7 +188,8 @@ MonoBehaviour:
     expression: 0
     voiceRequired: 1
     voiceClip: {fileID: 0}
-    conditions: []
+    conditions:
+    - {fileID: 11400000, guid: e7b84913435633c43ab79851b350e081, type: 2}
     effects: []
     choices: []
   - id: D4-03_015
@@ -200,7 +201,8 @@ MonoBehaviour:
     expression: 0
     voiceRequired: 1
     voiceClip: {fileID: 0}
-    conditions: []
+    conditions:
+    - {fileID: 11400000, guid: e7b84913435633c43ab79851b350e081, type: 2}
     effects: []
     choices: []
   - id: D4-03_016

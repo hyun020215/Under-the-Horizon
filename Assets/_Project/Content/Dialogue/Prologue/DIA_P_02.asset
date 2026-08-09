@@ -183,18 +183,14 @@ MonoBehaviour:
     voiceClip: {fileID: 0}
     conditions: []
     effects: []
-    choices: []
-  - id: P-02_015
-    speaker:
-      character: {fileID: 0}
-      overrideName: PLAYER_CHOICE
-    text: "\uC774\uBE14\uB9B0\uC5D0\uAC8C \uBA85\uB2E8 \uC218\uC815\uC790\uB97C \uBB3B\uAE30"
-    expression: 0
-    voiceRequired: 0
-    voiceClip: {fileID: 0}
-    conditions: []
-    effects: []
-    choices: []
+    choices:
+    - id: P-02_C1
+      text: "\uC774\uBE14\uB9B0\uC5D0\uAC8C \uBA85\uB2E8 \uC218\uC815\uC790\uB97C
+        \uBB3B\uAE30"
+      conditions: []
+      effects:
+      - {fileID: 11400000, guid: 1e6d86ea52d346349aa07f1411700922, type: 2}
+      nextLineId: P-02_016
   - id: P-02_016
     speaker:
       character: {fileID: 11400000, guid: deea118744593fa4883b9fc7691a6c13, type: 2}
@@ -204,7 +200,8 @@ MonoBehaviour:
     expression: 0
     voiceRequired: 1
     voiceClip: {fileID: 0}
-    conditions: []
+    conditions:
+    - {fileID: 11400000, guid: e9cc91262a5fbd640a4aff60bb47cd91, type: 2}
     effects: []
     choices: []
   - id: P-02_017
@@ -218,7 +215,8 @@ MonoBehaviour:
     expression: 0
     voiceRequired: 1
     voiceClip: {fileID: 0}
-    conditions: []
+    conditions:
+    - {fileID: 11400000, guid: e9cc91262a5fbd640a4aff60bb47cd91, type: 2}
     effects: []
     choices: []
   - id: P-02_018
@@ -229,7 +227,8 @@ MonoBehaviour:
     expression: 0
     voiceRequired: 1
     voiceClip: {fileID: 0}
-    conditions: []
+    conditions:
+    - {fileID: 11400000, guid: e9cc91262a5fbd640a4aff60bb47cd91, type: 2}
     effects: []
     choices: []
   - id: P-02_019
@@ -242,7 +241,8 @@ MonoBehaviour:
     expression: 0
     voiceRequired: 1
     voiceClip: {fileID: 0}
-    conditions: []
+    conditions:
+    - {fileID: 11400000, guid: e9cc91262a5fbd640a4aff60bb47cd91, type: 2}
     effects: []
     choices: []
   - id: P-02_020
@@ -266,7 +266,8 @@ MonoBehaviour:
     expression: 0
     voiceRequired: 1
     voiceClip: {fileID: 0}
-    conditions: []
+    conditions:
+    - {fileID: 11400000, guid: c3e720736d5a14341900bff5ff757347, type: 2}
     effects: []
     choices: []
   - id: P-02_022
@@ -278,7 +279,8 @@ MonoBehaviour:
     expression: 0
     voiceRequired: 1
     voiceClip: {fileID: 0}
-    conditions: []
+    conditions:
+    - {fileID: 11400000, guid: c3e720736d5a14341900bff5ff757347, type: 2}
     effects: []
     choices: []
   - id: P-02_023

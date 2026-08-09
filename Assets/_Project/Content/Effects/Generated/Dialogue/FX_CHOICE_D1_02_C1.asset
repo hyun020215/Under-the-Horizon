@@ -1,0 +1,75 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &-8525602938876196877
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e713369a9b2175746ad2fcf7c6909209, type: 3}
+  m_Name: FX_CHOICE_D1_02_C1_03
+  m_EditorClassIdentifier: UTH.Runtime::SetFlagEffect
+  flagId: intervened_dinner
+  value: 1
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f525133768f9d4b458dd37037f703fcf, type: 3}
+  m_Name: FX_CHOICE_D1_02_C1
+  m_EditorClassIdentifier: UTH.Runtime::CompositeEffect
+  effects:
+  - {fileID: 5145638295087025580}
+  - {fileID: 826870074289122454}
+  - {fileID: 1368761201422218326}
+  - {fileID: -8525602938876196877}
+--- !u!114 &826870074289122454
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e713369a9b2175746ad2fcf7c6909209, type: 3}
+  m_Name: FX_CHOICE_D1_02_C1_01
+  m_EditorClassIdentifier: UTH.Runtime::SetFlagEffect
+  flagId: DIALOGUE_CHOICE_D1-02_C2
+  value: 0
+--- !u!114 &1368761201422218326
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e713369a9b2175746ad2fcf7c6909209, type: 3}
+  m_Name: FX_CHOICE_D1_02_C1_02
+  m_EditorClassIdentifier: UTH.Runtime::SetFlagEffect
+  flagId: DIALOGUE_EFFECT_hostility_claire:+1
+  value: 1
+--- !u!114 &5145638295087025580
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e713369a9b2175746ad2fcf7c6909209, type: 3}
+  m_Name: FX_CHOICE_D1_02_C1_00
+  m_EditorClassIdentifier: UTH.Runtime::SetFlagEffect
+  flagId: DIALOGUE_CHOICE_D1-02_C1
+  value: 1

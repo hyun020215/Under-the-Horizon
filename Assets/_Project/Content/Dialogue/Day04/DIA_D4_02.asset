@@ -196,29 +196,19 @@ MonoBehaviour:
     voiceClip: {fileID: 0}
     conditions: []
     effects: []
-    choices: []
-  - id: D4-02_016
-    speaker:
-      character: {fileID: 0}
-      overrideName: PLAYER_CHOICE
-    text: "\uC774\uBE14\uB9B0\uC744 \uC989\uC2DC \uAD6C\uAE08"
-    expression: 0
-    voiceRequired: 0
-    voiceClip: {fileID: 0}
-    conditions: []
-    effects: []
-    choices: []
-  - id: D4-02_017
-    speaker:
-      character: {fileID: 0}
-      overrideName: PLAYER_CHOICE
-    text: "\uD604\uC7A5\uC744 \uBA3C\uC800 \uBCF4\uC874"
-    expression: 0
-    voiceRequired: 0
-    voiceClip: {fileID: 0}
-    conditions: []
-    effects: []
-    choices: []
+    choices:
+    - id: D4-02_C1
+      text: "\uC774\uBE14\uB9B0\uC744 \uC989\uC2DC \uAD6C\uAE08"
+      conditions: []
+      effects:
+      - {fileID: 11400000, guid: bac0e4b18bd2cc7449140c72fe03e3a6, type: 2}
+      nextLineId: D4-02_018
+    - id: D4-02_C2
+      text: "\uD604\uC7A5\uC744 \uBA3C\uC800 \uBCF4\uC874"
+      conditions: []
+      effects:
+      - {fileID: 11400000, guid: 6fc685069d5840940b1781555bbba769, type: 2}
+      nextLineId: D4-02_020
   - id: D4-02_018
     speaker:
       character: {fileID: 11400000, guid: deea118744593fa4883b9fc7691a6c13, type: 2}
@@ -229,7 +219,8 @@ MonoBehaviour:
     expression: 0
     voiceRequired: 1
     voiceClip: {fileID: 0}
-    conditions: []
+    conditions:
+    - {fileID: 11400000, guid: 201c7de9aade52149a16ae8563a88984, type: 2}
     effects: []
     choices: []
   - id: D4-02_019
@@ -242,7 +233,8 @@ MonoBehaviour:
     expression: 0
     voiceRequired: 1
     voiceClip: {fileID: 0}
-    conditions: []
+    conditions:
+    - {fileID: 11400000, guid: 201c7de9aade52149a16ae8563a88984, type: 2}
     effects: []
     choices: []
   - id: D4-02_020
@@ -255,7 +247,8 @@ MonoBehaviour:
     expression: 0
     voiceRequired: 1
     voiceClip: {fileID: 0}
-    conditions: []
+    conditions:
+    - {fileID: 11400000, guid: 7cbdbb7ce7e3f054b9d1d72675a0a2cb, type: 2}
     effects: []
     choices: []
   - id: D4-02_021
@@ -267,7 +260,8 @@ MonoBehaviour:
     expression: 0
     voiceRequired: 1
     voiceClip: {fileID: 0}
-    conditions: []
+    conditions:
+    - {fileID: 11400000, guid: 7cbdbb7ce7e3f054b9d1d72675a0a2cb, type: 2}
     effects: []
     choices: []
   - id: D4-02_022

@@ -67,98 +67,58 @@ MonoBehaviour:
     voiceClip: {fileID: 0}
     conditions: []
     effects: []
-    choices: []
-  - id: D4-04_005
-    speaker:
-      character: {fileID: 0}
-      overrideName: PLAYER_CHOICE
-    text: "\uC774\uBE14\uB9B0\uC774 \uB2E4\uB2C8\uC5D8\uC744 \uC8FD\uC600\uC2B5\uB2C8\uAE4C?"
-    expression: 0
-    voiceRequired: 0
-    voiceClip: {fileID: 0}
-    conditions: []
-    effects: []
-    choices: []
-  - id: D4-04_006
-    speaker:
-      character: {fileID: 0}
-      overrideName: PLAYER_CHOICE
-    text: "\uB2F9\uC2E0\uC740 \uC774\uBE14\uB9B0\uC5D0\uAC8C \uC778\uC99D \uD1A0\uD070\uC744
-      \uC81C\uACF5\uD588\uC2B5\uB2C8\uAE4C?"
-    expression: 0
-    voiceRequired: 0
-    voiceClip: {fileID: 0}
-    conditions: []
-    effects: []
-    choices: []
-  - id: D4-04_007
-    speaker:
-      character: {fileID: 0}
-      overrideName: PLAYER_CHOICE
-    text: "\uC774\uBE14\uB9B0\uC774 \uB2F9\uC2E0\uC5D0\uAC8C \uB3C8\uC744 \uC57D\uC18D\uD588\uC2B5\uB2C8\uAE4C?"
-    expression: 0
-    voiceRequired: 0
-    voiceClip: {fileID: 0}
-    conditions: []
-    effects: []
-    choices: []
-  - id: D4-04_008
-    speaker:
-      character: {fileID: 0}
-      overrideName: PLAYER_CHOICE
-    text: "\uB2F9\uC2E0\uC774 \uAE08\uACE0\uC758 \uBAA8\uB4C8\uC744 \uB36E\uC5B4\uC37C\uC2B5\uB2C8\uAE4C?"
-    expression: 0
-    voiceRequired: 0
-    voiceClip: {fileID: 0}
-    conditions: []
-    effects: []
-    choices: []
-  - id: D4-04_009
-    speaker:
-      character: {fileID: 0}
-      overrideName: PLAYER_CHOICE
-    text: "\uC774\uBE14\uB9B0\uC774 \uAE08\uACE0\uC5D0 \uB4E4\uC5B4\uAC00\uB294 \uAC83\uC744
-      \uC9C1\uC811 \uBD24\uC2B5\uB2C8\uAE4C?"
-    expression: 0
-    voiceRequired: 0
-    voiceClip: {fileID: 0}
-    conditions: []
-    effects: []
-    choices: []
-  - id: D4-04_010
-    speaker:
-      character: {fileID: 0}
-      overrideName: PLAYER_CHOICE
-    text: "\uD1A0\uD070\uC744 \uC900 \uC2DC\uAC01\uC740 21\uC2DC \uC774\uC804\uC785\uB2C8\uAE4C?"
-    expression: 0
-    voiceRequired: 0
-    voiceClip: {fileID: 0}
-    conditions: []
-    effects: []
-    choices: []
-  - id: D4-04_011
-    speaker:
-      character: {fileID: 0}
-      overrideName: PLAYER_CHOICE
-    text: "\uCD94\uB77D \uC804\uC5D0 \uC774\uBE14\uB9B0\uC774 \uB2F9\uC2E0\uC744
-      \uC704\uD611\uD588\uC2B5\uB2C8\uAE4C?"
-    expression: 0
-    voiceRequired: 0
-    voiceClip: {fileID: 0}
-    conditions: []
-    effects: []
-    choices: []
-  - id: D4-04_012
-    speaker:
-      character: {fileID: 0}
-      overrideName: PLAYER_CHOICE
-    text: "\uB9AC\uCC98\uB4DC\uAC00 \uD1A0\uD070 \uC81C\uACF5\uC744 \uC9C0\uC2DC\uD588\uC2B5\uB2C8\uAE4C?"
-    expression: 0
-    voiceRequired: 0
-    voiceClip: {fileID: 0}
-    conditions: []
-    effects: []
-    choices: []
+    choices:
+    - id: D4-04_Q1
+      text: "\uC774\uBE14\uB9B0\uC774 \uB2E4\uB2C8\uC5D8\uC744 \uC8FD\uC600\uC2B5\uB2C8\uAE4C?"
+      conditions: []
+      effects:
+      - {fileID: 11400000, guid: b65ccab3b1fc35e4786baebd1220b7c6, type: 2}
+      nextLineId: D4-04_013
+    - id: D4-04_Q2
+      text: "\uB2F9\uC2E0\uC740 \uC774\uBE14\uB9B0\uC5D0\uAC8C \uC778\uC99D \uD1A0\uD070\uC744
+        \uC81C\uACF5\uD588\uC2B5\uB2C8\uAE4C?"
+      conditions: []
+      effects:
+      - {fileID: 11400000, guid: 7b504c889c9f6324298eb5423f63517f, type: 2}
+      nextLineId: D4-04_015
+    - id: D4-04_Q3
+      text: "\uC774\uBE14\uB9B0\uC774 \uB2F9\uC2E0\uC5D0\uAC8C \uB3C8\uC744 \uC57D\uC18D\uD588\uC2B5\uB2C8\uAE4C?"
+      conditions: []
+      effects:
+      - {fileID: 11400000, guid: 18654177b967cac4eaf19379da2d7e71, type: 2}
+      nextLineId: D4-04_017
+    - id: D4-04_Q4
+      text: "\uB2F9\uC2E0\uC774 \uAE08\uACE0\uC758 \uBAA8\uB4C8\uC744 \uB36E\uC5B4\uC37C\uC2B5\uB2C8\uAE4C?"
+      conditions: []
+      effects:
+      - {fileID: 11400000, guid: 4baef787be471ed4da02b31011f616f0, type: 2}
+      nextLineId: D4-04_018
+    - id: D4-04_Q5
+      text: "\uC774\uBE14\uB9B0\uC774 \uAE08\uACE0\uC5D0 \uB4E4\uC5B4\uAC00\uB294
+        \uAC83\uC744 \uC9C1\uC811 \uBD24\uC2B5\uB2C8\uAE4C?"
+      conditions: []
+      effects:
+      - {fileID: 11400000, guid: f23e068835340aa40ab2b69a4edd4bd4, type: 2}
+      nextLineId: D4-04_019
+    - id: D4-04_Q6
+      text: "\uD1A0\uD070\uC744 \uC900 \uC2DC\uAC01\uC740 21\uC2DC \uC774\uC804\uC785\uB2C8\uAE4C?"
+      conditions: []
+      effects:
+      - {fileID: 11400000, guid: 9a0d1252dd730d246b51f38e974fda42, type: 2}
+      nextLineId: D4-04_020
+    - id: D4-04_Q7
+      text: "\uCD94\uB77D \uC804\uC5D0 \uC774\uBE14\uB9B0\uC774 \uB2F9\uC2E0\uC744
+        \uC704\uD611\uD588\uC2B5\uB2C8\uAE4C?"
+      conditions: []
+      effects:
+      - {fileID: 11400000, guid: 1bbd0c6b0f7a6334abdd37124d268d06, type: 2}
+      nextLineId: D4-04_021
+    - id: D4-04_Q8
+      text: "\uB9AC\uCC98\uB4DC\uAC00 \uD1A0\uD070 \uC81C\uACF5\uC744 \uC9C0\uC2DC\uD588\uC2B5\uB2C8\uAE4C?"
+      conditions: []
+      effects:
+      - {fileID: 11400000, guid: 266e01f996f6a9f47a23e1905bf85bdf, type: 2}
+      nextLineId: D4-04_022
   - id: D4-04_013
     speaker:
       character: {fileID: 0}
@@ -169,7 +129,8 @@ MonoBehaviour:
     expression: 0
     voiceRequired: 0
     voiceClip: {fileID: 0}
-    conditions: []
+    conditions:
+    - {fileID: 11400000, guid: 9de9b3bcdd49e52439e97cc02b27065f, type: 2}
     effects: []
     choices: []
   - id: D4-04_014
@@ -181,7 +142,8 @@ MonoBehaviour:
     expression: 0
     voiceRequired: 1
     voiceClip: {fileID: 0}
-    conditions: []
+    conditions:
+    - {fileID: 11400000, guid: 9de9b3bcdd49e52439e97cc02b27065f, type: 2}
     effects: []
     choices: []
   - id: D4-04_015
@@ -193,7 +155,8 @@ MonoBehaviour:
     expression: 0
     voiceRequired: 0
     voiceClip: {fileID: 0}
-    conditions: []
+    conditions:
+    - {fileID: 11400000, guid: 64c7b94fb1eda434bbbd489602195306, type: 2}
     effects: []
     choices: []
   - id: D4-04_016
@@ -204,7 +167,8 @@ MonoBehaviour:
     expression: 0
     voiceRequired: 1
     voiceClip: {fileID: 0}
-    conditions: []
+    conditions:
+    - {fileID: 11400000, guid: 64c7b94fb1eda434bbbd489602195306, type: 2}
     effects: []
     choices: []
   - id: D4-04_017
@@ -216,7 +180,8 @@ MonoBehaviour:
     expression: 0
     voiceRequired: 0
     voiceClip: {fileID: 0}
-    conditions: []
+    conditions:
+    - {fileID: 11400000, guid: 4b2c04fec6f32834b967b260f11793e2, type: 2}
     effects: []
     choices: []
   - id: D4-04_018
@@ -228,7 +193,8 @@ MonoBehaviour:
     expression: 0
     voiceRequired: 0
     voiceClip: {fileID: 0}
-    conditions: []
+    conditions:
+    - {fileID: 11400000, guid: 0b78557acb37ce144a18394606c67af4, type: 2}
     effects: []
     choices: []
   - id: D4-04_019
@@ -240,7 +206,8 @@ MonoBehaviour:
     expression: 0
     voiceRequired: 0
     voiceClip: {fileID: 0}
-    conditions: []
+    conditions:
+    - {fileID: 11400000, guid: dd299684661821c41bf8fa1f06dd0a24, type: 2}
     effects: []
     choices: []
   - id: D4-04_020
@@ -251,7 +218,8 @@ MonoBehaviour:
     expression: 0
     voiceRequired: 0
     voiceClip: {fileID: 0}
-    conditions: []
+    conditions:
+    - {fileID: 11400000, guid: 2553d07d51cfa8b48b0adac83e563998, type: 2}
     effects: []
     choices: []
   - id: D4-04_021
@@ -263,7 +231,8 @@ MonoBehaviour:
     expression: 0
     voiceRequired: 0
     voiceClip: {fileID: 0}
-    conditions: []
+    conditions:
+    - {fileID: 11400000, guid: 7f96a53adc821e949b0860217517a227, type: 2}
     effects: []
     choices: []
   - id: D4-04_022
@@ -274,7 +243,8 @@ MonoBehaviour:
     expression: 0
     voiceRequired: 0
     voiceClip: {fileID: 0}
-    conditions: []
+    conditions:
+    - {fileID: 11400000, guid: 8aaa266f31f2a0d4f9e0ec6804fe5777, type: 2}
     effects: []
     choices: []
   - id: D4-04_023
@@ -287,7 +257,8 @@ MonoBehaviour:
     expression: 0
     voiceRequired: 1
     voiceClip: {fileID: 0}
-    conditions: []
+    conditions:
+    - {fileID: 11400000, guid: 95655e5768dbae844a1409081e5bd4f7, type: 2}
     effects: []
     choices: []
   - id: D4-04_024
@@ -299,7 +270,8 @@ MonoBehaviour:
     expression: 0
     voiceRequired: 1
     voiceClip: {fileID: 0}
-    conditions: []
+    conditions:
+    - {fileID: 11400000, guid: 95655e5768dbae844a1409081e5bd4f7, type: 2}
     effects: []
     choices: []
   - id: D4-04_025
@@ -313,29 +285,19 @@ MonoBehaviour:
     voiceClip: {fileID: 0}
     conditions: []
     effects: []
-    choices: []
-  - id: D4-04_026
-    speaker:
-      character: {fileID: 0}
-      overrideName: PLAYER_CHOICE
-    text: "\uADF8\uB798\uB3C4 \uD55C \uAC00\uC9C0\uB9CC \uB354 \uBB3B\uB294\uB2E4"
-    expression: 0
-    voiceRequired: 0
-    voiceClip: {fileID: 0}
-    conditions: []
-    effects: []
-    choices: []
-  - id: D4-04_027
-    speaker:
-      character: {fileID: 0}
-      overrideName: PLAYER_CHOICE
-    text: "\uC5EC\uAE30\uC11C \uBA48\uCD98\uB2E4"
-    expression: 0
-    voiceRequired: 0
-    voiceClip: {fileID: 0}
-    conditions: []
-    effects: []
-    choices: []
+    choices:
+    - id: D4-04_C1
+      text: "\uADF8\uB798\uB3C4 \uD55C \uAC00\uC9C0\uB9CC \uB354 \uBB3B\uB294\uB2E4"
+      conditions: []
+      effects:
+      - {fileID: 11400000, guid: 2dcac265a1792704a980e433fdca51e1, type: 2}
+      nextLineId: D4-04_028
+    - id: D4-04_C2
+      text: "\uC5EC\uAE30\uC11C \uBA48\uCD98\uB2E4"
+      conditions: []
+      effects:
+      - {fileID: 11400000, guid: a053bc4822edcc0428ebffbd50e1f196, type: 2}
+      nextLineId:
   - id: D4-04_028
     speaker:
       character: {fileID: 0}
@@ -347,7 +309,8 @@ MonoBehaviour:
     expression: 0
     voiceRequired: 0
     voiceClip: {fileID: 0}
-    conditions: []
+    conditions:
+    - {fileID: 11400000, guid: f3bea81296a43514c9d3d8124527600f, type: 2}
     effects: []
     choices: []
   - id: D4-04_029

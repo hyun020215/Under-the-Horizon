@@ -178,29 +178,19 @@ MonoBehaviour:
     voiceClip: {fileID: 0}
     conditions: []
     effects: []
-    choices: []
-  - id: D5-03_014
-    speaker:
-      character: {fileID: 0}
-      overrideName: PLAYER_CHOICE
-    text: "\uBA74\uCC45 \uAC70\uB798"
-    expression: 0
-    voiceRequired: 0
-    voiceClip: {fileID: 0}
-    conditions: []
-    effects: []
-    choices: []
-  - id: D5-03_015
-    speaker:
-      character: {fileID: 0}
-      overrideName: PLAYER_CHOICE
-    text: "\uC804\uBA74 \uD3ED\uB85C"
-    expression: 0
-    voiceRequired: 0
-    voiceClip: {fileID: 0}
-    conditions: []
-    effects: []
-    choices: []
+    choices:
+    - id: D5-03_C1
+      text: "\uBA74\uCC45 \uAC70\uB798"
+      conditions: []
+      effects:
+      - {fileID: 11400000, guid: b9edf4865030f1b45b814230b69be2c0, type: 2}
+      nextLineId: D5-03_016
+    - id: D5-03_C2
+      text: "\uC804\uBA74 \uD3ED\uB85C"
+      conditions: []
+      effects:
+      - {fileID: 11400000, guid: a90008a5418469546af46c9e4f310c7b, type: 2}
+      nextLineId: D5-03_018
   - id: D5-03_016
     speaker:
       character: {fileID: 11400000, guid: deea118744593fa4883b9fc7691a6c13, type: 2}
@@ -211,7 +201,8 @@ MonoBehaviour:
     expression: 0
     voiceRequired: 1
     voiceClip: {fileID: 0}
-    conditions: []
+    conditions:
+    - {fileID: 11400000, guid: f78c2c8ca378b0f40a6414ea073e1d69, type: 2}
     effects: []
     choices: []
   - id: D5-03_017
@@ -224,7 +215,8 @@ MonoBehaviour:
     expression: 0
     voiceRequired: 1
     voiceClip: {fileID: 0}
-    conditions: []
+    conditions:
+    - {fileID: 11400000, guid: f78c2c8ca378b0f40a6414ea073e1d69, type: 2}
     effects: []
     choices: []
   - id: D5-03_018
@@ -238,7 +230,8 @@ MonoBehaviour:
     expression: 0
     voiceRequired: 1
     voiceClip: {fileID: 0}
-    conditions: []
+    conditions:
+    - {fileID: 11400000, guid: 85e4319f1b0f5ee4a8846854d4d0898b, type: 2}
     effects: []
     choices: []
   - id: D5-03_019
@@ -250,7 +243,8 @@ MonoBehaviour:
     expression: 0
     voiceRequired: 1
     voiceClip: {fileID: 0}
-    conditions: []
+    conditions:
+    - {fileID: 11400000, guid: 85e4319f1b0f5ee4a8846854d4d0898b, type: 2}
     effects: []
     choices: []
   - id: D5-03_020

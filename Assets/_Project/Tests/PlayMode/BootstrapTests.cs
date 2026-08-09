@@ -122,44 +122,33 @@ public sealed class BootstrapTests
 
         Button advance = dialogue.transform.Find("AdvanceButton").GetComponent<Button>();
         StorySceneDirector story = Object.FindFirstObjectByType<StorySceneDirector>();
-        int lineCount = story.Current.EntryDialogue.Lines.Length;
-        for (var index = 1; index < lineCount; index++)
-        {
-            elapsed = 0f;
-            while (!dialogue.IsRevealing && elapsed < SceneLoadTimeoutSeconds)
-            {
-                elapsed += Time.unscaledDeltaTime;
-                yield return null;
-            }
-            advance.onClick.Invoke();
-            yield return null;
-            advance.onClick.Invoke();
-            elapsed = 0f;
-            while (narrative.History.Lines.Count < index + 1
-                   && elapsed < SceneLoadTimeoutSeconds)
-            {
-                elapsed += Time.unscaledDeltaTime;
-                yield return null;
-            }
-            Assert.That(narrative.History.Lines.Count, Is.EqualTo(index + 1));
-        }
+        Assert.That(story.Current.EntryDialogue.Lines, Is.Not.Empty);
         elapsed = 0f;
-        while (!dialogue.IsRevealing && elapsed < SceneLoadTimeoutSeconds)
-        {
-            elapsed += Time.unscaledDeltaTime;
-            yield return null;
-        }
-        advance.onClick.Invoke();
-        yield return null;
-        advance.onClick.Invoke();
-        elapsed = 0f;
-        while (router.Current != ScreenId.Exploration
+        while (router.Current == ScreenId.Dialogue
                && elapsed < SceneLoadTimeoutSeconds)
         {
             elapsed += Time.unscaledDeltaTime;
+            if (dialogue.IsRevealing)
+            {
+                advance.onClick.Invoke();
+            }
+            else
+            {
+                Button choice = dialogue
+                    .GetComponentsInChildren<Button>()
+                    .FirstOrDefault(button =>
+                        button.GetComponent<DialogueChoiceBinding>() != null);
+                if (choice != null)
+                    choice.onClick.Invoke();
+                else
+                    advance.onClick.Invoke();
+            }
+
             yield return null;
         }
+
         Assert.That(router.Current, Is.EqualTo(ScreenId.Exploration));
+        Assert.That(narrative.History.Lines.Count, Is.GreaterThan(1));
         CanvasGroup transitionOverlay = GameObject.Find("TransitionOverlay")
             .GetComponent<CanvasGroup>();
         elapsed = 0f;

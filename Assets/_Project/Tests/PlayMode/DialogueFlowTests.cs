@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Reflection;
+using System.Threading.Tasks;
 using NUnit.Framework;
 using UnityEngine;
 using UnityEngine.TestTools;
@@ -36,5 +37,67 @@ public sealed class DialogueFlowTests
             Object.Destroy(sequence);
             Object.Destroy(gameObject);
         }
+    }
+
+    [UnityTest]
+    public IEnumerator SelectedChoiceJumpsToItsAuthoredNextLine()
+    {
+        var gameObject = new GameObject("DialogueBranchTest");
+        DialogueSequence sequence = ScriptableObject.CreateInstance<DialogueSequence>();
+
+        try
+        {
+            DialogueChoice choice = CreateChoice("choice-b", "branch-b");
+            var lines = new[]
+            {
+                new DialogueLine
+                {
+                    id = "choice-owner",
+                    text = "선택",
+                    choices = new[] { choice },
+                },
+                new DialogueLine { id = "branch-a", text = "A" },
+                new DialogueLine { id = "branch-b", text = "B" },
+            };
+            typeof(DialogueSequence)
+                .GetField("lines", BindingFlags.Instance | BindingFlags.NonPublic)
+                ?.SetValue(sequence, lines);
+
+            NarrativeDirector director = gameObject.AddComponent<NarrativeDirector>();
+            director.LinePresented += line =>
+                Task.FromResult(line.id == "choice-owner" ? choice : null);
+            Task play = director.PlayAsync(sequence);
+            while (!play.IsCompleted)
+                yield return null;
+
+            Assert.That(play.IsFaulted, Is.False);
+            Assert.That(
+                director.History.Lines,
+                Is.EqualTo(new[] { "choice-owner", "branch-b" }));
+        }
+        finally
+        {
+            Object.Destroy(sequence);
+            Object.Destroy(gameObject);
+        }
+    }
+
+    private static DialogueChoice CreateChoice(string id, string nextLineId)
+    {
+        var choice = new DialogueChoice();
+        SetChoiceField(choice, "id", id);
+        SetChoiceField(choice, "text", id);
+        SetChoiceField(choice, "nextLineId", nextLineId);
+        return choice;
+    }
+
+    private static void SetChoiceField(
+        DialogueChoice choice,
+        string name,
+        string value)
+    {
+        typeof(DialogueChoice)
+            .GetField(name, BindingFlags.Instance | BindingFlags.NonPublic)
+            ?.SetValue(choice, value);
     }
 }

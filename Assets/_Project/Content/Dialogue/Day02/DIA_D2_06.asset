@@ -296,30 +296,20 @@ MonoBehaviour:
     voiceClip: {fileID: 0}
     conditions: []
     effects: []
-    choices: []
-  - id: D2-06_024
-    speaker:
-      character: {fileID: 0}
-      overrideName: PLAYER_CHOICE
-    text: "\uC808\uCC28\uB97C \uBB34\uC2DC\uD558\uACE0 \uC9C0\uAE08 \uB2F9\uC7A5
-      \uD655\uC778\uD55C\uB2E4"
-    expression: 0
-    voiceRequired: 0
-    voiceClip: {fileID: 0}
-    conditions: []
-    effects: []
-    choices: []
-  - id: D2-06_025
-    speaker:
-      character: {fileID: 0}
-      overrideName: PLAYER_CHOICE
-    text: "\uC815\uC2DD \uC694\uCCAD \uACB0\uACFC\uB97C \uAE30\uB2E4\uB9B0\uB2E4"
-    expression: 0
-    voiceRequired: 0
-    voiceClip: {fileID: 0}
-    conditions: []
-    effects: []
-    choices: []
+    choices:
+    - id: D2-06_C3
+      text: "\uC808\uCC28\uB97C \uBB34\uC2DC\uD558\uACE0 \uC9C0\uAE08 \uB2F9\uC7A5
+        \uD655\uC778\uD55C\uB2E4"
+      conditions: []
+      effects:
+      - {fileID: 11400000, guid: a1cf89a46ce46614487ebf781db384c9, type: 2}
+      nextLineId: D2-06_026
+    - id: D2-06_C4
+      text: "\uC815\uC2DD \uC694\uCCAD \uACB0\uACFC\uB97C \uAE30\uB2E4\uB9B0\uB2E4"
+      conditions: []
+      effects:
+      - {fileID: 11400000, guid: a48cd664f01077d41b70a81e780e1ea0, type: 2}
+      nextLineId:
   - id: D2-06_026
     speaker:
       character: {fileID: 11400000, guid: 8582caea0d2b3204bad2ba188e71e46d, type: 2}
@@ -332,7 +322,8 @@ MonoBehaviour:
     expression: 0
     voiceRequired: 1
     voiceClip: {fileID: 0}
-    conditions: []
+    conditions:
+    - {fileID: 11400000, guid: 12c71a374b7ab3b4dae4be874eac0bf7, type: 2}
     effects: []
     choices: []
   - id: D2-06_027
