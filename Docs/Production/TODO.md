@@ -1,94 +1,83 @@
 # 통합 제작 TODO
 
 > 이 문서는 프로젝트의 유일한 TODO 목록이다. 자산 폴더 안에 TODO 파일을 다시 만들지 않는다.  
-> 갱신일: 2026-08-08
+> 갱신일: 2026-08-09 (`d40b061` 이후 로컬 `main` 기준)
 
-## 완료된 원본 반영
+## 완료
 
-- [x] 최신 원본 두 경로의 Git HEAD와 2,466개 비생성 파일 SHA-256 비교
-- [x] 장소 배경 59종과 Horizon 주요 상태 배경 반영
-- [x] 핵심 증거 `C-01`~`C-18` 이미지 반영
-- [x] Deck 06~10 및 Port 지도 레이어 반영
-- [x] 주연·환경·전문직 NPC 이미지 반영
-- [x] BGM 8종, 환경·사건 효과음 21종, 인물별 Voice Bark와 Story Recording 반영
-- [x] 혈흔 방향 및 CCTV 퍼즐 원본 이미지 반영
-- [x] 시나리오, 제작 매뉴얼, 전체 대화, 오디오 큐, 크루즈 구조도 원본을 `Docs/Narrative/Source/`에 반영
-- [x] 대화·선택·장면 인덱스·증거 CSV 원본 반영
-- [x] Unity 패키지와 핵심 ProjectSettings 기준선 반영
+- [x] 원본 저장소의 비생성 파일과 최신 버전을 비교하고 필요한 코드·미디어를 이식했다.
+- [x] 41개 `StorySceneDefinition`과 `C-01`~`C-18`의 canonical ID를 구성했다.
+- [x] 0바이트 ScriptableObject와 Prefab을 현재 스키마로 복구하고 빈 중복 자산을 제거했다.
+- [x] `Bootstrap.unity`를 composition root로, `Game.unity`를 지속 런타임 셸로 연결했다.
+- [x] Title → Save Slot → Game 흐름과 화면 라우팅을 연결했다.
+- [x] 한국어 마스터 CSV의 전체 대화와 100개 선택지를 실행 가능한 그래프로 가져왔다.
+- [x] 41개 CharacterPlacementSet의 구조와 정규화 좌표 검증을 구성했다.
+- [x] Story Scene·Location·Character Placement·Interaction·Audio Cue·Evidence·Sequence 편집 도구를 구성했다.
+- [x] ID, 필수 참조, 대화 그래프, 배치 좌표, Interaction Action, Puzzle controller,
+  완료 Effect, Location 배경·오디오를 검사하는 빌드 사전 검증을 구성했다.
+- [x] D1-06 발견 장면을 첫 조사 vertical slice로 완성했다.
+  - 문, 혈흔·시신, 세면대, 녹음기, 천장 패널의 월드 핫스팟
+  - `Character`/`Context`/`Investigation` capability와 증거 획득 검증
+  - 다섯 조사 완료 후 Richard 대화와 공식 선택지 개방
+  - Input Lock, Audio, Wait, Dialogue로 구성한 entry Sequence
+- [x] 필수 Sequence가 `WaitCommand`만 포함하면 실패하도록 Validator를 강화했다.
+- [x] `AudioDirector` 아래 Music A/B, Voice Bark, Story Voice, crossfade와 대화 더킹을 연결했다.
+- [x] Content, 대화 선택지, Save/Load, 대표 Puzzle, Transition, 오디오 회귀 테스트를 추가했다.
 
-기존 TODO에 적힌 예시 파일명과 실제 원본 이름이 다른 경우 새 파일을 복제하지 않고 실제 원본을 유지한다. 예를 들어 Horizon 상태는 `BG_horizon_d1_discovery.png`, `BG_horizon_cleared_day.png`, `BG_horizon_d8_finale.png`로 존재하며, 음악은 실제 곡명 기반 `MUS_*.mp3`를 사용한다. 동일 미디어를 TODO 예시 이름으로 복제하면 GUID와 콘텐츠 참조만 늘어나므로 금지한다.
+## P1 — 플레이 가능한 콘텐츠 완성
 
-## P0 — Unity에서 먼저 복구할 항목
+- [ ] 나머지 40개 Story Scene의 일반 대화 Interaction을 실제 NPC·맥거핀·조사·증거·출구·퍼즐
+  Interaction으로 교체한다.
+  - 완료 조건: 각 장면의 원본 행동과 `requiredInteractionTypes`, 최소 상호작용 수,
+    Condition/GameEffect가 일치한다.
+- [ ] 41개 CharacterPlacementSet을 실제 플레이 화면에서 시각 검수하고 좌표·스케일·sorting order를
+  최종 조정한다.
+- [ ] 모든 Story Scene을 원본의 전용 Location State와 배경·오디오에 연결한다.
+  - 현재 다수 장면은 생성된 기본 State를 공유하므로 구조적 유효성과 장면별 시각 재현을 구분한다.
+- [ ] D4-02, D5-01, D7-01, D8-02, D8-03 Sequence를 실제 연출 명령으로 작성한다.
+  - 현재 Audio + Wait는 placeholder 탈출을 위한 최소 구성일 뿐 완성 시네마틱이 아니다.
+- [ ] 13개 PuzzleDefinition에 입력 항목, 정답·순서, 오답 판정, 힌트 단계와 저장할 중간 진행을
+  데이터로 작성하고 실제 Puzzle Interaction에 연결한다.
+- [ ] D8-01 최종 심문의 6단계 논증과 A/B/C/Bad 엔딩 판정·라우팅을 현재 Condition/GameEffect와
+  `GameStateStore.endingId`로 이식한다.
+- [ ] Story Recording 파일과 Dialogue line ID의 승인된 대응표를 AudioCue/Sequence에 연결한다.
+- [ ] 클릭·호버·확인·취소·증거 발견·이론 해금 공통 효과음을 선정하고 라이선스를 기록한다.
+- [ ] 최종 게임 로고와 앱 아이콘 승인본을 적용한다.
 
-- [x] 0바이트 `.asset` 212개를 현재 스키마의 실제 ScriptableObject로 변환한다.
-  - Story Scene 41개
-  - Location과 Location State
-  - CharacterDefinition과 CharacterPlacementSet
-  - InteractionSet
-  - DialogueSequence와 데이터베이스
-  - EvidenceDefinition `C-01`~`C-18`
-  - PuzzleDefinition, AudioCueProfile, TransitionProfile, Sequence
-  - `GAME_` 및 `DATABASE_` 루트 자산
-- [x] 0바이트 Prefab을 실제 GameObject 계층과 현재 스크립트 참조로 다시 만든다.
-  - App, Character, Interaction, Location, UI, FX, Puzzle Prefab
-- [x] `Bootstrap.unity`에서 App 수명주기와 `Game.unity` 로드를 연결한다.
-- [x] `Game.unity`에서 WorldCanvas, UICanvas, Directors, EventSystem을 실제 Prefab·컴포넌트에 연결한다.
-- [x] `ContentDatabase`에 41개 장면과 장소·증거 데이터베이스를 등록한다.
+## P1 — 검증 및 제작 도구
 
-P0 자산은 `Under The Horizon > Build > P0 Project Content`에서 다시 생성할 수 있다. Story Scene별 상세 상호작용·연출·최종 배치 튜닝은 아래 P1 항목에서 계속 추적한다.
+- [ ] P-01부터 모든 엔딩까지 도달 가능한지 검사하는 Story graph 회귀 검증을 추가한다.
+  - D8-01 분기 규칙이 아직 이식되지 않아 현재 D8-02가 그래프에서 도달 불가능하다.
+- [ ] 13개 퍼즐 각각에 대해 정답 → `PuzzleResult` → `GameEffect` → Save/Load 회귀 테스트를 추가한다.
+- [ ] Puzzle 직접 미리보기와 공통 Preview 계약을 구현한다.
+- [ ] 필요한 Addressables 등록·레이블과 깨진 직렬화 참조 검증을 추가한다.
+- [ ] Unity Editor에서 EditMode/PlayMode 전체 테스트와 Bootstrap 대표 플레이스루를 통과시킨다.
+  - 현재 배치 실행은 Unity Licensing Client IPC 실패로 완료하지 못했으며 C# 프로젝트 컴파일은 통과했다.
 
-0바이트 자리표시자는 완성 자산으로 계산하지 않는다. 이전 스크립트 GUID를 가진 레거시 ScriptableObject를 그대로 활성화하지 말고 현재 스키마로 변환한다.
+## P2 — 출시 설정과 품질
 
-## P1 — 콘텐츠 완성
-
-- [ ] 41개 Story Scene별 CharacterPlacementSet을 제작하고 정규화 좌표를 검수한다.
-- [ ] 41개 Story Scene별 InteractionSet과 Condition/GameEffect를 제작한다.
-- [ ] 모든 Location State에 배경·오디오·선택적 효과를 연결한다.
-- [ ] 전체 대화 XLSX/CSV를 DialogueSequence로 가져오고 선택지·효과·다음 대사를 검증한다.
-- [ ] Story Recording을 `Audio/StoryRecordings/` 역할로 정리하고 AudioCueProfile에 연결한다.
-- [ ] 실제 원본에 없는 UI 공통 효과음(클릭·뒤로·확인·탭, 증거 발견·이론 해금)을 제작 또는 라이선스 확보한다.
-- [ ] 게임 로고와 앱 아이콘의 최종 승인본을 제작한다. 현재 `UI_logo_transparent.png`는 임시 UI 로고로만 취급한다.
-
-## P1 — Editor 및 Validator
-
-- [ ] StoryScene·Location·CharacterPlacement·Interaction·AudioCue·Evidence·Sequence 편집 창을 구현한다.
-- [ ] Story Scene·Location·Puzzle 직접 미리보기를 구현한다.
-- [ ] 대화·오디오·증거 가져오기 도구를 실제 원본 형식에 연결한다.
-- [ ] 다음 검증을 완성한다.
-  - 중복 ID
-  - 깨진 장면 경로와 진행 불가능 경로
-  - Location·State·Character·Dialogue·Evidence·Puzzle 누락
-  - Audio·Transition·Sequence 누락
-  - 깨진 직렬화 참조
-  - 필요한 Addressables 등록·레이블 누락
-
-## P2 — 설정과 품질
-
-- [ ] Audio Mixer 그룹, 스냅샷과 더킹 곡선을 최종 음원으로 튜닝한다.
-- [ ] Input Actions, Render Pipeline, Renderer, Global Volume을 타깃 플랫폼에서 검증한다.
-- [ ] 앱 이름, 회사명, 아이콘, 해상도, 품질, 플랫폼별 Player Settings를 확정한다.
+- [ ] Audio Mixer 그룹·스냅샷과 더킹 attack/release 및 버스별 최종 볼륨을 실제 음원으로 튜닝한다.
 - [ ] 대형 배경·캐릭터·증거·BGM·환경음·녹음을 Addressables 그룹과 레이블로 구성한다.
-- [ ] EditMode 콘텐츠 검증과 PlayMode 대표 진행·저장·퍼즐 테스트를 통과시킨다.
+- [ ] Input Actions, Render Pipeline, Renderer와 Global Volume을 타깃 플랫폼에서 검증한다.
+- [ ] 앱 이름, 회사명, 아이콘, 해상도, 품질과 플랫폼별 Player Settings를 확정한다.
+- [ ] CI에서 Unity Test Runner와 Build Preflight를 push/PR마다 실행한다.
 - [ ] `Docs/QA/ReleaseChecklist.md`를 모두 확인한다.
+
+## 외부 결정·데이터가 필요한 항목
+
+세부 목록과 원문에서 복구 가능한 범위는 `Docs/Production/CONTENT_DATA_GAPS.md`를 기준으로 한다.
+
+- 퍼즐별 최종 UX, 허용 오차, 재시도·힌트 정책과 중간 진행 저장 범위
+- Story Recording ↔ Dialogue line ID 최종 대응표
+- UI 공통 효과음의 음원·라이선스
+- 로고·앱 아이콘 아트 디렉션과 배포 플랫폼 규격
+- CI 실행 환경, Unity 라이선스 방식과 대상 빌드 플랫폼
+- Audio Mixer의 승인된 목표 음량·더킹 값
 
 ## 작업 규칙
 
 - 완료 항목은 근거 파일이나 테스트를 확인한 뒤 체크한다.
-- 새 할 일은 우선순위와 완료 조건을 함께 적는다.
-- 아키텍처 변경이 필요하면 구현 전에 `AGENTS.md`의 변경 절차를 따른다.
-- 기능 단위로 커밋하고 검증 후 원격 `main`에 푸시한다.
-
-## P1 현재 수행 결과 (2026-08-08)
-
-- [x] 41개 Story Scene의 `CharacterPlacementSet`을 원본 장면 인물 정보로 생성하고 정규화 좌표·스케일을 검증한다.
-- [x] 41개 Story Scene에 반복 가능한 내러티브 `InteractionDefinition`/`InteractionSet`과 완료 `GameEffect`를 연결한다.
-- [x] 모든 Location에 기본 State, 배경 및 기본 `AudioCueProfile`을 연결하고 Validator로 검사한다.
-- [x] 한국어 마스터 CSV의 전체 장면 대사를 `DialogueSequence`로 생성하고 대화 ID를 정규화한다.
-- [x] Story Scene·Location·Character Placement·Interaction·Audio Cue·Evidence·Sequence 편집창을 구현한다.
-- [x] Story Graph 및 Story Scene·Location·Character 미리보기 창을 구현한다.
-- [x] 중복 ID, 장면 경로, 필수 참조, 배치 좌표, 상호작용 Action, 완료 Effect, Location 배경·오디오, C-01~C-18을 검증한다.
-- [ ] 대사 선택지·조건·효과·다음 노드의 원본 컬럼 매핑은 원본 CSV에 구조화된 값이 부족한 행을 사람이 확정한 뒤 보강한다.
-- [ ] Story Recording 장면별 큐 연결은 녹음 파일과 대사 line ID의 최종 대응표 승인 후 수행한다.
-- [ ] 클릭·호버·확인·취소·증거 발견·이론 해금 공통 효과음은 최종 음원 선정 또는 라이선스 확인 후 연결한다.
-- [ ] 게임 로고와 앱 아이콘의 최종 승인본은 아트 디렉션 및 배포 플랫폼 규격 확정 후 제작한다.
-- [ ] Puzzle 직접 미리보기는 각 PuzzleDefinition의 세부 규칙 데이터와 공통 Preview 계약을 확정한 뒤 구현한다.
+- 원본에 없는 서사 사실이나 정답을 임의로 만들지 않는다.
+- 장면 차이는 Content 데이터로 표현하고 Story Scene 전용 컨트롤러를 만들지 않는다.
+- 아키텍처 변경이 필요하면 `AGENTS.md` 변경 절차에 따라 승인받는다.
+- 기능 단위로 커밋하고 검증한다. 원격 공개 저장소 push는 사용자의 명시적 승인 후 수행한다.
