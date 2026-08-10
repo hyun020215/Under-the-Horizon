@@ -65,6 +65,16 @@ public static class P0ProjectBuilder
         EditorApplication.Exit(0);
     }
 
+    public static void RefreshPresentationFromCommandLine()
+    {
+        ConfigureRuntimeVisualQuality();
+        BuildPresentationPrefabs();
+        BuildGameScene();
+        AssetDatabase.SaveAssets();
+        AssetDatabase.Refresh();
+        EditorApplication.Exit(0);
+    }
+
     private static void CreatePlaceholderAssets()
     {
         string absoluteContent = Path.GetFullPath(ContentRoot);
@@ -426,6 +436,23 @@ public static class P0ProjectBuilder
         }
     }
 
+    private static void BuildPresentationPrefabs()
+    {
+        Sprite panel = AssetDatabase.LoadAssetAtPath<Sprite>(ThemePanelPath);
+        (string name, Type type, ScreenId id)[] screens =
+        {
+            ("PF_TitleScreen", typeof(TitleScreen), ScreenId.Title),
+            ("PF_SaveSlotScreen", typeof(SaveSlotScreen), ScreenId.SaveSlot),
+            ("PF_DialogueScreen", typeof(DialogueScreen), ScreenId.Dialogue),
+        };
+
+        foreach ((string name, Type type, ScreenId id) in screens)
+        {
+            string path = $"{PrefabRoot}/UI/{name}.prefab";
+            SavePrefab(path, CreateScreen(name, type, id, panel));
+        }
+    }
+
     private static void EnsureScreenPrefab(
         string name,
         Type type,
@@ -441,7 +468,12 @@ public static class P0ProjectBuilder
     {
         GameObject root = new(name);
         root.AddComponent<AppLifetime>();
-        root.AddComponent<AppBootstrap>();
+        AppBootstrap bootstrap = root.AddComponent<AppBootstrap>();
+        SetObject(
+            bootstrap,
+            "gameDefinition",
+            AssetDatabase.LoadAssetAtPath<GameDefinition>(
+                ContentRoot + "/Game/GAME_UnderTheHorizon.asset"));
         return root;
     }
 
@@ -566,7 +598,7 @@ public static class P0ProjectBuilder
         GameObject dimObject = new("Dialogue Focus Dim", typeof(RectTransform), typeof(CanvasRenderer), typeof(Image));
         dimObject.transform.SetParent(root, false);
         Image dim = dimObject.GetComponent<Image>();
-        dim.color = new Color(0.005f, 0.008f, 0.025f, 0.32f);
+        dim.color = new Color(0.005f, 0.008f, 0.025f, 0.16f);
         dim.raycastTarget = false;
         SetRect(dimObject.GetComponent<RectTransform>(), Vector2.zero, Vector2.one);
 
@@ -576,7 +608,7 @@ public static class P0ProjectBuilder
         panel.sprite = AssetDatabase.LoadAssetAtPath<Sprite>(ProjectRoot + "/Art/UI/Panels/UI_panel_dialogue.png");
         panel.color = Color.white;
         panel.type = Image.Type.Sliced;
-        SetRect(panelObject.GetComponent<RectTransform>(), new Vector2(0.06f, 0.18f), new Vector2(0.60f, 0.68f));
+        SetRect(panelObject.GetComponent<RectTransform>(), new Vector2(0.055f, 0.055f), new Vector2(0.945f, 0.30f));
 
         Text scene = CreateText("SceneLabel", panelObject.transform, font, 18, TextAnchor.MiddleLeft);
         scene.color = new Color(0.79f, 0.60f, 0.29f, 0.78f);
@@ -587,7 +619,7 @@ public static class P0ProjectBuilder
         Image nameplate = nameplateObject.GetComponent<Image>();
         nameplate.sprite = AssetDatabase.LoadAssetAtPath<Sprite>(ProjectRoot + "/Art/UI/Panels/UI_label_nameplate.png");
         nameplate.type = Image.Type.Sliced;
-        SetRect(nameplateObject.GetComponent<RectTransform>(), new Vector2(0.06f, 0.69f), new Vector2(0.31f, 0.75f));
+        SetRect(nameplateObject.GetComponent<RectTransform>(), new Vector2(0.075f, 0.285f), new Vector2(0.28f, 0.345f));
         Text speaker = CreateText("SpeakerLabel", nameplateObject.transform, font, 28, TextAnchor.MiddleCenter);
         speaker.color = new Color(0.025f, 0.043f, 0.071f);
         SetRect(speaker.rectTransform, Vector2.zero, Vector2.one);
@@ -603,7 +635,7 @@ public static class P0ProjectBuilder
             ProjectRoot + "/Art/UI/Dialogue/UI_btn_dialogue_advance_normal.png",
             ProjectRoot + "/Art/UI/Dialogue/UI_btn_dialogue_advance_pressed.png",
             out Text advanceText);
-        SetRect((RectTransform)advance.transform, new Vector2(0.54f, 0.20f), new Vector2(0.59f, 0.28f));
+        SetRect((RectTransform)advance.transform, new Vector2(0.875f, 0.075f), new Vector2(0.925f, 0.145f));
 
         Button[] choices = new Button[3];
         Text[] choiceLabels = new Text[3];
@@ -615,8 +647,8 @@ public static class P0ProjectBuilder
                 ProjectRoot + "/Art/UI/Buttons/UI_btn_choice_pressed.png",
                 out choiceLabels[i]);
             choices[i].gameObject.AddComponent<DialogueChoiceBinding>();
-            var top = 0.19f - (i * 0.052f);
-            SetRect((RectTransform)choices[i].transform, new Vector2(0.06f, top - 0.045f), new Vector2(0.58f, top));
+            var top = 0.29f - (i * 0.07f);
+            SetRect((RectTransform)choices[i].transform, new Vector2(0.10f, top - 0.058f), new Vector2(0.90f, top));
             choices[i].gameObject.SetActive(false);
         }
 
@@ -654,7 +686,7 @@ public static class P0ProjectBuilder
         GameObject shadeObject = new("Left Readability Shade", typeof(RectTransform), typeof(CanvasRenderer), typeof(Image));
         shadeObject.transform.SetParent(root, false);
         Image shade = shadeObject.GetComponent<Image>();
-        shade.color = new Color(0.005f, 0.008f, 0.025f, 0.22f);
+        shade.color = new Color(0.005f, 0.008f, 0.025f, 0.34f);
         shade.raycastTarget = false;
         SetRect(shadeObject.GetComponent<RectTransform>(), Vector2.zero, Vector2.one);
 
@@ -664,10 +696,10 @@ public static class P0ProjectBuilder
         logo.sprite = AssetDatabase.LoadAssetAtPath<Sprite>(ProjectRoot + "/Art/Branding/UI_logo_transparent.png");
         logo.preserveAspect = true;
         logo.raycastTarget = false;
-        SetRect(logoObject.GetComponent<RectTransform>(), new Vector2(0f, 0.10f), new Vector2(0.50f, 1f));
+        SetRect(logoObject.GetComponent<RectTransform>(), new Vector2(0.025f, 0.28f), new Vector2(0.48f, 0.96f));
 
         Button start = CreateTitleButton("StartButton", root, font, "시작", true);
-        SetRect((RectTransform)start.transform, new Vector2(0.02f, 0.145f), new Vector2(0.26f, 0.20f));
+        SetRect((RectTransform)start.transform, new Vector2(0.04f, 0.20f), new Vector2(0.30f, 0.255f));
         string[] secondaryLabels = { "설정", "크레딧", "종료" };
         Button[] secondaryButtons = new Button[secondaryLabels.Length];
         for (var i = 0; i < secondaryLabels.Length; i++)
@@ -680,11 +712,11 @@ public static class P0ProjectBuilder
                 false
             );
             secondaryButtons[i] = secondary;
-            float top = 0.14f - i * 0.055f;
+            float top = 0.195f - i * 0.05f;
             SetRect(
                 (RectTransform)secondary.transform,
-                new Vector2(0.02f, top - 0.05f),
-                new Vector2(0.26f, top)
+                new Vector2(0.04f, top - 0.042f),
+                new Vector2(0.30f, top)
             );
         }
         SetObject(screen, "startButton", start);
@@ -736,30 +768,52 @@ public static class P0ProjectBuilder
     {
         Font font = LoadUiFont("Pretendard/FONT_Pretendard-SemiBold.ttf");
         Image background = root.GetComponent<Image>();
-        background.color = new Color(0.015f, 0.02f, 0.055f, 1f);
+        background.color = new Color(0.012f, 0.022f, 0.035f, 1f);
+
+        Image glow = CreateLayer("Save Screen Glow", root).gameObject.AddComponent<Image>();
+        glow.color = new Color(0.10f, 0.18f, 0.23f, 0.35f);
+        glow.raycastTarget = false;
+        SetRect(glow.rectTransform, new Vector2(0.08f, 0.10f), new Vector2(0.92f, 0.88f));
+
+        Image frame = CreateLayer("Save Slot Frame", root).gameObject.AddComponent<Image>();
+        frame.sprite = AssetDatabase.LoadAssetAtPath<Sprite>(ThemePanelPath);
+        frame.type = Image.Type.Sliced;
+        frame.color = new Color(0.62f, 0.46f, 0.22f, 0.92f);
+        frame.raycastTarget = false;
+        SetRect(frame.rectTransform, new Vector2(0.19f, 0.17f), new Vector2(0.81f, 0.78f));
 
         Text title = CreateText("Save Slot Title", root, font, 42, TextAnchor.MiddleCenter);
         title.text = "저장 슬롯 선택";
         title.color = new Color(0.88f, 0.72f, 0.35f);
-        SetRect(title.rectTransform, new Vector2(0.25f, 0.70f), new Vector2(0.75f, 0.82f));
+        SetRect(title.rectTransform, new Vector2(0.25f, 0.76f), new Vector2(0.75f, 0.87f));
+
+        Text subtitle = CreateText("Save Slot Subtitle", root, font, 20, TextAnchor.MiddleCenter);
+        subtitle.text = "계속할 항해 기록을 선택하세요";
+        subtitle.color = new Color(0.78f, 0.76f, 0.69f, 1f);
+        SetRect(subtitle.rectTransform, new Vector2(0.25f, 0.70f), new Vector2(0.75f, 0.76f));
 
         var buttons = new Button[3];
         for (var index = 0; index < buttons.Length; index++)
         {
-            buttons[index] = CreateSpriteButton(
+            buttons[index] = CreateTitleButton(
                 $"Slot{index + 1}Button",
                 root,
                 font,
-                $"슬롯 {index + 1}",
-                ProjectRoot + "/Art/UI/Buttons/UI_btn_standard_normal.png",
-                ProjectRoot + "/Art/UI/Buttons/UI_btn_standard_pressed.png",
-                out _
+                $"항해 기록 {index + 1}",
+                index == 0
             );
-            float top = 0.64f - index * 0.13f;
+            Image slotImage = buttons[index].GetComponent<Image>();
+            slotImage.color = index == 0
+                ? new Color(0.20f, 0.12f, 0.035f, 0.98f)
+                : new Color(0.035f, 0.07f, 0.10f, 0.96f);
+            Text slotLabel = buttons[index].GetComponentInChildren<Text>();
+            slotLabel.fontSize = 26;
+            slotLabel.color = new Color(0.965f, 0.941f, 0.867f, 1f);
+            float top = 0.64f - index * 0.145f;
             SetRect(
                 (RectTransform)buttons[index].transform,
-                new Vector2(0.34f, top - 0.09f),
-                new Vector2(0.66f, top)
+                new Vector2(0.30f, top - 0.10f),
+                new Vector2(0.70f, top)
             );
         }
         SetArray(screen, "slotButtons", buttons.Cast<UnityEngine.Object>().ToArray());
@@ -1102,28 +1156,28 @@ public static class P0ProjectBuilder
         SetRect((RectTransform)root.transform, Vector2.zero, Vector2.one);
 
         Image topBar = CreateLayer("StatusBar", root.transform).gameObject.AddComponent<Image>();
-        topBar.color = new Color(0.035f, 0.075f, 0.12f, 0.96f);
+        topBar.color = new Color(0.018f, 0.035f, 0.055f, 0.76f);
         topBar.raycastTarget = false;
-        SetRect(topBar.rectTransform, new Vector2(0f, 0.844f), Vector2.one);
+        SetRect(topBar.rectTransform, new Vector2(0f, 0.91f), Vector2.one);
 
         Text time = CreateHudLabel(
-            "Time", topBar.transform, font, 34, TextAnchor.MiddleCenter,
-            "1일 차  ·  오전", 0.01f, 0.25f
+            "Time", topBar.transform, font, 24, TextAnchor.MiddleCenter,
+            "1일 차  ·  오전", 0.015f, 0.20f
         );
         Text anxiety = CreateHudLabel(
-            "Anxiety", topBar.transform, font, 28, TextAnchor.UpperLeft,
-            "승객 불안  0/100", 0.26f, 0.62f
+            "Anxiety", topBar.transform, font, 20, TextAnchor.UpperLeft,
+            "승객 불안  0/100", 0.52f, 0.75f
         );
         Image anxietyFill = CreateHudMeter(
-            "AnxietyMeter", topBar.transform, 0.26f, 0.62f,
+            "AnxietyMeter", topBar.transform, 0.52f, 0.75f,
             new Color(0.455f, 0.169f, 0.169f, 1f)
         );
         Text integrity = CreateHudLabel(
-            "Integrity", topBar.transform, font, 28, TextAnchor.UpperLeft,
-            "현장 보존도  100/100", 0.63f, 0.99f
+            "Integrity", topBar.transform, font, 20, TextAnchor.UpperLeft,
+            "현장 보존도  100/100", 0.76f, 0.985f
         );
         Image integrityFill = CreateHudMeter(
-            "IntegrityMeter", topBar.transform, 0.63f, 0.99f,
+            "IntegrityMeter", topBar.transform, 0.76f, 0.985f,
             new Color(0.216f, 0.412f, 0.412f, 1f)
         );
 
@@ -1131,13 +1185,13 @@ public static class P0ProjectBuilder
             "MapButton", root.transform, font, "지도",
             ProjectRoot + "/Art/UI/Buttons/UI_btn_standard_normal.png",
             ProjectRoot + "/Art/UI/Buttons/UI_btn_standard_pressed.png", out _);
-        SetRect((RectTransform)map.transform, new Vector2(0.74f, 0.79f), new Vector2(0.85f, 0.84f));
+        SetRect((RectTransform)map.transform, new Vector2(0.77f, 0.855f), new Vector2(0.87f, 0.90f));
 
         Button record = CreateSpriteButton(
             "RecordButton", root.transform, font, "수사 기록",
             ProjectRoot + "/Art/UI/Buttons/UI_btn_standard_normal.png",
             ProjectRoot + "/Art/UI/Buttons/UI_btn_standard_pressed.png", out _);
-        SetRect((RectTransform)record.transform, new Vector2(0.86f, 0.79f), new Vector2(0.98f, 0.84f));
+        SetRect((RectTransform)record.transform, new Vector2(0.88f, 0.855f), new Vector2(0.985f, 0.90f));
 
         PersistentHud hud = root.GetComponent<PersistentHud>();
         SetObject(hud, "screens", router);
@@ -1162,7 +1216,7 @@ public static class P0ProjectBuilder
         float maxX)
     {
         Image panel = CreateLayer(name + "Panel", parent).gameObject.AddComponent<Image>();
-        panel.color = new Color(0.075f, 0.13f, 0.18f, 0.96f);
+        panel.color = new Color(0.055f, 0.10f, 0.14f, 0.78f);
         panel.raycastTarget = false;
         SetRect(panel.rectTransform, new Vector2(minX, 0.08f), new Vector2(maxX, 0.92f));
         Text label = CreateText(name + "Label", panel.transform, font, size, alignment);

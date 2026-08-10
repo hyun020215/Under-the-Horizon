@@ -58,3 +58,4 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: UTH.Runtime::AppBootstrap
   gameScene: Game
+  gameDefinition: {fileID: 11400000, guid: 1516a1cacf0d61347ace21131f1ee9dc, type: 2}
