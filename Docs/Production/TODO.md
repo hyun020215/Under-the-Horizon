@@ -63,6 +63,8 @@
   - Location 이동 노드와 Condition 기반 잠금·목표 목적지 표시는 남아 있다.
 - [ ] 조사 기록·증거 노트 UI를 완성한다.
   - 기존 EvidenceDefinition/Inventory/Director와 Investigation Record 화면을 사용한다.
+  - 발견한 증거만 표시하는 카드 목록과 이미지·명칭·설명 상세 보기는 완료했다.
+  - 인물 탭, 증거 분류/필터와 새 증거 획득 표시 애니메이션은 남아 있다.
 - [ ] Evidence Board의 노드·연결·이론 슬롯 UX를 완성한다.
   - 기존 `EvidenceBoardDirector`, `EvidenceBoardGraph`, `TheoryResolver`를 사용한다.
 - [ ] Investigation/Puzzle 공통 셸의 열기·닫기·힌트·결과 표시를 이전 UX에 맞춘다.

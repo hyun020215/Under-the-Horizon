@@ -18,7 +18,7 @@ public static class PresentationCaptureRunner
         outputDirectory = Path.GetFullPath("Logs/PresentationCaptures");
         Directory.CreateDirectory(outputDirectory);
         foreach (string fileName in new[]
-                 { "01-title.png", "02-save-slots.png", "03-gameplay.png", "04-map.png" })
+                 { "01-title.png", "02-save-slots.png", "03-gameplay.png", "05-record.png" })
         {
             string path = Path.Combine(outputDirectory, fileName);
             if (File.Exists(path))
@@ -78,12 +78,12 @@ public static class PresentationCaptureRunner
         }
         else if (stage == 6 && frame >= 20)
         {
-            Click("MapButton");
+            Click("RecordButton");
             NextStage();
         }
         else if (stage == 7 && frame >= 240)
         {
-            Capture("04-map.png");
+            Capture("05-record.png");
             stage = 8;
             EditorApplication.update -= Update;
             EditorApplication.isPlaying = false;

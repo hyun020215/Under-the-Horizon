@@ -184,8 +184,9 @@ public sealed class DialogueScreen : ScreenBase
 
     private IEnumerator AnimateChoice(Button button, int index)
     {
-        CanvasGroup group = button.GetComponent<CanvasGroup>()
-            ?? button.gameObject.AddComponent<CanvasGroup>();
+        CanvasGroup group = button.GetComponent<CanvasGroup>();
+        if (group == null)
+            yield break;
         RectTransform rect = (RectTransform)button.transform;
         Vector2 rest = rect.anchoredPosition;
         group.alpha = 0f;

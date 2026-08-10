@@ -184,6 +184,19 @@ public sealed class BootstrapTests
         while (transitionOverlay.blocksRaycasts)
             yield return null;
 
+        hud.transform.Find("RecordButton").GetComponent<Button>().onClick.Invoke();
+        while (router.Current != ScreenId.InvestigationRecord)
+            yield return null;
+        InvestigationRecordScreen record = Object.FindFirstObjectByType<InvestigationRecordScreen>(
+            FindObjectsInactive.Include);
+        Assert.That(record.gameObject.activeInHierarchy, Is.True);
+        Assert.That(GameObject.Find("Empty Label"), Is.Not.Null);
+        record.transform.Find("BackButton").GetComponent<Button>().onClick.Invoke();
+        while (router.Current != ScreenId.Exploration)
+            yield return null;
+        while (transitionOverlay.blocksRaycasts)
+            yield return null;
+
         int historyBeforeClick = narrative.History.Lines.Count;
         CharacterView character = Object.FindFirstObjectByType<CharacterView>();
         Assert.That(character, Is.Not.Null);

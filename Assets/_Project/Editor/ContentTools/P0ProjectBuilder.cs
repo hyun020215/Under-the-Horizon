@@ -125,6 +125,30 @@ public static class P0ProjectBuilder
         EditorApplication.Exit(0);
     }
 
+    public static void RefreshInvestigationRecordFromCommandLine()
+    {
+        Sprite panel = AssetDatabase.LoadAssetAtPath<Sprite>(ThemePanelPath);
+        SavePrefab(PrefabRoot + "/UI/PF_RecordScreen.prefab",
+            CreateScreen("PF_RecordScreen", typeof(InvestigationRecordScreen),
+                ScreenId.InvestigationRecord, panel));
+        BuildGameScene();
+        AssetDatabase.SaveAssets();
+        AssetDatabase.Refresh();
+        EditorApplication.Exit(0);
+    }
+
+    public static void RefreshDialogueFromCommandLine()
+    {
+        Sprite panel = AssetDatabase.LoadAssetAtPath<Sprite>(ThemePanelPath);
+        SavePrefab(PrefabRoot + "/UI/PF_DialogueScreen.prefab",
+            CreateScreen("PF_DialogueScreen", typeof(DialogueScreen),
+                ScreenId.Dialogue, panel));
+        BuildGameScene();
+        AssetDatabase.SaveAssets();
+        AssetDatabase.Refresh();
+        EditorApplication.Exit(0);
+    }
+
     private static void EnsurePresentationProfiles()
     {
         EnsureAsset<AmbientParticleProfile>(
@@ -581,6 +605,8 @@ public static class P0ProjectBuilder
             BuildSaveSlotScreen(root.transform, saveSlot);
         else if (screen is MapScreen map)
             BuildMapScreen(root.transform, map);
+        else if (screen is InvestigationRecordScreen record)
+            BuildInvestigationRecordScreen(root.transform, record);
         else if (screen is ExplorationScreen)
         {
             Image image = root.GetComponent<Image>();
@@ -594,6 +620,91 @@ public static class P0ProjectBuilder
             BuildSecondaryScreen(root.transform, screen);
         root.SetActive(false);
         return root;
+    }
+
+    private static void BuildInvestigationRecordScreen(
+        Transform root, InvestigationRecordScreen screen)
+    {
+        Font font = LoadUiFont("Pretendard/FONT_Pretendard-SemiBold.ttf");
+        Image background = root.GetComponent<Image>();
+        background.color = new Color(0.012f, 0.022f, 0.035f, 1f);
+        Text title = CreateText("Record Title", root, font, 42, TextAnchor.MiddleLeft);
+        title.text = "조사 기록";
+        title.color = new Color(0.965f, 0.827f, 0.529f, 1f);
+        SetRect(title.rectTransform, new Vector2(0.055f, 0.88f), new Vector2(0.48f, 0.97f));
+
+        Image listPanel = CreateLayer("Evidence List", root).gameObject.AddComponent<Image>();
+        listPanel.color = new Color(0.025f, 0.045f, 0.065f, 0.96f);
+        SetRect(listPanel.rectTransform, new Vector2(0.055f, 0.15f), new Vector2(0.58f, 0.86f));
+        Image detailPanel = CreateLayer("Evidence Detail", root).gameObject.AddComponent<Image>();
+        detailPanel.sprite = AssetDatabase.LoadAssetAtPath<Sprite>(ThemePanelPath);
+        detailPanel.type = Image.Type.Sliced;
+        detailPanel.color = new Color(0.055f, 0.07f, 0.085f, 0.98f);
+        SetRect(detailPanel.rectTransform, new Vector2(0.60f, 0.15f), new Vector2(0.945f, 0.86f));
+
+        const int capacity = 18;
+        var buttons = new Button[capacity];
+        var images = new Image[capacity];
+        var labels = new Text[capacity];
+        Sprite cardSprite = AssetDatabase.LoadAssetAtPath<Sprite>(
+            ProjectRoot + "/Art/UI/Cards/UI_card_evidence.png");
+        for (var index = 0; index < capacity; index++)
+        {
+            GameObject card = new($"EvidenceCard{index + 1}", typeof(RectTransform),
+                typeof(CanvasRenderer), typeof(Image), typeof(Button));
+            card.transform.SetParent(listPanel.transform, false);
+            Image cardImage = card.GetComponent<Image>();
+            cardImage.sprite = cardSprite;
+            cardImage.type = Image.Type.Sliced;
+            cardImage.color = new Color(0.10f, 0.12f, 0.14f, 1f);
+            Button button = card.GetComponent<Button>();
+            button.targetGraphic = cardImage;
+            int column = index % 3;
+            int row = index / 3;
+            float left = 0.025f + column * 0.325f;
+            float top = 0.965f - row * 0.158f;
+            SetRect((RectTransform)card.transform,
+                new Vector2(left, top - 0.135f), new Vector2(left + 0.30f, top));
+            Image thumbnail = CreateLayer("Thumbnail", card.transform).gameObject.AddComponent<Image>();
+            thumbnail.preserveAspect = true;
+            thumbnail.raycastTarget = false;
+            SetRect(thumbnail.rectTransform, new Vector2(0.04f, 0.30f), new Vector2(0.34f, 0.92f));
+            Text label = CreateText("Label", card.transform, font, 16, TextAnchor.MiddleLeft);
+            label.color = new Color(0.92f, 0.88f, 0.78f, 1f);
+            label.raycastTarget = false;
+            SetRect(label.rectTransform, new Vector2(0.38f, 0.10f), new Vector2(0.96f, 0.90f));
+            buttons[index] = button;
+            images[index] = thumbnail;
+            labels[index] = label;
+        }
+
+        Text empty = CreateText("Empty Label", listPanel.transform, font, 24, TextAnchor.MiddleCenter);
+        empty.text = "아직 수집된 증거가 없습니다.";
+        empty.color = new Color(0.72f, 0.69f, 0.62f, 1f);
+        SetRect(empty.rectTransform, new Vector2(0.12f, 0.35f), new Vector2(0.88f, 0.65f));
+        Image detailImage = CreateLayer("Detail Image", detailPanel.transform).gameObject.AddComponent<Image>();
+        detailImage.preserveAspect = true;
+        detailImage.raycastTarget = false;
+        SetRect(detailImage.rectTransform, new Vector2(0.10f, 0.53f), new Vector2(0.90f, 0.92f));
+        Text detailTitle = CreateText("Detail Title", detailPanel.transform, font, 28, TextAnchor.MiddleLeft);
+        detailTitle.color = new Color(0.965f, 0.827f, 0.529f, 1f);
+        SetRect(detailTitle.rectTransform, new Vector2(0.10f, 0.40f), new Vector2(0.90f, 0.52f));
+        Text detailBody = CreateText("Detail Body", detailPanel.transform, font, 20, TextAnchor.UpperLeft);
+        detailBody.color = new Color(0.88f, 0.85f, 0.78f, 1f);
+        detailBody.horizontalOverflow = HorizontalWrapMode.Wrap;
+        SetRect(detailBody.rectTransform, new Vector2(0.10f, 0.10f), new Vector2(0.90f, 0.39f));
+        Button back = CreateTitleButton("BackButton", root, font, "돌아가기", false);
+        SetRect((RectTransform)back.transform,
+            new Vector2(0.055f, 0.055f), new Vector2(0.18f, 0.12f));
+
+        SetArray(screen, "cardButtons", buttons.Cast<UnityEngine.Object>().ToArray());
+        SetArray(screen, "cardImages", images.Cast<UnityEngine.Object>().ToArray());
+        SetArray(screen, "cardLabels", labels.Cast<UnityEngine.Object>().ToArray());
+        SetObject(screen, "detailImage", detailImage);
+        SetObject(screen, "detailTitle", detailTitle);
+        SetObject(screen, "detailBody", detailBody);
+        SetObject(screen, "emptyLabel", empty);
+        SetObject(screen, "backButton", back);
     }
 
     private static void BuildMapScreen(Transform root, MapScreen screen)
@@ -874,6 +985,7 @@ public static class P0ProjectBuilder
                 ProjectRoot + "/Art/UI/Buttons/UI_btn_choice_pressed.png",
                 out choiceLabels[i]);
             choices[i].gameObject.AddComponent<DialogueChoiceBinding>();
+            choices[i].gameObject.AddComponent<CanvasGroup>();
             var top = 0.29f - (i * 0.07f);
             SetRect((RectTransform)choices[i].transform, new Vector2(0.10f, top - 0.058f), new Vector2(0.90f, top));
             choices[i].gameObject.SetActive(false);
@@ -1184,6 +1296,13 @@ public static class P0ProjectBuilder
         gameCamera.backgroundColor = new Color(0.005f, 0.008f, 0.015f, 1f);
         GameStateStore state = new GameObject("GameStateStore").AddComponent<GameStateStore>();
         state.transform.SetParent(root.transform);
+        EvidenceDirector evidenceDirector = new GameObject("EvidenceDirector")
+            .AddComponent<EvidenceDirector>();
+        evidenceDirector.transform.SetParent(root.transform);
+        SetObject(evidenceDirector, "state", state);
+        SetObject(evidenceDirector, "database",
+            AssetDatabase.LoadAssetAtPath<EvidenceDatabase>(
+                ContentRoot + "/Game/DATABASE_Evidence.asset"));
 
         Canvas world = CreateCanvas("WorldCanvas", root.transform);
         world.sortingOrder = 0;
@@ -1227,6 +1346,11 @@ public static class P0ProjectBuilder
             {
                 SetObject(mapScreen, "screens", router);
                 SetObject(mapScreen, "state", state);
+            }
+            if (screen is InvestigationRecordScreen recordScreen)
+            {
+                SetObject(recordScreen, "screens", router);
+                SetObject(recordScreen, "evidence", evidenceDirector);
             }
         }
         BuildPersistentHud(uiFrame, router, state);
