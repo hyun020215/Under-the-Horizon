@@ -927,7 +927,7 @@ public static class P0ProjectBuilder
         frame.type = Image.Type.Sliced;
         frame.color = new Color(0.62f, 0.46f, 0.22f, 0.92f);
         frame.raycastTarget = false;
-        SetRect(frame.rectTransform, new Vector2(0.19f, 0.17f), new Vector2(0.81f, 0.78f));
+        SetRect(frame.rectTransform, new Vector2(0.055f, 0.17f), new Vector2(0.945f, 0.78f));
 
         Text title = CreateText("Save Slot Title", root, font, 42, TextAnchor.MiddleCenter);
         title.text = "저장 슬롯 선택";
@@ -977,11 +977,11 @@ public static class P0ProjectBuilder
             actionLabels[index].color = new Color(0.965f, 0.827f, 0.529f, 1f);
             SetRect(actionLabels[index].rectTransform,
                 new Vector2(0.08f, 0.07f), new Vector2(0.92f, 0.24f));
-            float left = 0.08f + index * 0.305f;
+            float left = 0.075f + index * 0.2925f;
             SetRect(
                 (RectTransform)buttons[index].transform,
                 new Vector2(left, 0.22f),
-                new Vector2(left + 0.285f, 0.68f)
+                new Vector2(left + 0.275f, 0.68f)
             );
         }
         SetArray(screen, "slotButtons", buttons.Cast<UnityEngine.Object>().ToArray());

@@ -13,8 +13,17 @@ public static class PresentationCaptureRunner
 
     public static void CaptureFromCommandLine()
     {
+        frame = 0;
+        stage = 0;
         outputDirectory = Path.GetFullPath("Logs/PresentationCaptures");
         Directory.CreateDirectory(outputDirectory);
+        foreach (string fileName in new[]
+                 { "01-title.png", "02-save-slots.png", "03-gameplay.png" })
+        {
+            string path = Path.Combine(outputDirectory, fileName);
+            if (File.Exists(path))
+                File.Delete(path);
+        }
         EditorSceneManager.OpenScene(GameScenePath);
         EditorApplication.playModeStateChanged += OnPlayModeChanged;
         EditorApplication.isPlaying = true;

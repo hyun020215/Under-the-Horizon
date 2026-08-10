@@ -38,6 +38,9 @@ public sealed class BootstrapTests
 
         TitleScreen title = Object.FindFirstObjectByType<TitleScreen>(FindObjectsInactive.Include);
         Assert.That(title, Is.Not.Null);
+        ScreenRouter router = Object.FindFirstObjectByType<ScreenRouter>();
+        while (router.Current != ScreenId.Title)
+            yield return null;
         Assert.That(title.gameObject.activeInHierarchy, Is.True);
         Button start = title.transform.Find("StartButton").GetComponent<Button>();
         start.onClick.Invoke();
@@ -47,6 +50,8 @@ public sealed class BootstrapTests
             FindObjectsInactive.Include
         );
         Assert.That(slots, Is.Not.Null);
+        while (router.Current != ScreenId.SaveSlot)
+            yield return null;
         Assert.That(slots.gameObject.activeInHierarchy, Is.True);
         slots.transform.Find("Slot3Button").GetComponent<Button>().onClick.Invoke();
         yield return null;
@@ -115,7 +120,6 @@ public sealed class BootstrapTests
             Is.Not.Null
         );
 
-        ScreenRouter router = Object.FindFirstObjectByType<ScreenRouter>();
         var reopen = router.OpenAsync(ScreenId.Dialogue);
         while (!reopen.IsCompleted)
             yield return null;

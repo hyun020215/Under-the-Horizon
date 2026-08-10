@@ -47,9 +47,9 @@ public sealed class SaveSlotScreen : ScreenBase
 
     private void RefreshCards()
     {
-        if (AppContext.Services == null ||
-            !AppContext.Services.TryGet(out SaveService saves))
-            return;
+        SaveService saves = null;
+        AppContext.Services?.TryGet(out saves);
+        saves ??= new SaveService();
         for (var index = 0; index < slotButtons.Length; index++)
         {
             SaveSlot slot = new(index);
