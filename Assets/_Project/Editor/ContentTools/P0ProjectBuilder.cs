@@ -646,7 +646,7 @@ public static class P0ProjectBuilder
         artwork.color = Color.white;
         artwork.raycastTarget = false;
         AspectRatioFitter artworkAspect = artwork.gameObject.AddComponent<AspectRatioFitter>();
-        artworkAspect.aspectMode = AspectRatioFitter.AspectMode.FitInParent;
+        artworkAspect.aspectMode = AspectRatioFitter.AspectMode.EnvelopeParent;
         artworkAspect.aspectRatio = titleSprite.rect.width / titleSprite.rect.height;
         artwork.transform.SetAsFirstSibling();
 
@@ -862,22 +862,25 @@ public static class P0ProjectBuilder
         GameObject cameraObject = new("Main Camera", typeof(Camera), typeof(AudioListener));
         cameraObject.tag = "MainCamera";
         cameraObject.transform.SetParent(root.transform);
+        Camera gameCamera = cameraObject.GetComponent<Camera>();
+        gameCamera.clearFlags = CameraClearFlags.SolidColor;
+        gameCamera.backgroundColor = new Color(0.005f, 0.008f, 0.015f, 1f);
         GameStateStore state = new GameObject("GameStateStore").AddComponent<GameStateStore>();
         state.transform.SetParent(root.transform);
 
         Canvas world = CreateCanvas("WorldCanvas", root.transform);
         world.sortingOrder = 0;
-        RectTransform worldFrame = CreateSafeFrame("WorldFrame", world.transform);
+        RectTransform worldFrame = CreateLayer("WorldFrame", world.transform);
         Image background = CreateLayer("BackgroundLayer", worldFrame).gameObject.AddComponent<Image>();
         AspectRatioFitter backgroundAspect = background.gameObject.AddComponent<AspectRatioFitter>();
-        backgroundAspect.aspectMode = AspectRatioFitter.AspectMode.FitInParent;
+        backgroundAspect.aspectMode = AspectRatioFitter.AspectMode.EnvelopeParent;
         background.raycastTarget = false;
         RectTransform characterLayer = CreateLayer("CharacterLayer", worldFrame);
         CreateLayer("HotspotLayer", worldFrame);
 
         Canvas ui = CreateCanvas("UICanvas", root.transform);
         ui.sortingOrder = 100;
-        RectTransform uiFrame = CreateSafeFrame("UIFrame", ui.transform);
+        RectTransform uiFrame = CreateLayer("UIFrame", ui.transform);
         RectTransform screenHost = CreateLayer("ScreenHost", uiFrame);
         RectTransform transitionRoot = CreateLayer("TransitionOverlay", ui.transform);
         Image transitionBlocker = transitionRoot.gameObject.AddComponent<Image>();
@@ -1194,15 +1197,6 @@ public static class P0ProjectBuilder
         fill.raycastTarget = false;
         SetRect(fill.rectTransform, Vector2.zero, Vector2.one);
         return fill;
-    }
-
-    private static RectTransform CreateSafeFrame(string name, Transform parent)
-    {
-        RectTransform frame = CreateLayer(name, parent);
-        AspectRatioFitter aspect = frame.gameObject.AddComponent<AspectRatioFitter>();
-        aspect.aspectMode = AspectRatioFitter.AspectMode.FitInParent;
-        aspect.aspectRatio = 16f / 9f;
-        return frame;
     }
 
     private static Font LoadUiFont(string relativePath) =>
