@@ -12,7 +12,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 77daaaebdb0b0ce40a68134ba225703e, type: 3}
   m_Name: THEORY_NoExitUsed
   m_EditorClassIdentifier: UTH.Runtime::TheoryDefinition
-  id: 
-  displayName: 
-  description: 
-  requiredEvidence: []
+  id: scene_denial
+  displayName: 현장 출입 부정
+  description: 세 출구가 모두 사용되지 않아 사건 현장에 살아 있는 제3자가 없었다.
+  requiredEvidence:
+  - {fileID: 11400000, guid: 6d7ab6aec949529409a0059f064a4028, type: 2}
+  - {fileID: 11400000, guid: d73b059da5794bd4d8218b5a042cfbb2, type: 2}
+  - {fileID: 11400000, guid: ea9c7d2c82eaf0f4b94322663dc5b164, type: 2}

@@ -12,7 +12,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 77daaaebdb0b0ce40a68134ba225703e, type: 3}
   m_Name: THEORY_BallastMurder
   m_EditorClassIdentifier: UTH.Runtime::TheoryDefinition
-  id: 
-  displayName: 
-  description: 
-  requiredEvidence: []
+  id: actual_murder
+  displayName: 실제 살해 장소
+  description: 다니엘은 밸러스트 구역에서 질소로 살해됐다.
+  requiredEvidence:
+  - {fileID: 11400000, guid: c750d3b7504945f4399db9e786eb0d5d, type: 2}
+  - {fileID: 11400000, guid: 1093f33f25c8a9341afef70004ff2445, type: 2}

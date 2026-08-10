@@ -12,7 +12,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 77daaaebdb0b0ce40a68134ba225703e, type: 3}
   m_Name: THEORY_CargoRail
   m_EditorClassIdentifier: UTH.Runtime::TheoryDefinition
-  id: 
-  displayName: 
-  description: 
-  requiredEvidence: []
+  id: transport_route
+  displayName: 서비스 운송 경로
+  description: 86kg 하중은 서비스 레일을 따라 7층에서 8층으로 이동했다.
+  requiredEvidence:
+  - {fileID: 11400000, guid: 910f570e241ed9b489148e5d4cceaf4a, type: 2}
+  - {fileID: 11400000, guid: 2dabd4f0316a75849843c8559ee2adc5, type: 2}

@@ -12,7 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 77daaaebdb0b0ce40a68134ba225703e, type: 3}
   m_Name: THEORY_OrpheusTruth
   m_EditorClassIdentifier: UTH.Runtime::TheoryDefinition
-  id: 
-  displayName: 
-  description: 
-  requiredEvidence: []
+  id: past_event
+  displayName: 오르페우스 과거 사건
+  description: 과거 보험 사기 설계와 현재 살인은 구분해야 한다.
+  requiredEvidence:
+  - {fileID: 11400000, guid: c81a9d6db0b56404484b8e79c66f4e60, type: 2}
