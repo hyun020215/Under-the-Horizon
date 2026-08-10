@@ -75,6 +75,17 @@ public static class P0ProjectBuilder
         EditorApplication.Exit(0);
     }
 
+    public static void RefreshSettingsFromCommandLine()
+    {
+        Sprite panel = AssetDatabase.LoadAssetAtPath<Sprite>(ThemePanelPath);
+        SavePrefab(
+            PrefabRoot + "/UI/PF_SettingsScreen.prefab",
+            CreateScreen("PF_SettingsScreen", typeof(SettingsScreen), ScreenId.Settings, panel));
+        AssetDatabase.SaveAssets();
+        AssetDatabase.Refresh();
+        EditorApplication.Exit(0);
+    }
+
     private static void CreatePlaceholderAssets()
     {
         string absoluteContent = Path.GetFullPath(ContentRoot);
@@ -541,16 +552,102 @@ public static class P0ProjectBuilder
         SetRect(body.rectTransform, new Vector2(0.2f, 0.35f), new Vector2(0.8f, 0.68f));
         if (screen is SettingsScreen settings)
         {
-            Slider master = CreateSettingsSlider(root, font, "전체 음량", 0.62f);
-            Slider music = CreateSettingsSlider(root, font, "배경 음악", 0.49f);
-            Slider sfx = CreateSettingsSlider(root, font, "효과음", 0.36f);
+            Slider master = CreateSettingsSlider(root, font, "전체 음량", 0.66f);
+            Slider music = CreateSettingsSlider(root, font, "배경 음악", 0.56f);
+            Slider sfx = CreateSettingsSlider(root, font, "효과음", 0.46f);
+            Dropdown resolution = CreateSettingsDropdown(root, font, "해상도", 0.32f);
+            Toggle fullscreen = CreateSettingsToggle(root, font, "전체 화면", 0.23f);
+            Button apply = CreateTitleButton(
+                "ApplyDisplayButton", root, font, "화면 설정 적용", true);
+            SetRect((RectTransform)apply.transform,
+                new Vector2(0.44f, 0.13f), new Vector2(0.72f, 0.19f));
             SetObject(settings, "masterSlider", master);
             SetObject(settings, "musicSlider", music);
             SetObject(settings, "sfxSlider", sfx);
+            SetObject(settings, "resolutionDropdown", resolution);
+            SetObject(settings, "fullscreenToggle", fullscreen);
+            SetObject(settings, "applyDisplayButton", apply);
         }
         Button back = CreateTitleButton("BackButton", root, font, "뒤로", false);
         SetRect((RectTransform)back.transform, new Vector2(0.05f, 0.06f), new Vector2(0.20f, 0.12f));
         SetObject(screen, "backButton", back);
+    }
+
+    private static Dropdown CreateSettingsDropdown(
+        Transform root, Font font, string label, float centerY)
+    {
+        Text caption = CreateText(label + " Label", root, font, 26, TextAnchor.MiddleLeft);
+        caption.text = label;
+        caption.color = new Color(0.965f, 0.941f, 0.867f, 1f);
+        SetRect(caption.rectTransform,
+            new Vector2(0.28f, centerY - 0.025f),
+            new Vector2(0.43f, centerY + 0.025f));
+
+        GameObject dropdownObject = new(label + " Dropdown",
+            typeof(RectTransform), typeof(CanvasRenderer), typeof(Image), typeof(Dropdown));
+        dropdownObject.transform.SetParent(root, false);
+        SetRect((RectTransform)dropdownObject.transform,
+            new Vector2(0.44f, centerY - 0.035f),
+            new Vector2(0.72f, centerY + 0.035f));
+        Image background = dropdownObject.GetComponent<Image>();
+        background.color = new Color(0.035f, 0.07f, 0.10f, 0.98f);
+
+        Text selected = CreateText("Label", dropdownObject.transform, font, 22, TextAnchor.MiddleLeft);
+        selected.color = new Color(0.965f, 0.941f, 0.867f, 1f);
+        SetRect(selected.rectTransform, new Vector2(0.06f, 0f), new Vector2(0.88f, 1f));
+        Text arrow = CreateText("Arrow", dropdownObject.transform, font, 22, TextAnchor.MiddleCenter);
+        arrow.text = "▼";
+        SetRect(arrow.rectTransform, new Vector2(0.88f, 0f), Vector2.one);
+
+        GameObject template = new("Template", typeof(RectTransform),
+            typeof(CanvasRenderer), typeof(Image), typeof(ScrollRect));
+        template.transform.SetParent(dropdownObject.transform, false);
+        template.SetActive(false);
+        RectTransform templateRect = (RectTransform)template.transform;
+        templateRect.anchorMin = new Vector2(0f, 0f);
+        templateRect.anchorMax = new Vector2(1f, 0f);
+        templateRect.pivot = new Vector2(0.5f, 1f);
+        templateRect.anchoredPosition = new Vector2(0f, -4f);
+        templateRect.sizeDelta = new Vector2(0f, 240f);
+        template.GetComponent<Image>().color = new Color(0.018f, 0.035f, 0.052f, 1f);
+        GameObject item = new("Item", typeof(RectTransform), typeof(Toggle));
+        item.transform.SetParent(template.transform, false);
+        SetRect((RectTransform)item.transform, Vector2.zero, Vector2.one);
+        Text itemLabel = CreateText("Item Label", item.transform, font, 21, TextAnchor.MiddleLeft);
+        SetRect(itemLabel.rectTransform, new Vector2(0.06f, 0f), Vector2.one);
+
+        Dropdown dropdown = dropdownObject.GetComponent<Dropdown>();
+        dropdown.targetGraphic = background;
+        dropdown.captionText = selected;
+        dropdown.template = templateRect;
+        dropdown.itemText = itemLabel;
+        return dropdown;
+    }
+
+    private static Toggle CreateSettingsToggle(
+        Transform root, Font font, string label, float centerY)
+    {
+        GameObject toggleObject = new(label + " Toggle", typeof(RectTransform), typeof(Toggle));
+        toggleObject.transform.SetParent(root, false);
+        SetRect((RectTransform)toggleObject.transform,
+            new Vector2(0.44f, centerY - 0.03f),
+            new Vector2(0.72f, centerY + 0.03f));
+        Image box = CreateLayer("Background", toggleObject.transform).gameObject.AddComponent<Image>();
+        box.color = new Color(0.035f, 0.07f, 0.10f, 1f);
+        box.rectTransform.anchorMin = new Vector2(0f, 0.15f);
+        box.rectTransform.anchorMax = new Vector2(0.12f, 0.85f);
+        Text mark = CreateText("Checkmark", box.transform, font, 26, TextAnchor.MiddleCenter);
+        mark.text = "✓";
+        mark.color = new Color(0.965f, 0.827f, 0.529f, 1f);
+        SetRect(mark.rectTransform, Vector2.zero, Vector2.one);
+        Text toggleLabel = CreateText("Label", toggleObject.transform, font, 24, TextAnchor.MiddleLeft);
+        toggleLabel.text = label;
+        SetRect(toggleLabel.rectTransform, new Vector2(0.16f, 0f), Vector2.one);
+        Toggle toggle = toggleObject.GetComponent<Toggle>();
+        toggle.targetGraphic = box;
+        toggle.graphic = mark;
+        toggle.isOn = true;
+        return toggle;
     }
 
     private static Slider CreateSettingsSlider(

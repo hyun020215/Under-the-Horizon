@@ -22,13 +22,16 @@ public sealed class AppBootstrap : MonoBehaviour
             contentLoader = new ContentLoader(gameDefinition);
             var saves = new SaveService();
             var audioSettings = new AudioSettingsService();
+            var displaySettings = new DisplaySettingsService();
             audioSettings.Load();
+            displaySettings.Load();
 
             AppContext.Services.Register(gameDefinition);
             AppContext.Services.Register(contentLoader.Database);
             AppContext.Services.Register(contentLoader);
             AppContext.Services.Register(saves);
             AppContext.Services.Register(audioSettings);
+            AppContext.Services.Register(displaySettings);
         }
         catch (System.Exception exception)
         {
