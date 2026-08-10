@@ -47,6 +47,7 @@ public static class ContentValidator
 
         ValidateStoryScenes(scenes, errors);
         ValidateLocations(errors);
+        ValidateAudioCueProfiles(errors);
         ValidateDialogues(dialogues, errors);
         ValidatePuzzles(puzzles, errors);
         ValidateDatabases(errors);
@@ -279,6 +280,63 @@ public static class ContentValidator
                 if (state == null || state.Background == null)
                     errors.Add($"{location.Id} has a State without a background.");
             }
+        }
+    }
+
+    private static void ValidateAudioCueProfiles(ICollection<string> errors)
+    {
+        foreach (AudioCueProfile profile in LoadAll<AudioCueProfile>())
+        {
+            ValidateAudioRole(
+                profile,
+                profile.music,
+                "music",
+                "Music",
+                "MUS_",
+                errors);
+            ValidateAudioRole(
+                profile,
+                profile.ambienceA,
+                "ambience A",
+                "Ambience",
+                "AMB_",
+                errors);
+            ValidateAudioRole(
+                profile,
+                profile.ambienceB,
+                "ambience B",
+                "Ambience",
+                "AMB_",
+                errors);
+            ValidateAudioRole(
+                profile,
+                profile.entryStinger,
+                "entry stinger",
+                "SFX",
+                "SFX_",
+                errors);
+        }
+    }
+
+    private static void ValidateAudioRole(
+        AudioCueProfile profile,
+        AudioClip clip,
+        string slot,
+        string roleFolder,
+        string prefix,
+        ICollection<string> errors)
+    {
+        if (clip == null)
+            return;
+
+        string path = AssetDatabase.GetAssetPath(clip).Replace('\\', '/');
+        string expectedRoot = $"Assets/_Project/Audio/{roleFolder}/";
+        if (!path.StartsWith(expectedRoot, StringComparison.Ordinal)
+            || !clip.name.StartsWith(prefix, StringComparison.OrdinalIgnoreCase))
+        {
+            errors.Add(
+                $"{profile.name} {slot} must reference "
+                + $"{expectedRoot}{prefix}*, but references {path}.");
         }
     }
 
