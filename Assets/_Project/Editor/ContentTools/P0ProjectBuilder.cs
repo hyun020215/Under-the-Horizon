@@ -162,6 +162,17 @@ public static class P0ProjectBuilder
         EditorApplication.Exit(0);
     }
 
+    public static void RefreshPuzzleShellFromCommandLine()
+    {
+        Sprite panel = AssetDatabase.LoadAssetAtPath<Sprite>(ThemePanelPath);
+        SavePrefab(PrefabRoot + "/UI/PF_PuzzleScreen.prefab",
+            CreateScreen("PF_PuzzleScreen", typeof(PuzzleScreen), ScreenId.Puzzle, panel));
+        BuildGameScene();
+        AssetDatabase.SaveAssets();
+        AssetDatabase.Refresh();
+        EditorApplication.Exit(0);
+    }
+
     private static void EnsurePresentationProfiles()
     {
         EnsureAsset<AmbientParticleProfile>(
@@ -622,6 +633,8 @@ public static class P0ProjectBuilder
             BuildInvestigationRecordScreen(root.transform, record);
         else if (screen is EvidenceBoardScreen evidenceBoard)
             BuildEvidenceBoardScreen(root.transform, evidenceBoard);
+        else if (screen is PuzzleScreen puzzle)
+            BuildPuzzleScreen(root.transform, puzzle);
         else if (screen is ExplorationScreen)
         {
             Image image = root.GetComponent<Image>();
@@ -786,6 +799,41 @@ public static class P0ProjectBuilder
         SetArray(screen, "theoryLabels", theoryLabels.Cast<UnityEngine.Object>().ToArray());
         SetObject(screen, "detailTitle", detailTitle); SetObject(screen, "detailBody", detailBody);
         SetObject(screen, "progressLabel", progress); SetObject(screen, "emptyLabel", empty); SetObject(screen, "backButton", back);
+    }
+
+    private static void BuildPuzzleScreen(Transform root, PuzzleScreen screen)
+    {
+        Font font = LoadUiFont("Pretendard/FONT_Pretendard-SemiBold.ttf");
+        root.GetComponent<Image>().color = new Color(0.008f, 0.014f, 0.022f, 0.98f);
+        Image frame = CreateLayer("Puzzle Frame", root).gameObject.AddComponent<Image>();
+        frame.sprite = AssetDatabase.LoadAssetAtPath<Sprite>(ThemePanelPath);
+        frame.type = Image.Type.Sliced; frame.color = new Color(0.06f, 0.075f, 0.09f, 0.98f);
+        SetRect(frame.rectTransform, new Vector2(0.10f, 0.09f), new Vector2(0.90f, 0.91f));
+        Text title = CreateText("Puzzle Title", frame.transform, font, 38, TextAnchor.MiddleCenter);
+        title.color = new Color(0.965f, 0.827f, 0.529f, 1f);
+        SetRect(title.rectTransform, new Vector2(0.08f, 0.84f), new Vector2(0.92f, 0.96f));
+        Text instruction = CreateText("Instruction", frame.transform, font, 20, TextAnchor.MiddleCenter);
+        instruction.color = new Color(0.85f, 0.82f, 0.75f, 1f);
+        SetRect(instruction.rectTransform, new Vector2(0.10f, 0.73f), new Vector2(0.90f, 0.84f));
+        Image workspace = CreateLayer("Controller Workspace", frame.transform).gameObject.AddComponent<Image>();
+        workspace.color = new Color(0.015f, 0.025f, 0.038f, 1f);
+        SetRect(workspace.rectTransform, new Vector2(0.08f, 0.27f), new Vector2(0.92f, 0.72f));
+        Text hint = CreateText("Hint", workspace.transform, font, 21, TextAnchor.MiddleCenter);
+        hint.color = new Color(0.94f, 0.78f, 0.43f, 1f);
+        SetRect(hint.rectTransform, new Vector2(0.08f, 0.12f), new Vector2(0.92f, 0.88f));
+        Text result = CreateText("Result", frame.transform, font, 26, TextAnchor.MiddleCenter);
+        result.color = new Color(0.94f, 0.78f, 0.43f, 1f);
+        SetRect(result.rectTransform, new Vector2(0.18f, 0.15f), new Vector2(0.82f, 0.25f));
+        Button cancel = CreateTitleButton("CancelButton", frame.transform, font, "나가기", false);
+        Button hintButton = CreateTitleButton("HintButton", frame.transform, font, "힌트", true);
+        Button returnButton = CreateTitleButton("ReturnButton", frame.transform, font, "조사로 돌아가기", true);
+        SetRect((RectTransform)cancel.transform, new Vector2(0.08f, 0.07f), new Vector2(0.25f, 0.15f));
+        SetRect((RectTransform)hintButton.transform, new Vector2(0.75f, 0.07f), new Vector2(0.92f, 0.15f));
+        SetRect((RectTransform)returnButton.transform, new Vector2(0.37f, 0.07f), new Vector2(0.63f, 0.15f));
+        SetObject(screen, "titleLabel", title); SetObject(screen, "instructionLabel", instruction);
+        SetObject(screen, "hintLabel", hint); SetObject(screen, "resultLabel", result);
+        SetObject(screen, "hintButton", hintButton); SetObject(screen, "cancelButton", cancel);
+        SetObject(screen, "returnButton", returnButton);
     }
 
     private static void BuildMapScreen(Transform root, MapScreen screen)
@@ -1445,6 +1493,8 @@ public static class P0ProjectBuilder
                 SetObject(evidenceBoardScreen, "screens", router);
                 SetObject(evidenceBoardScreen, "board", evidenceBoardDirector);
             }
+            if (screen is PuzzleScreen puzzleScreenView)
+                SetObject(puzzleScreenView, "screens", router);
         }
         BuildPersistentHud(uiFrame, router, state);
         transitionRoot.SetAsLastSibling();
@@ -1502,6 +1552,7 @@ public static class P0ProjectBuilder
         }
 
         PuzzleDirector puzzles = CreatePuzzleDirector(root.transform, router);
+        SetObject(puzzles, "puzzleScreen", screens.OfType<PuzzleScreen>().FirstOrDefault());
         InteractionDirector interactions = new GameObject("InteractionDirector").AddComponent<InteractionDirector>();
         interactions.transform.SetParent(root.transform);
         SetObject(interactions, "state", state);

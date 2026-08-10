@@ -75,6 +75,9 @@
   - [ ] 추론 완료의 논리 상태와 효과 적용은 기존 `GameStateStore`/`GameEffect` 계약에 맞춰 연결한다.
 - [ ] Investigation/Puzzle 공통 셸의 열기·닫기·힌트·결과 표시를 이전 UX에 맞춘다.
   - 기존 `PuzzleDirector`와 각 전용 Puzzle controller의 규칙 코드는 재사용한다.
+  - [x] `PuzzleScreen` 공통 프레임에 제목·안내·단계형 힌트·취소·결과·복귀 동작을 연결했다.
+  - [x] 완료 판정과 `GameEffect` 적용은 계속 `PuzzleDirector`/`PuzzleDefinition`이 소유한다.
+  - [ ] 각 전용 컨트롤러의 실제 조작 뷰와 중간 진행 데이터는 퍼즐별 콘텐츠 작업에서 연결한다.
 
 ### 미이식 — 후속 순서
 

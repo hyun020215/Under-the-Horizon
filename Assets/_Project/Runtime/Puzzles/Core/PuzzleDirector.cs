@@ -9,6 +9,8 @@ public sealed class PuzzleDirector : MonoBehaviour
 
     [SerializeField]
     private ScreenRouter screens;
+    [SerializeField] private PuzzleScreen puzzleScreen;
+    private ValidatedPuzzleController activeController;
 
     public async Task<PuzzleResult> PlayAsync(PuzzleDefinition definition, GameStateStore state)
     {
@@ -24,9 +26,15 @@ public sealed class PuzzleDirector : MonoBehaviour
             throw new InvalidOperationException(
                 $"Puzzle controller '{definition.ControllerKey}' is not registered."
             );
+        activeController = controller as ValidatedPuzzleController;
+        puzzleScreen?.Present(definition, CancelActive);
         PuzzleResult result = await controller.PlayAsync(new PuzzleContext(definition, state));
+        activeController = null;
         if (result.Completed)
             definition.ApplyCompletion(state);
+        puzzleScreen?.ShowResult(result);
         return result;
     }
+
+    private void CancelActive() => activeController?.Cancel();
 }
