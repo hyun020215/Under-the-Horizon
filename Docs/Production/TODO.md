@@ -1,7 +1,7 @@
 # 통합 제작 TODO
 
 > 이 문서는 프로젝트의 유일한 TODO 목록이다. 자산 폴더 안에 TODO 파일을 다시 만들지 않는다.  
-> 갱신일: 2026-08-09 (`d40b061` 이후 로컬 `main` 기준)
+> 갱신일: 2026-08-10 (`7d3801e` 이후 로컬 `main` 기준)
 
 ## 완료
 
@@ -25,6 +25,9 @@
 - [x] Audio 원본을 Music·Ambience·SFX·VoiceBarks·StoryRecordings 역할로 정리하고,
   Story Recording 16개를 Story Scene별 `REC_` 자산으로 분리했다.
 - [x] Content, 대화 선택지, Save/Load, 대표 Puzzle, Transition, 오디오 회귀 테스트를 추가했다.
+- [x] 고정 16:9 프레임을 제거하고 타이틀·장소 배경이 화면 비율을 유지하며 뷰포트를 덮도록 했다.
+- [x] 13개 PuzzleDefinition을 장면별 월드 Interaction과 PuzzleInteractionAction에 연결했다.
+  - 퍼즐 규칙과 장면별 핫스팟 최종 좌표는 별도 미완료 항목이다.
 
 ## P1 — 플레이 가능한 콘텐츠 완성
 
@@ -40,6 +43,7 @@
   - 현재 Audio + Wait는 placeholder 탈출을 위한 최소 구성일 뿐 완성 시네마틱이 아니다.
 - [ ] 13개 PuzzleDefinition에 입력 항목, 정답·순서, 오답 판정, 힌트 단계와 저장할 중간 진행을
   데이터로 작성하고 실제 Puzzle Interaction에 연결한다.
+  - Puzzle Interaction 진입 연결은 완료했다. 규칙 데이터와 최종 핫스팟 좌표가 남았다.
 - [ ] D8-01 최종 심문의 6단계 논증과 A/B/C/Bad 엔딩 판정·라우팅을 현재 Condition/GameEffect와
   `GameStateStore.endingId`로 이식한다.
 - [ ] Story Recording 파일과 Dialogue line ID의 승인된 대응표를 AudioCue/Sequence에 연결한다.
