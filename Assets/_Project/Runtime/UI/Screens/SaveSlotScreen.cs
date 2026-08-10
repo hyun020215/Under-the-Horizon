@@ -29,7 +29,7 @@ public sealed class SaveSlotScreen : ScreenBase
 
     private void Select(int index)
     {
-        selection?.TrySetResult(new SaveSlot(index));
-        selection = null;
+        selection ??= new TaskCompletionSource<SaveSlot>();
+        selection.TrySetResult(new SaveSlot(index));
     }
 }

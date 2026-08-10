@@ -42,8 +42,8 @@ public sealed class TitleScreen : ScreenBase
 
     private void RequestStart()
     {
-        startRequested?.TrySetResult(true);
-        startRequested = null;
+        startRequested ??= new TaskCompletionSource<bool>();
+        startRequested.TrySetResult(true);
     }
 
     private async void Open(ScreenId id)
