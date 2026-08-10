@@ -14,11 +14,24 @@ public sealed class TitleScreen : ScreenBase
 
     private void Awake()
     {
+        EnsureAtmosphere();
         if (startButton != null)
             startButton.onClick.AddListener(RequestStart);
         settingsButton?.onClick.AddListener(() => Open(ScreenId.Settings));
         creditsButton?.onClick.AddListener(() => Open(ScreenId.Credits));
         quitButton?.onClick.AddListener(Quit);
+    }
+
+    private void EnsureAtmosphere()
+    {
+        Transform background = transform.Find("Title Background");
+        if (background == null)
+            return;
+        AmbientParticleOverlay overlay =
+            background.GetComponent<AmbientParticleOverlay>()
+            ?? background.gameObject.AddComponent<AmbientParticleOverlay>();
+        overlay.Initialize((RectTransform)background,
+            new Color(0.76f, 0.62f, 0.38f, 0.34f));
     }
 
     public Task WaitForStartAsync()

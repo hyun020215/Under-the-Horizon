@@ -13,36 +13,48 @@ public sealed class UiButtonFeedback : MonoBehaviour,
     private AudioClip hoverClip;
     private AudioClip clickClip;
     private Button button;
+    private Graphic graphic;
+    private Vector3 baseScale;
+    private Color baseColor;
+
+    private void Awake()
+    {
+        button = GetComponent<Button>();
+        graphic = GetComponent<Graphic>();
+        baseScale = transform.localScale;
+        if (graphic != null)
+            baseColor = graphic.color;
+    }
 
     public void Configure(SfxController controller, AudioClip hover, AudioClip click)
     {
         sfx = controller;
         hoverClip = hover;
         clickClip = click;
-        button = GetComponent<Button>();
+        button ??= GetComponent<Button>();
+        graphic ??= GetComponent<Graphic>();
     }
 
     public void OnPointerEnter(PointerEventData eventData)
     {
         if (!IsInteractable())
             return;
-        transform.localScale = Vector3.one * 1.035f;
+        Apply(1.035f, 1.10f);
         sfx?.Play(hoverClip, 0.45f);
     }
 
-    public void OnPointerExit(PointerEventData eventData) =>
-        transform.localScale = Vector3.one;
+    public void OnPointerExit(PointerEventData eventData) => Apply(1f, 1f);
 
     public void OnPointerDown(PointerEventData eventData)
     {
         if (IsInteractable())
-            transform.localScale = Vector3.one * 0.98f;
+            Apply(0.98f, 0.94f);
     }
 
     public void OnPointerUp(PointerEventData eventData)
     {
         if (IsInteractable())
-            transform.localScale = Vector3.one * 1.035f;
+            Apply(1.035f, 1.10f);
     }
 
     public void OnPointerClick(PointerEventData eventData)
@@ -52,4 +64,18 @@ public sealed class UiButtonFeedback : MonoBehaviour,
     }
 
     private bool IsInteractable() => button == null || button.IsInteractable();
+
+    private void Apply(float scale, float brightness)
+    {
+        transform.localScale = baseScale * scale;
+        if (graphic == null)
+            return;
+        graphic.color = new Color(
+            Mathf.Min(1f, baseColor.r * brightness),
+            Mathf.Min(1f, baseColor.g * brightness),
+            Mathf.Min(1f, baseColor.b * brightness),
+            baseColor.a);
+    }
+
+    private void OnDisable() => Apply(1f, 1f);
 }
