@@ -1,7 +1,7 @@
 # 통합 제작 TODO
 
 > 이 문서는 프로젝트의 유일한 TODO 목록이다. 자산 폴더 안에 TODO 파일을 다시 만들지 않는다.  
-> 갱신일: 2026-08-10 (`7d3801e` 이후 로컬 `main` 기준)
+> 갱신일: 2026-08-11 (`772736e` 이후 로컬 `main` 기준)
 
 ## 완료
 
@@ -28,6 +28,46 @@
 - [x] 고정 16:9 프레임을 제거하고 타이틀·장소 배경이 화면 비율을 유지하며 뷰포트를 덮도록 했다.
 - [x] 13개 PuzzleDefinition을 장면별 월드 Interaction과 PuzzleInteractionAction에 연결했다.
   - 퍼즐 규칙과 장면별 핫스팟 최종 좌표는 별도 미완료 항목이다.
+
+## UI/UX — 이전 프로젝트 이식 현황
+
+### 완료
+
+- [x] 데스크톱 기준 해상도를 1920×1080으로 설정하고 16:9 해상도 프리셋,
+  전체화면/창 모드와 설정 화면 적용 기능을 추가했다.
+- [x] 타이틀 배경·로고·메뉴 배치, 버튼 hover/press 피드백과 공통 UI 효과음을 이식했다.
+- [x] 화면 전환을 `ScreenRouter` → `TransitionDirector` → `TransitionProfile` 단일 경로로 정리했다.
+- [x] 타이틀·장소 파티클과 인물 호흡·흔들림·실루엣·바닥 그림자 값을 콘텐츠 프로필로 분리했다.
+- [x] 저장 슬롯을 3개 가로 카드로 구성하고 실제 저장 상태의 DAY·장면·이어하기 상태를 표시한다.
+- [x] Unity Play Mode에서 Title → Save Slot → Gameplay 실제 버튼 흐름과 16:9 캡처를 검증했다.
+
+### 부분 이식 — 기존 시스템을 확장한다
+
+- [ ] 저장 슬롯 삭제와 시작/이어하기 확인 UX를 완성한다.
+  - 기존 `ModalRouter`를 확장해 공통 확인 모달로 구현하며 화면 내부 임시 패널을 만들지 않는다.
+- [ ] Persistent HUD를 이전 프로젝트의 목표 중심 HUD로 완성한다.
+  - 기존 `PersistentHud`, `ObjectiveWidget`, `GameStateStore`를 사용한다.
+  - 내부 수치는 제품 디자인이 승인한 정성 표현으로 바꾸기 전까지 추가 노출하지 않는다.
+- [ ] Dialogue UI의 화자/내레이션/선택지 모드, 초상화 포커스와 타이포그래피를 완성한다.
+  - 기존 `DialogueScreen`, `NarrativeDirector`, `DialogueLine` 데이터를 확장한다.
+- [ ] Map 화면을 실제 Location/Condition 데이터와 연결한다.
+  - 기존 `MapScreen`, `MapDefinition`, `ScreenRouter`를 사용한다.
+- [ ] 조사 기록·증거 노트 UI를 완성한다.
+  - 기존 EvidenceDefinition/Inventory/Director와 Investigation Record 화면을 사용한다.
+- [ ] Evidence Board의 노드·연결·이론 슬롯 UX를 완성한다.
+  - 기존 `EvidenceBoardDirector`, `EvidenceBoardGraph`, `TheoryResolver`를 사용한다.
+- [ ] Investigation/Puzzle 공통 셸의 열기·닫기·힌트·결과 표시를 이전 UX에 맞춘다.
+  - 기존 `PuzzleDirector`와 각 전용 Puzzle controller의 규칙 코드는 재사용한다.
+
+### 미이식 — 후속 순서
+
+- [ ] Reduced Motion과 타이핑 속도 등 접근성 설정을 설정 서비스와 연출 프로필에 연결한다.
+- [ ] 게임 커서, 클릭 가능 지점 피드백, alpha/polygon hit 영역을 공통 Interaction View로 이식한다.
+- [ ] 타이틀 수면/광선, 발견·증거 획득·이론 해금 화면 효과를 Sequence/Transition 데이터로 이식한다.
+- [ ] 지도·증거·퍼즐·모달 화면을 포함한 1280×720, 1920×1080, 2560×1440 시각 회귀 캡처를 구축한다.
+
+> UI/UX 작업 시 이 목록을 매 기능 커밋마다 갱신한다. 기존 Runtime/Content/Prefab이 있는 기능은
+> 새 프레임워크를 만들지 않고 해당 시스템을 확장한다.
 
 ## P1 — 플레이 가능한 콘텐츠 완성
 
@@ -58,7 +98,8 @@
 - [ ] Puzzle 직접 미리보기와 공통 Preview 계약을 구현한다.
 - [ ] 필요한 Addressables 등록·레이블과 깨진 직렬화 참조 검증을 추가한다.
 - [ ] Unity Editor에서 EditMode/PlayMode 전체 테스트와 Bootstrap 대표 플레이스루를 통과시킨다.
-  - 현재 배치 실행은 Unity Licensing Client IPC 실패로 완료하지 못했으며 C# 프로젝트 컴파일은 통과했다.
+  - 2026-08-11 기준 EditMode 28/28, Bootstrap PlayMode 1/1과 실제 화면 캡처를 통과했다.
+  - 전체 PlayMode 모음과 전 Story Scene 대표 플레이스루는 계속 확장한다.
 
 ## P2 — 출시 설정과 품질
 
