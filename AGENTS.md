@@ -863,7 +863,39 @@ Local simplicity must not destroy global authorability.
 
 ---
 
-# 28. Architecture change protocol
+# 28. Incremental migration and commit workflow
+
+UI/UX ports, legacy migrations, and other multi-step feature work must proceed as a sequence of independently verifiable functional increments.
+
+### Before each increment
+
+- Inventory the existing Runtime, Content, Prefab, Editor, and Test implementation related to the feature.
+- Search for an existing owner, director, router, profile, definition, or view before adding a new type or asset.
+- Classify the change into the correct architecture layer and identify its authoritative state owner.
+- If an implementation is partial, extend it instead of creating a parallel replacement.
+- Record the increment as completed, partial, or remaining in the existing production TODO document.
+
+### During each increment
+
+- Keep the change centered on one coherent behavior or user-facing capability.
+- Reuse existing systems and serialized assets wherever they satisfy the requirement.
+- Route screen, transition, audio, state, and content work through their established owners.
+- Do not duplicate a legacy implementation merely to reproduce its appearance; port the behavior through current architecture boundaries.
+- Keep unrelated worktree changes out of the increment.
+
+### Before starting the next increment
+
+- Audit the diff for parallel systems, duplicated responsibilities, hard-coded content differences, and dependency-direction violations.
+- Run the narrowest relevant tests plus any required content or architecture validation.
+- Update `Docs/Production/TODO.md` in the same commit with what was completed, what remains partial, and the next migration target.
+- Commit the verified increment immediately with a message describing that single capability.
+- Do not accumulate several unrelated UI/UX features into a bulk migration commit.
+
+If an increment cannot be committed independently, reduce its scope or explain the unavoidable coupling before proceeding.
+
+---
+
+# 29. Architecture change protocol
 
 An architectural change is any change that modifies one or more of:
 
@@ -896,7 +928,7 @@ Do not treat silence as approval.
 
 ---
 
-# 29. Pre-commit architecture checklist for AI agents
+# 30. Pre-commit architecture checklist for AI agents
 
 Before finishing a task, verify:
 
@@ -911,16 +943,20 @@ Before finishing a task, verify:
 - [ ] I kept character placement and hotspots in content data where applicable.
 - [ ] I did not spread new `Resources.Load` dependencies.
 - [ ] I did not create a parallel framework.
+- [ ] I inspected and reused the existing owner/system before adding new implementation.
+- [ ] I did not duplicate an already migrated or partially migrated feature.
 - [ ] I preserved stable IDs and serialized references.
 - [ ] I considered save migration when serialized state changed.
 - [ ] I added or updated validation/tests for new reusable behavior.
+- [ ] I updated `Docs/Production/TODO.md` for incremental migration work.
+- [ ] This commit contains one coherent feature and excludes unrelated worktree changes.
 - [ ] I updated architecture documentation if an explicitly approved architectural change was made.
 
 If any checked statement is false, fix the implementation or explicitly report the architectural conflict.
 
 ---
 
-# 30. Final rule
+# 31. Final rule
 
 When uncertain between:
 
