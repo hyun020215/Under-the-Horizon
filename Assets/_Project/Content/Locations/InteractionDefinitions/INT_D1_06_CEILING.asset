@@ -17,7 +17,12 @@ MonoBehaviour:
   displayName: 천장 장식 패널
   targetId: 
   hasWorldHotspot: 1
-  normalizedRect: {x: 0.43, y: 0.82, width: 0.14, height: 0.17}
+  normalizedRect:
+    serializedVersion: 2
+    x: 0.43
+    y: 0.82
+    width: 0.14
+    height: 0.17
   conditions: []
   action: {fileID: 11400000, guid: 07a3f28c5dcf4fa8a47f10147830b2ba, type: 2}
   repeatable: 0
