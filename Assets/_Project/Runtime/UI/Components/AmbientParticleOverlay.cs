@@ -4,38 +4,48 @@ using UnityEngine.UI;
 [DisallowMultipleComponent]
 public sealed class AmbientParticleOverlay : MonoBehaviour
 {
-    private const int ParticleCount = 18;
-    private readonly RectTransform[] particles = new RectTransform[ParticleCount];
-    private readonly Image[] images = new Image[ParticleCount];
+    private RectTransform[] particles;
+    private Image[] images;
     private RectTransform host;
     private float elapsed;
-    private Color tint = new(1f, 0.88f, 0.62f, 0.42f);
+    private AmbientParticleProfile profile;
     private static Sprite glowSprite;
 
-    public void Initialize(RectTransform target, Color color)
+    public void Initialize(RectTransform target, AmbientParticleProfile settings)
     {
         host = target;
-        tint = color;
-        if (particles[0] == null)
-            Build();
-    }
-
-    public void SetTint(Color color)
-    {
-        tint = color;
+        if (profile != settings)
+        {
+            profile = settings;
+            Rebuild();
+        }
     }
 
     private void Awake()
     {
         host ??= transform as RectTransform;
-        if (host != null && particles[0] == null)
+        if (host != null && profile != null && particles == null)
+            Build();
+    }
+
+    private void Rebuild()
+    {
+        if (particles != null)
+            foreach (RectTransform particle in particles)
+                if (particle != null)
+                    Destroy(particle.gameObject);
+        particles = null;
+        images = null;
+        if (host != null && profile != null)
             Build();
     }
 
     private void Build()
     {
         EnsureGlowSprite();
-        for (int index = 0; index < ParticleCount; index++)
+        particles = new RectTransform[profile.Count];
+        images = new Image[profile.Count];
+        for (int index = 0; index < profile.Count; index++)
         {
             GameObject particle = new(
                 $"Ambient Particle {index + 1}",
@@ -43,7 +53,7 @@ public sealed class AmbientParticleOverlay : MonoBehaviour
             particle.transform.SetParent(host, false);
             RectTransform rect = particle.GetComponent<RectTransform>();
             rect.anchorMin = rect.anchorMax = new Vector2(0.5f, 0.5f);
-            float size = Mathf.Lerp(4f, 13f, Hash01(index, 0));
+            float size = Mathf.Lerp(profile.SizeRange.x, profile.SizeRange.y, Hash01(index, 0));
             rect.sizeDelta = new Vector2(size, size);
             Image image = particle.GetComponent<Image>();
             image.sprite = glowSprite;
@@ -55,24 +65,25 @@ public sealed class AmbientParticleOverlay : MonoBehaviour
 
     private void Update()
     {
-        if (host == null || particles[0] == null || host.rect.width <= 0f)
+        if (host == null || profile == null || particles == null ||
+            particles.Length == 0 || host.rect.width <= 0f)
             return;
         elapsed += Time.unscaledDeltaTime;
         Rect bounds = host.rect;
-        for (int index = 0; index < ParticleCount; index++)
+        for (int index = 0; index < particles.Length; index++)
         {
-            float speed = Mathf.Lerp(4f, 10f, Hash01(index, 1));
+            float speed = Mathf.Lerp(profile.SpeedRange.x, profile.SpeedRange.y, Hash01(index, 1));
             float y = bounds.yMin + Mathf.Repeat(
                 Hash01(index, 2) * bounds.height + elapsed * speed,
                 bounds.height);
             float sway = Mathf.Sin(elapsed * Mathf.Lerp(0.3f, 0.7f, Hash01(index, 3))
                 + Hash01(index, 4) * Mathf.PI * 2f);
             float x = bounds.xMin + Mathf.Repeat(
-                Hash01(index, 5) * bounds.width + sway * bounds.width * 0.06f,
+                Hash01(index, 5) * bounds.width + sway * bounds.width * profile.Sway,
                 bounds.width);
             particles[index].anchoredPosition = new Vector2(x, y);
-            Color color = tint;
-            color.a *= Mathf.Lerp(0.15f, 0.60f,
+            Color color = profile.Tint;
+            color.a *= Mathf.Lerp(profile.AlphaRange.x, profile.AlphaRange.y,
                 (Mathf.Sin(elapsed * 1.2f + index) + 1f) * 0.5f);
             images[index].color = color;
         }

@@ -12,6 +12,8 @@ public sealed class LocationPresenter : MonoBehaviour
 
     [SerializeField]
     private GameStateStore state;
+    [SerializeField]
+    private AmbientParticleProfile defaultAmbientParticles;
     private AmbientParticleOverlay particles;
     public LocationDefinition Current { get; private set; }
 
@@ -31,15 +33,7 @@ public sealed class LocationPresenter : MonoBehaviour
             particles ??= background.GetComponent<AmbientParticleOverlay>()
                 ?? background.gameObject.AddComponent<AmbientParticleOverlay>();
             particles.Initialize(background.rectTransform,
-                new Color(1f, 0.86f, 0.58f, 0.32f));
-            if (locationState != null)
-            {
-                Color particleTint = Color.Lerp(
-                    new Color(0.62f, 0.78f, 1f, 0.28f),
-                    new Color(1f, 0.82f, 0.52f, 0.36f),
-                    Mathf.Clamp01(locationState.Tint.r));
-                particles.SetTint(particleTint);
-            }
+                locationState?.AmbientParticles ?? defaultAmbientParticles);
         }
         if (location != null)
             state?.SetCurrentLocation(location.Id);

@@ -14,8 +14,11 @@ public sealed class LocationStateDefinition : ScriptableObject
 
     [SerializeField]
     private AudioCueProfile audioOverride;
+    [SerializeField]
+    private AmbientParticleProfile ambientParticles;
     public string Id => id;
     public Sprite Background => background;
     public Color Tint => tint;
     public AudioCueProfile AudioOverride => audioOverride;
+    public AmbientParticleProfile AmbientParticles => ambientParticles;
 }

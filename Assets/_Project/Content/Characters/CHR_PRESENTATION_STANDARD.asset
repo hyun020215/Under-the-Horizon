@@ -1,0 +1,25 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0d2cdb56c4f3490e9eed19db98b5279d, type: 3}
+  m_Name: CHR_PRESENTATION_STANDARD
+  m_EditorClassIdentifier: UTH.Runtime::CharacterPresentationProfile
+  breathingCycleRange: {x: 3.15, y: 4.05}
+  swayCycleRange: {x: 4.3, y: 5.3}
+  verticalMotion: 1.5
+  breathingScale: 0.006
+  swayDegrees: 0.65
+  blendDuration: 0.35
+  silhouetteColor: {r: 0.015, g: 0.02, b: 0.03, a: 0.58}
+  silhouetteDistance: {x: 7, y: -5}
+  groundShadowSize: {x: 330, y: 82}
+  groundShadowOffset: {x: 0, y: 10}
+  groundShadowColor: {r: 0.005, g: 0.01, b: 0.018, a: 0.46}

@@ -9,6 +9,7 @@ public sealed class TitleScreen : ScreenBase
     [SerializeField] private Button creditsButton;
     [SerializeField] private Button quitButton;
     [SerializeField] private ScreenRouter screens;
+    [SerializeField] private AmbientParticleProfile ambientParticles;
 
     private TaskCompletionSource<bool> startRequested;
 
@@ -30,8 +31,7 @@ public sealed class TitleScreen : ScreenBase
         AmbientParticleOverlay overlay =
             background.GetComponent<AmbientParticleOverlay>()
             ?? background.gameObject.AddComponent<AmbientParticleOverlay>();
-        overlay.Initialize((RectTransform)background,
-            new Color(0.76f, 0.62f, 0.38f, 0.34f));
+        overlay.Initialize((RectTransform)background, ambientParticles);
     }
 
     public Task WaitForStartAsync()

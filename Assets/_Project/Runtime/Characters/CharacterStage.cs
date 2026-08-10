@@ -13,6 +13,8 @@ public sealed class CharacterStage : MonoBehaviour
 
     [SerializeField]
     private InteractionDirector interactions;
+    [SerializeField]
+    private CharacterPresentationProfile defaultPresentation;
 
     private readonly List<CharacterView> views = new();
     private readonly List<GameObject> shadows = new();
@@ -27,6 +29,7 @@ public sealed class CharacterStage : MonoBehaviour
             {
                 shadows.Add(CreateGroundShadow(placement));
                 CharacterView view = Instantiate(prefab, root);
+                view.ConfigurePresentation(defaultPresentation);
                 view.Apply(placement);
                 view.Clicked += OnCharacterClicked;
                 views.Add(view);
@@ -61,12 +64,16 @@ public sealed class CharacterStage : MonoBehaviour
         rect.anchorMin = rect.anchorMax = new Vector2(
             placement.normalizedX, placement.normalizedY);
         rect.pivot = new Vector2(0.5f, 0.5f);
-        rect.anchoredPosition = new Vector2(0f, 10f);
+        CharacterPresentationProfile profile =
+            placement.character?.PresentationOverride ?? defaultPresentation;
+        if (profile == null)
+            return shadow;
+        rect.anchoredPosition = profile.GroundShadowOffset;
         float scale = placement.scale <= 0f ? 1f : placement.scale;
-        rect.sizeDelta = new Vector2(330f * scale, 82f * scale);
+        rect.sizeDelta = profile.GroundShadowSize * scale;
         Image image = shadow.GetComponent<Image>();
         image.sprite = groundShadowSprite;
-        image.color = new Color(0.005f, 0.01f, 0.018f, 0.46f);
+        image.color = profile.GroundShadowColor;
         image.raycastTarget = false;
         return shadow;
     }

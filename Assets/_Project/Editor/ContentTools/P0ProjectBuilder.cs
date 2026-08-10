@@ -94,6 +94,35 @@ public static class P0ProjectBuilder
         EditorApplication.Exit(0);
     }
 
+    public static void RefreshPresentationProfilesFromCommandLine()
+    {
+        EnsurePresentationProfiles();
+        BuildPresentationPrefabs();
+        BuildGameScene();
+        AssetDatabase.SaveAssets();
+        AssetDatabase.Refresh();
+        EditorApplication.Exit(0);
+    }
+
+    private static void EnsurePresentationProfiles()
+    {
+        EnsureAsset<AmbientParticleProfile>(
+            ContentRoot + "/UI/UI_AMBIENCE_TITLE.asset");
+        EnsureAsset<AmbientParticleProfile>(
+            ContentRoot + "/UI/UI_AMBIENCE_LOCATION.asset");
+        EnsureAsset<CharacterPresentationProfile>(
+            ContentRoot + "/Characters/CHR_PRESENTATION_STANDARD.asset");
+    }
+
+    private static void EnsureAsset<T>(string path) where T : ScriptableObject
+    {
+        if (AssetDatabase.LoadAssetAtPath<T>(path) != null)
+            return;
+        T asset = ScriptableObject.CreateInstance<T>();
+        asset.name = Path.GetFileNameWithoutExtension(path);
+        AssetDatabase.CreateAsset(asset, path);
+    }
+
     private static void CreatePlaceholderAssets()
     {
         string absoluteContent = Path.GetFullPath(ContentRoot);
@@ -828,6 +857,9 @@ public static class P0ProjectBuilder
         SetObject(screen, "settingsButton", secondaryButtons[0]);
         SetObject(screen, "creditsButton", secondaryButtons[1]);
         SetObject(screen, "quitButton", secondaryButtons[2]);
+        SetObject(screen, "ambientParticles",
+            AssetDatabase.LoadAssetAtPath<AmbientParticleProfile>(
+                ContentRoot + "/UI/UI_AMBIENCE_TITLE.asset"));
     }
 
     private static Button CreateTitleButton(
@@ -1071,12 +1103,18 @@ public static class P0ProjectBuilder
         characterStage.transform.SetParent(root.transform);
         SetObject(characterStage, "prefab", characterPrefab);
         SetObject(characterStage, "root", characterLayer);
+        SetObject(characterStage, "defaultPresentation",
+            AssetDatabase.LoadAssetAtPath<CharacterPresentationProfile>(
+                ContentRoot + "/Characters/CHR_PRESENTATION_STANDARD.asset"));
 
         LocationPresenter location = new GameObject("LocationPresenter").AddComponent<LocationPresenter>();
         location.transform.SetParent(root.transform);
         SetObject(location, "background", background);
         SetObject(location, "backgroundAspect", backgroundAspect);
         SetObject(location, "state", state);
+        SetObject(location, "defaultAmbientParticles",
+            AssetDatabase.LoadAssetAtPath<AmbientParticleProfile>(
+                ContentRoot + "/UI/UI_AMBIENCE_LOCATION.asset"));
 
         AudioDirector audio = CreateAudioDirector(
             root.transform,

@@ -14,9 +14,12 @@ public sealed class CharacterDefinition : ScriptableObject
 
     [SerializeField]
     private CharacterVisualSet[] visuals;
+    [SerializeField]
+    private CharacterPresentationProfile presentationOverride;
     public string Id => id;
     public string DisplayName => displayName;
     public Sprite Portrait => portrait;
+    public CharacterPresentationProfile PresentationOverride => presentationOverride;
 
     public Sprite Resolve(CharacterPose pose, CharacterExpression expression)
     {

@@ -10,11 +10,13 @@ public sealed class CharacterIdleMotion : MonoBehaviour
     private Quaternion authoredRotation;
     private float elapsed;
     private int seed;
+    private CharacterPresentationProfile profile;
 
-    public void Configure(int deterministicSeed)
+    public void Configure(int deterministicSeed, CharacterPresentationProfile settings)
     {
         rect ??= GetComponent<RectTransform>();
         seed = deterministicSeed;
+        profile = settings;
         authoredPosition = rect.anchoredPosition;
         authoredScale = rect.localScale;
         authoredRotation = rect.localRotation;
@@ -25,24 +27,27 @@ public sealed class CharacterIdleMotion : MonoBehaviour
 
     private void Update()
     {
-        if (rect == null)
+        if (rect == null || profile == null)
             return;
         elapsed += Time.unscaledDeltaTime;
-        float breathingCycle = Mathf.Lerp(3.15f, 4.05f, Hash01(seed, 0));
+        float breathingCycle = Mathf.Lerp(profile.BreathingCycleRange.x,
+            profile.BreathingCycleRange.y, Hash01(seed, 0));
         float breathing = Mathf.Sin(elapsed * Mathf.PI * 2f / breathingCycle
             + Hash01(seed, 1) * Mathf.PI * 2f);
-        float swayCycle = Mathf.Lerp(4.3f, 5.3f, Hash01(seed, 2));
+        float swayCycle = Mathf.Lerp(profile.SwayCycleRange.x,
+            profile.SwayCycleRange.y, Hash01(seed, 2));
         float sway = Mathf.Sin(elapsed * Mathf.PI * 2f / swayCycle
             + Hash01(seed, 3) * Mathf.PI * 2f);
-        float blend = Mathf.SmoothStep(0f, 1f, Mathf.Clamp01(elapsed / 0.35f));
+        float blend = Mathf.SmoothStep(0f, 1f,
+            Mathf.Clamp01(elapsed / Mathf.Max(.01f, profile.BlendDuration)));
         rect.anchoredPosition = authoredPosition
-            + Vector2.up * breathing * 1.5f * blend;
+            + Vector2.up * breathing * profile.VerticalMotion * blend;
         rect.localScale = new Vector3(
             authoredScale.x,
-            authoredScale.y * (1f + breathing * 0.006f * blend),
+            authoredScale.y * (1f + breathing * profile.BreathingScale * blend),
             authoredScale.z);
         rect.localRotation = authoredRotation
-            * Quaternion.Euler(0f, 0f, sway * 0.65f * blend);
+            * Quaternion.Euler(0f, 0f, sway * profile.SwayDegrees * blend);
     }
 
     private void OnDisable() => Restore();

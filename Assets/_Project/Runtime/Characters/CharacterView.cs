@@ -13,6 +13,7 @@ public sealed class CharacterView : MonoBehaviour, IPointerClickHandler
     private bool clickable;
     private CharacterIdleMotion idleMotion;
     private Outline silhouette;
+    private CharacterPresentationProfile defaultPresentation;
 
     private void Awake()
     {
@@ -22,11 +23,12 @@ public sealed class CharacterView : MonoBehaviour, IPointerClickHandler
         {
             silhouette = image.GetComponent<Outline>()
                 ?? image.gameObject.AddComponent<Outline>();
-            silhouette.effectColor = new Color(0.015f, 0.02f, 0.03f, 0.58f);
-            silhouette.effectDistance = new Vector2(7f, -5f);
             silhouette.useGraphicAlpha = true;
         }
     }
+
+    public void ConfigurePresentation(CharacterPresentationProfile profile) =>
+        defaultPresentation = profile;
 
     public void Apply(CharacterPlacement placement)
     {
@@ -44,7 +46,14 @@ public sealed class CharacterView : MonoBehaviour, IPointerClickHandler
                 placement.normalizedY
             );
         transform.localScale = Vector3.one * (placement.scale <= 0 ? 1 : placement.scale);
-        idleMotion?.Configure(Definition?.Id?.GetHashCode() ?? 0);
+        CharacterPresentationProfile presentation =
+            Definition?.PresentationOverride ?? defaultPresentation;
+        if (silhouette != null && presentation != null)
+        {
+            silhouette.effectColor = presentation.SilhouetteColor;
+            silhouette.effectDistance = presentation.SilhouetteDistance;
+        }
+        idleMotion?.Configure(StableHash(Definition?.Id), presentation);
         gameObject.SetActive(Definition != null);
     }
 
@@ -52,5 +61,17 @@ public sealed class CharacterView : MonoBehaviour, IPointerClickHandler
     {
         if (clickable)
             Clicked?.Invoke(this);
+    }
+
+    private static int StableHash(string value)
+    {
+        unchecked
+        {
+            int hash = 17;
+            if (value != null)
+                foreach (char character in value)
+                    hash = hash * 31 + character;
+            return hash;
+        }
     }
 }
