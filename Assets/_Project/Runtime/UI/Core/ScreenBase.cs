@@ -10,8 +10,9 @@ public abstract class ScreenBase : MonoBehaviour
     public virtual async Task OpenAsync(ScreenContext context)
     {
         gameObject.SetActive(true);
-        CanvasGroup group = GetComponent<CanvasGroup>()
-            ?? gameObject.AddComponent<CanvasGroup>();
+        CanvasGroup group = GetComponent<CanvasGroup>();
+        if (group == null)
+            group = gameObject.AddComponent<CanvasGroup>();
         RectTransform rect = transform as RectTransform;
         Vector3 authoredScale = rect != null ? rect.localScale : Vector3.one;
         group.alpha = 0f;
@@ -22,8 +23,9 @@ public abstract class ScreenBase : MonoBehaviour
 
     public virtual async Task CloseAsync()
     {
-        CanvasGroup group = GetComponent<CanvasGroup>()
-            ?? gameObject.AddComponent<CanvasGroup>();
+        CanvasGroup group = GetComponent<CanvasGroup>();
+        if (group == null)
+            group = gameObject.AddComponent<CanvasGroup>();
         RectTransform rect = transform as RectTransform;
         Vector3 authoredScale = rect != null ? rect.localScale : Vector3.one;
         await Animate(group, rect, authoredScale * 0.99f, group.alpha, 0f, 0.12f);
