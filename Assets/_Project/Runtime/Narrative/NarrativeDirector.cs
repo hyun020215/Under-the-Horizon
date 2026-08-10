@@ -24,6 +24,7 @@ public sealed class NarrativeDirector : MonoBehaviour
     private TransitionProfile dialogueCloseTransition;
     private readonly DialogueHistory history = new();
     public event Func<DialogueLine, Task<DialogueChoice>> LinePresented;
+    public event Action<DialogueLine> LineChanged;
     public event Action DialogueStarted;
     public event Action DialogueEnded;
     public DialogueHistory History => history;
@@ -101,6 +102,7 @@ public sealed class NarrativeDirector : MonoBehaviour
             }
 
             history.Add(line.id);
+            LineChanged?.Invoke(line);
             if (line.voiceClip != null)
                 voice?.Play(line.voiceClip);
             DialogueChoice selected = null;

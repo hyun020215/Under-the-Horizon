@@ -14,6 +14,7 @@ public sealed class CharacterView : MonoBehaviour, IPointerClickHandler
     private CharacterIdleMotion idleMotion;
     private Outline silhouette;
     private CharacterPresentationProfile defaultPresentation;
+    private CharacterPresentationProfile activePresentation;
 
     private void Awake()
     {
@@ -48,6 +49,7 @@ public sealed class CharacterView : MonoBehaviour, IPointerClickHandler
         transform.localScale = Vector3.one * (placement.scale <= 0 ? 1 : placement.scale);
         CharacterPresentationProfile presentation =
             Definition?.PresentationOverride ?? defaultPresentation;
+        activePresentation = presentation;
         if (silhouette != null && presentation != null)
         {
             silhouette.effectColor = presentation.SilhouetteColor;
@@ -55,6 +57,19 @@ public sealed class CharacterView : MonoBehaviour, IPointerClickHandler
         }
         idleMotion?.Configure(StableHash(Definition?.Id), presentation);
         gameObject.SetActive(Definition != null);
+    }
+
+    public void SetDialogueFocus(bool dialogueActive, bool focused)
+    {
+        if (image == null)
+            return;
+        image.color = !dialogueActive || activePresentation == null
+            ? Color.white
+            : focused
+                ? activePresentation.DialogueFocusTint
+                : activePresentation.DialogueUnfocusedTint;
+        if (dialogueActive && focused)
+            transform.SetAsLastSibling();
     }
 
     public void OnPointerClick(PointerEventData eventData)

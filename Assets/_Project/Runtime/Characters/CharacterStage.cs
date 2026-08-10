@@ -15,10 +15,29 @@ public sealed class CharacterStage : MonoBehaviour
     private InteractionDirector interactions;
     [SerializeField]
     private CharacterPresentationProfile defaultPresentation;
+    [SerializeField]
+    private NarrativeDirector narrative;
 
     private readonly List<CharacterView> views = new();
     private readonly List<GameObject> shadows = new();
     private static Sprite groundShadowSprite;
+
+    private void OnEnable()
+    {
+        if (narrative == null)
+            return;
+        narrative.LineChanged += OnDialogueLineChanged;
+        narrative.DialogueEnded += ClearDialogueFocus;
+    }
+
+    private void OnDisable()
+    {
+        if (narrative == null)
+            return;
+        narrative.LineChanged -= OnDialogueLineChanged;
+        narrative.DialogueEnded -= ClearDialogueFocus;
+        ClearDialogueFocus();
+    }
 
     public Task ApplyAsync(CharacterPlacementSet set)
     {
@@ -120,5 +139,20 @@ public sealed class CharacterStage : MonoBehaviour
         {
             Debug.LogException(exception, view);
         }
+    }
+
+    private void OnDialogueLineChanged(DialogueLine line)
+    {
+        CharacterDefinition speaker = line.speaker?.Character;
+        foreach (CharacterView view in views)
+            if (view != null)
+                view.SetDialogueFocus(true, speaker != null && view.Definition == speaker);
+    }
+
+    private void ClearDialogueFocus()
+    {
+        foreach (CharacterView view in views)
+            if (view != null)
+                view.SetDialogueFocus(false, false);
     }
 }

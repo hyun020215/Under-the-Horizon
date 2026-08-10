@@ -18,6 +18,8 @@ public sealed class DialogueScreen : ScreenBase
     [SerializeField] private SfxController sfx;
     [SerializeField] private AudioClip typewriterClip;
     [SerializeField, Min(1f)] private float charactersPerSecond = 45f;
+    [SerializeField, Min(0f)] private float choiceRevealDuration = .18f;
+    [SerializeField, Min(0f)] private float choiceRevealDistance = 18f;
 
     private TaskCompletionSource<DialogueChoice> pendingLine;
     private Coroutine revealRoutine;
@@ -176,6 +178,38 @@ public sealed class DialogueScreen : ScreenBase
             choiceButtons[i].GetComponent<DialogueChoiceBinding>().Choice = choice;
             if (choiceLabels != null && i < choiceLabels.Length)
                 choiceLabels[i].text = choice.Text;
+            StartCoroutine(AnimateChoice(choiceButtons[i], i));
         }
+    }
+
+    private IEnumerator AnimateChoice(Button button, int index)
+    {
+        CanvasGroup group = button.GetComponent<CanvasGroup>()
+            ?? button.gameObject.AddComponent<CanvasGroup>();
+        RectTransform rect = (RectTransform)button.transform;
+        Vector2 rest = rect.anchoredPosition;
+        group.alpha = 0f;
+        rect.anchoredPosition = rest + Vector2.down * choiceRevealDistance;
+        float delay = index * .045f;
+        while (delay > 0f)
+        {
+            delay -= Time.unscaledDeltaTime;
+            yield return null;
+        }
+        float elapsed = 0f;
+        while (elapsed < choiceRevealDuration)
+        {
+            elapsed += Time.unscaledDeltaTime;
+            float t = choiceRevealDuration <= 0f
+                ? 1f
+                : Mathf.Clamp01(elapsed / choiceRevealDuration);
+            t = 1f - Mathf.Pow(1f - t, 3f);
+            group.alpha = t;
+            rect.anchoredPosition = Vector2.LerpUnclamped(
+                rest + Vector2.down * choiceRevealDistance, rest, t);
+            yield return null;
+        }
+        group.alpha = 1f;
+        rect.anchoredPosition = rest;
     }
 }

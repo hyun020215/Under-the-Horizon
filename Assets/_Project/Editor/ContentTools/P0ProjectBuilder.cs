@@ -1270,6 +1270,7 @@ public static class P0ProjectBuilder
 
         NarrativeDirector narrative = new GameObject("NarrativeDirector").AddComponent<NarrativeDirector>();
         narrative.transform.SetParent(root.transform);
+        SetObject(characterStage, "narrative", narrative);
         SetObject(narrative, "state", state);
         SetObject(narrative, "screens", router);
         SetObject(narrative, "voice", voice);

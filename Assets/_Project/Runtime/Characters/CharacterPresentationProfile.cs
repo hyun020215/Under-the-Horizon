@@ -14,6 +14,8 @@ public sealed class CharacterPresentationProfile : ScriptableObject
     [SerializeField] private Vector2 groundShadowSize = new(330f, 82f);
     [SerializeField] private Vector2 groundShadowOffset = new(0f, 10f);
     [SerializeField] private Color groundShadowColor = new(.005f, .01f, .018f, .46f);
+    [SerializeField] private Color dialogueFocusTint = Color.white;
+    [SerializeField] private Color dialogueUnfocusedTint = new(.48f, .50f, .56f, .72f);
 
     public Vector2 BreathingCycleRange => breathingCycleRange;
     public Vector2 SwayCycleRange => swayCycleRange;
@@ -26,4 +28,6 @@ public sealed class CharacterPresentationProfile : ScriptableObject
     public Vector2 GroundShadowSize => groundShadowSize;
     public Vector2 GroundShadowOffset => groundShadowOffset;
     public Color GroundShadowColor => groundShadowColor;
+    public Color DialogueFocusTint => dialogueFocusTint;
+    public Color DialogueUnfocusedTint => dialogueUnfocusedTint;
 }
