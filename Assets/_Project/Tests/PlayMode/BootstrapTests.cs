@@ -96,14 +96,16 @@ public sealed class BootstrapTests
             .GetComponent<AspectRatioFitter>();
         Assert.That(
             backgroundAspect.aspectMode,
-            Is.EqualTo(AspectRatioFitter.AspectMode.FitInParent)
+            Is.EqualTo(AspectRatioFitter.AspectMode.EnvelopeParent)
         );
-        AspectRatioFitter worldFrame = GameObject.Find("WorldFrame")
-            .GetComponent<AspectRatioFitter>();
-        AspectRatioFitter uiFrame = GameObject.Find("UIFrame")
-            .GetComponent<AspectRatioFitter>();
-        Assert.That(worldFrame.aspectRatio, Is.EqualTo(16f / 9f).Within(0.001f));
-        Assert.That(uiFrame.aspectRatio, Is.EqualTo(worldFrame.aspectRatio).Within(0.001f));
+        RectTransform worldFrame = GameObject.Find("WorldFrame")
+            .GetComponent<RectTransform>();
+        RectTransform uiFrame = GameObject.Find("UIFrame")
+            .GetComponent<RectTransform>();
+        Assert.That(worldFrame.GetComponent<AspectRatioFitter>(), Is.Null);
+        Assert.That(uiFrame.GetComponent<AspectRatioFitter>(), Is.Null);
+        Assert.That(worldFrame.anchorMax, Is.EqualTo(Vector2.one));
+        Assert.That(uiFrame.anchorMax, Is.EqualTo(Vector2.one));
         Assert.That(
             Object.FindFirstObjectByType<PersistentHud>().transform.parent.name,
             Is.EqualTo("UIFrame")
