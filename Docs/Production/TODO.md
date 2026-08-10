@@ -49,10 +49,14 @@
 - [ ] Persistent HUD를 이전 프로젝트의 목표 중심 HUD로 완성한다.
   - 기존 `PersistentHud`, `ObjectiveWidget`, `GameStateStore`를 사용한다.
   - 내부 수치는 제품 디자인이 승인한 정성 표현으로 바꾸기 전까지 추가 노출하지 않는다.
+  - 시간·Location 표시명·현재 Story Scene 표시명을 목표로 렌더하고 시스템 화면에서 숨기는 작업은 완료했다.
+  - 목표 단계/guidance 데이터와 목표 변경 애니메이션은 남아 있다.
 - [ ] Dialogue UI의 화자/내레이션/선택지 모드, 초상화 포커스와 타이포그래피를 완성한다.
   - 기존 `DialogueScreen`, `NarrativeDirector`, `DialogueLine` 데이터를 확장한다.
 - [ ] Map 화면을 실제 Location/Condition 데이터와 연결한다.
   - 기존 `MapScreen`, `MapDefinition`, `ScreenRouter`를 사용한다.
+  - Deck별 Base/Restricted/Technical 레이어, 덱 탭, 현재 위치 표시와 뒤로가기는 이식 완료했다.
+  - Location 이동 노드와 Condition 기반 잠금·목표 목적지 표시는 남아 있다.
 - [ ] 조사 기록·증거 노트 UI를 완성한다.
   - 기존 EvidenceDefinition/Inventory/Director와 Investigation Record 화면을 사용한다.
 - [ ] Evidence Board의 노드·연결·이론 슬롯 UX를 완성한다.

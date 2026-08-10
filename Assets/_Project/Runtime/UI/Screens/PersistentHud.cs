@@ -14,21 +14,17 @@ public sealed class PersistentHud : MonoBehaviour
 
     [SerializeField]
     private GameStateStore state;
+    [SerializeField]
+    private ContentDatabase content;
 
     [SerializeField]
     private Text timeLabel;
 
     [SerializeField]
-    private Text anxietyLabel;
+    private Text locationLabel;
 
     [SerializeField]
-    private Text integrityLabel;
-
-    [SerializeField]
-    private Image anxietyFill;
-
-    [SerializeField]
-    private Image integrityFill;
+    private Text objectiveLabel;
 
     private void Awake()
     {
@@ -60,10 +56,10 @@ public sealed class PersistentHud : MonoBehaviour
 
     private void OnScreenOpened(ScreenId id)
     {
-        bool visible = id != ScreenId.Title
-            && id != ScreenId.SaveSlot
-            && id != ScreenId.Ending
-            && id != ScreenId.Credits;
+        bool visible = id == ScreenId.Exploration
+            || id == ScreenId.Dialogue
+            || id == ScreenId.Investigation
+            || id == ScreenId.Interrogation;
         gameObject.SetActive(visible);
     }
 
@@ -85,16 +81,22 @@ public sealed class PersistentHud : MonoBehaviour
     {
         current ??= new GameState();
         if (timeLabel != null)
-            timeLabel.text = $"{Mathf.Max(1, current.day)}일 차  ·  {TimeBlockLabel(current.timeBlock)}";
-        if (anxietyLabel != null)
-            anxietyLabel.text = $"승객 불안  {current.publicAnxiety}/100";
-        if (integrityLabel != null)
-            integrityLabel.text = $"현장 보존도  {current.evidenceIntegrity}/100";
-        if (anxietyFill != null)
-            anxietyFill.fillAmount = current.publicAnxiety / 100f;
-        if (integrityFill != null)
-            integrityFill.fillAmount = current.evidenceIntegrity / 100f;
+            timeLabel.text = $"DAY {Mathf.Max(1, current.day)} · {TimeBlockLabel(current.timeBlock)}";
+        if (locationLabel != null)
+            locationLabel.text = ResolveLocation(current.currentLocationId);
+        if (objectiveLabel != null)
+            objectiveLabel.text = "◆ " + ResolveObjective(current.currentStorySceneId);
     }
+
+    private string ResolveLocation(string id) =>
+        content != null && content.TryGetLocation(id, out LocationDefinition location)
+            ? location.DisplayName
+            : id ?? string.Empty;
+
+    private string ResolveObjective(string id) =>
+        content != null && content.TryGetStoryScene(id, out StorySceneDefinition scene)
+            ? scene.DisplayName
+            : "자유 조사";
 
     private static string TimeBlockLabel(TimeBlock block) => block switch
     {

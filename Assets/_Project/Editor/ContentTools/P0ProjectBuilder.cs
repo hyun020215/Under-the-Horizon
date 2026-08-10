@@ -114,6 +114,17 @@ public static class P0ProjectBuilder
         EditorApplication.Exit(0);
     }
 
+    public static void RefreshMapFromCommandLine()
+    {
+        Sprite panel = AssetDatabase.LoadAssetAtPath<Sprite>(ThemePanelPath);
+        SavePrefab(PrefabRoot + "/UI/PF_MapScreen.prefab",
+            CreateScreen("PF_MapScreen", typeof(MapScreen), ScreenId.Map, panel));
+        BuildGameScene();
+        AssetDatabase.SaveAssets();
+        AssetDatabase.Refresh();
+        EditorApplication.Exit(0);
+    }
+
     private static void EnsurePresentationProfiles()
     {
         EnsureAsset<AmbientParticleProfile>(
@@ -568,6 +579,8 @@ public static class P0ProjectBuilder
             BuildTitleScreen(root.transform, title);
         else if (screen is SaveSlotScreen saveSlot)
             BuildSaveSlotScreen(root.transform, saveSlot);
+        else if (screen is MapScreen map)
+            BuildMapScreen(root.transform, map);
         else if (screen is ExplorationScreen)
         {
             Image image = root.GetComponent<Image>();
@@ -581,6 +594,76 @@ public static class P0ProjectBuilder
             BuildSecondaryScreen(root.transform, screen);
         root.SetActive(false);
         return root;
+    }
+
+    private static void BuildMapScreen(Transform root, MapScreen screen)
+    {
+        Font font = LoadUiFont("Pretendard/FONT_Pretendard-SemiBold.ttf");
+        Image background = root.GetComponent<Image>();
+        background.sprite = AssetDatabase.LoadAssetAtPath<Sprite>(
+            ProjectRoot + "/Art/UI/Map/MAP_ui_map_screen_backdrop.png");
+        background.color = Color.white;
+
+        Text title = CreateText("Map Title", root, font, 42, TextAnchor.MiddleLeft);
+        title.text = "M.V. ELYSIUM · DECK PLAN";
+        title.color = new Color(0.965f, 0.827f, 0.529f, 1f);
+        SetRect(title.rectTransform, new Vector2(0.055f, 0.88f), new Vector2(0.60f, 0.97f));
+        Text location = CreateText("Current Location", root, font, 22, TextAnchor.MiddleRight);
+        location.color = new Color(0.80f, 0.76f, 0.67f, 1f);
+        SetRect(location.rectTransform, new Vector2(0.60f, 0.89f), new Vector2(0.94f, 0.96f));
+
+        Image viewport = CreateLayer("Map Viewport", root).gameObject.AddComponent<Image>();
+        viewport.color = new Color(0.015f, 0.025f, 0.035f, 0.95f);
+        SetRect(viewport.rectTransform, new Vector2(0.19f, 0.15f), new Vector2(0.94f, 0.86f));
+        Image baseLayer = CreateMapLayer("Base Layer", viewport.transform);
+        Image restrictedLayer = CreateMapLayer("Restricted Layer", viewport.transform);
+        Image technicalLayer = CreateMapLayer("Technical Layer", viewport.transform);
+
+        MapDefinition[] maps = LoadAll<MapDefinition>()
+            .OrderBy(map => map.Id, StringComparer.Ordinal).ToArray();
+        var deckButtons = new Button[maps.Length];
+        for (var index = 0; index < maps.Length; index++)
+        {
+            string label = maps[index].Id.Replace("MAP_", string.Empty);
+            deckButtons[index] = CreateTitleButton(
+                $"{label}Button", root, font, label, index == 0);
+            float top = 0.83f - index * 0.105f;
+            SetRect((RectTransform)deckButtons[index].transform,
+                new Vector2(0.055f, top - 0.075f), new Vector2(0.17f, top));
+        }
+
+        Toggle restricted = CreateSettingsToggle(root, font, "제한 구역", 0.18f);
+        SetRect((RectTransform)restricted.transform,
+            new Vector2(0.21f, 0.07f), new Vector2(0.39f, 0.13f));
+        Toggle technical = CreateSettingsToggle(root, font, "기술 도면", 0.18f);
+        SetRect((RectTransform)technical.transform,
+            new Vector2(0.41f, 0.07f), new Vector2(0.59f, 0.13f));
+        Button back = CreateTitleButton("BackButton", root, font, "돌아가기", false);
+        SetRect((RectTransform)back.transform,
+            new Vector2(0.055f, 0.055f), new Vector2(0.17f, 0.12f));
+        Text deckLabel = CreateText("Deck Label", viewport.transform, font, 24, TextAnchor.UpperLeft);
+        deckLabel.color = new Color(0.965f, 0.827f, 0.529f, 0.9f);
+        SetRect(deckLabel.rectTransform, new Vector2(0.03f, 0.88f), new Vector2(0.35f, 0.97f));
+
+        SetObject(screen, "baseLayer", baseLayer);
+        SetObject(screen, "restrictedLayer", restrictedLayer);
+        SetObject(screen, "technicalLayer", technicalLayer);
+        SetObject(screen, "deckLabel", deckLabel);
+        SetObject(screen, "locationLabel", location);
+        SetObject(screen, "restrictedToggle", restricted);
+        SetObject(screen, "technicalToggle", technical);
+        SetObject(screen, "backButton", back);
+        SetArray(screen, "maps", maps.Cast<UnityEngine.Object>().ToArray());
+        SetArray(screen, "deckButtons", deckButtons.Cast<UnityEngine.Object>().ToArray());
+    }
+
+    private static Image CreateMapLayer(string name, Transform parent)
+    {
+        Image image = CreateLayer(name, parent).gameObject.AddComponent<Image>();
+        image.preserveAspect = true;
+        image.raycastTarget = false;
+        SetRect(image.rectTransform, new Vector2(0.03f, 0.05f), new Vector2(0.97f, 0.95f));
+        return image;
     }
 
     private static void BuildSecondaryScreen(Transform root, ScreenBase screen)
@@ -1140,6 +1223,11 @@ public static class P0ProjectBuilder
         {
             if (screen is TitleScreen || screen is SettingsScreen || screen is CreditsScreen)
                 SetObject(screen, "screens", router);
+            if (screen is MapScreen mapScreen)
+            {
+                SetObject(mapScreen, "screens", router);
+                SetObject(mapScreen, "state", state);
+            }
         }
         BuildPersistentHud(uiFrame, router, state);
         transitionRoot.SetAsLastSibling();
@@ -1390,51 +1478,43 @@ public static class P0ProjectBuilder
         Image topBar = CreateLayer("StatusBar", root.transform).gameObject.AddComponent<Image>();
         topBar.color = new Color(0.018f, 0.035f, 0.055f, 0.76f);
         topBar.raycastTarget = false;
-        SetRect(topBar.rectTransform, new Vector2(0f, 0.91f), Vector2.one);
+        SetRect(topBar.rectTransform, new Vector2(0f, 0.84f), Vector2.one);
 
         Text time = CreateHudLabel(
-            "Time", topBar.transform, font, 24, TextAnchor.MiddleCenter,
-            "1일 차  ·  오전", 0.015f, 0.20f
+            "Time", topBar.transform, font, 20, TextAnchor.MiddleLeft,
+            "DAY 1 · 오후", 0.02f, 0.13f
         );
-        Text anxiety = CreateHudLabel(
-            "Anxiety", topBar.transform, font, 20, TextAnchor.UpperLeft,
-            "승객 불안  0/100", 0.52f, 0.75f
+        Text location = CreateHudLabel(
+            "Location", topBar.transform, font, 28, TextAnchor.MiddleLeft,
+            "항구", 0.135f, 0.28f
         );
-        Image anxietyFill = CreateHudMeter(
-            "AnxietyMeter", topBar.transform, 0.52f, 0.75f,
-            new Color(0.455f, 0.169f, 0.169f, 1f)
-        );
-        Text integrity = CreateHudLabel(
-            "Integrity", topBar.transform, font, 20, TextAnchor.UpperLeft,
-            "현장 보존도  100/100", 0.76f, 0.985f
-        );
-        Image integrityFill = CreateHudMeter(
-            "IntegrityMeter", topBar.transform, 0.76f, 0.985f,
-            new Color(0.216f, 0.412f, 0.412f, 1f)
+        Text objective = CreateHudLabel(
+            "Objective", topBar.transform, font, 27, TextAnchor.MiddleCenter,
+            "◆ 항구의 기자", 0.30f, 0.70f
         );
 
         Button map = CreateSpriteButton(
             "MapButton", root.transform, font, "지도",
             ProjectRoot + "/Art/UI/Buttons/UI_btn_standard_normal.png",
             ProjectRoot + "/Art/UI/Buttons/UI_btn_standard_pressed.png", out _);
-        SetRect((RectTransform)map.transform, new Vector2(0.77f, 0.855f), new Vector2(0.87f, 0.90f));
+        SetRect((RectTransform)map.transform, new Vector2(0.74f, 0.87f), new Vector2(0.85f, 0.95f));
 
         Button record = CreateSpriteButton(
             "RecordButton", root.transform, font, "수사 기록",
             ProjectRoot + "/Art/UI/Buttons/UI_btn_standard_normal.png",
             ProjectRoot + "/Art/UI/Buttons/UI_btn_standard_pressed.png", out _);
-        SetRect((RectTransform)record.transform, new Vector2(0.88f, 0.855f), new Vector2(0.985f, 0.90f));
+        SetRect((RectTransform)record.transform, new Vector2(0.865f, 0.87f), new Vector2(0.985f, 0.95f));
 
         PersistentHud hud = root.GetComponent<PersistentHud>();
         SetObject(hud, "screens", router);
         SetObject(hud, "state", state);
+        SetObject(hud, "content", AssetDatabase.LoadAssetAtPath<ContentDatabase>(
+            ContentRoot + "/Game/DATABASE_Content.asset"));
         SetObject(hud, "mapButton", map);
         SetObject(hud, "recordButton", record);
         SetObject(hud, "timeLabel", time);
-        SetObject(hud, "anxietyLabel", anxiety);
-        SetObject(hud, "integrityLabel", integrity);
-        SetObject(hud, "anxietyFill", anxietyFill);
-        SetObject(hud, "integrityFill", integrityFill);
+        SetObject(hud, "locationLabel", location);
+        SetObject(hud, "objectiveLabel", objective);
     }
 
     private static Text CreateHudLabel(

@@ -167,6 +167,23 @@ public sealed class BootstrapTests
         }
         Assert.That(transitionOverlay.blocksRaycasts, Is.False);
 
+        hud.transform.Find("MapButton").GetComponent<Button>().onClick.Invoke();
+        elapsed = 0f;
+        while (router.Current != ScreenId.Map && elapsed < SceneLoadTimeoutSeconds)
+        {
+            elapsed += Time.unscaledDeltaTime;
+            yield return null;
+        }
+        Assert.That(router.Current, Is.EqualTo(ScreenId.Map));
+        MapScreen map = Object.FindFirstObjectByType<MapScreen>(FindObjectsInactive.Include);
+        Assert.That(map.gameObject.activeInHierarchy, Is.True);
+        Assert.That(GameObject.Find("Base Layer").GetComponent<Image>().sprite, Is.Not.Null);
+        map.transform.Find("BackButton").GetComponent<Button>().onClick.Invoke();
+        while (router.Current != ScreenId.Exploration)
+            yield return null;
+        while (transitionOverlay.blocksRaycasts)
+            yield return null;
+
         int historyBeforeClick = narrative.History.Lines.Count;
         CharacterView character = Object.FindFirstObjectByType<CharacterView>();
         Assert.That(character, Is.Not.Null);

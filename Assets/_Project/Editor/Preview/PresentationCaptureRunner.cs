@@ -18,7 +18,7 @@ public static class PresentationCaptureRunner
         outputDirectory = Path.GetFullPath("Logs/PresentationCaptures");
         Directory.CreateDirectory(outputDirectory);
         foreach (string fileName in new[]
-                 { "01-title.png", "02-save-slots.png", "03-gameplay.png" })
+                 { "01-title.png", "02-save-slots.png", "03-gameplay.png", "04-map.png" })
         {
             string path = Path.Combine(outputDirectory, fileName);
             if (File.Exists(path))
@@ -36,7 +36,7 @@ public static class PresentationCaptureRunner
             Screen.SetResolution(1600, 900, false);
             EditorApplication.update += Update;
         }
-        else if (change == PlayModeStateChange.EnteredEditMode && stage >= 6)
+        else if (change == PlayModeStateChange.EnteredEditMode && stage >= 8)
         {
             EditorApplication.playModeStateChanged -= OnPlayModeChanged;
             EditorApplication.Exit(0);
@@ -74,7 +74,17 @@ public static class PresentationCaptureRunner
         else if (stage == 5 && frame >= 240)
         {
             Capture("03-gameplay.png");
-            stage = 6;
+            NextStage();
+        }
+        else if (stage == 6 && frame >= 20)
+        {
+            Click("MapButton");
+            NextStage();
+        }
+        else if (stage == 7 && frame >= 240)
+        {
+            Capture("04-map.png");
+            stage = 8;
             EditorApplication.update -= Update;
             EditorApplication.isPlaying = false;
         }
@@ -87,7 +97,7 @@ public static class PresentationCaptureRunner
     {
         foreach (Button button in Object.FindObjectsByType<Button>(FindObjectsInactive.Include, FindObjectsSortMode.None))
         {
-            if (button.name != name)
+            if (button.name != name || !button.gameObject.activeInHierarchy)
                 continue;
             button.onClick.Invoke();
             return;

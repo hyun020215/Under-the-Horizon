@@ -14,9 +14,14 @@ public sealed class SaveSlotPresentationTests
         {
             SaveSlotScreen screen = root.GetComponent<SaveSlotScreen>();
             Button[] buttons = root.GetComponentsInChildren<Button>(true);
-            Assert.That(buttons.Length, Is.EqualTo(3));
-            Assert.That(buttons[0].GetComponent<RectTransform>().anchorMin.y,
-                Is.EqualTo(buttons[1].GetComponent<RectTransform>().anchorMin.y));
+            Button[] slots = System.Array.FindAll(buttons,
+                button => button.name.StartsWith("Slot"));
+            Button[] deletes = System.Array.FindAll(buttons,
+                button => button.name.StartsWith("DeleteSlot"));
+            Assert.That(slots.Length, Is.EqualTo(3));
+            Assert.That(deletes.Length, Is.EqualTo(3));
+            Assert.That(slots[0].GetComponent<RectTransform>().anchorMin.y,
+                Is.EqualTo(slots[1].GetComponent<RectTransform>().anchorMin.y));
             Assert.That(root.GetComponentsInChildren<Text>(true),
                 Has.Some.Matches<Text>(text => text.name == "Chapter"));
             Assert.That(screen, Is.Not.Null);
