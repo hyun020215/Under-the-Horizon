@@ -11,6 +11,22 @@ public sealed class CharacterView : MonoBehaviour, IPointerClickHandler
     public event Action<CharacterView> Clicked;
 
     private bool clickable;
+    private CharacterIdleMotion idleMotion;
+    private Outline silhouette;
+
+    private void Awake()
+    {
+        idleMotion = GetComponent<CharacterIdleMotion>()
+            ?? gameObject.AddComponent<CharacterIdleMotion>();
+        if (image != null)
+        {
+            silhouette = image.GetComponent<Outline>()
+                ?? image.gameObject.AddComponent<Outline>();
+            silhouette.effectColor = new Color(0.015f, 0.02f, 0.03f, 0.58f);
+            silhouette.effectDistance = new Vector2(7f, -5f);
+            silhouette.useGraphicAlpha = true;
+        }
+    }
 
     public void Apply(CharacterPlacement placement)
     {
@@ -28,6 +44,7 @@ public sealed class CharacterView : MonoBehaviour, IPointerClickHandler
                 placement.normalizedY
             );
         transform.localScale = Vector3.one * (placement.scale <= 0 ? 1 : placement.scale);
+        idleMotion?.Configure(Definition?.Id?.GetHashCode() ?? 0);
         gameObject.SetActive(Definition != null);
     }
 
