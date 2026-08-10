@@ -7,6 +7,10 @@ public sealed class ScreenRouter : MonoBehaviour
 {
     [SerializeField]
     private ScreenBase[] screens;
+    [SerializeField]
+    private TransitionDirector transitionDirector;
+    [SerializeField]
+    private TransitionProfile defaultTransition;
     private readonly Dictionary<ScreenId, ScreenBase> index = new();
     public ScreenId? Current { get; private set; }
     public event Action<ScreenId> Opened;
@@ -22,7 +26,7 @@ public sealed class ScreenRouter : MonoBehaviour
 
     public async Task OpenAsync(ScreenId id, ScreenContext context = default)
     {
-        await OpenAsync(id, context, null, null);
+        await OpenAsync(id, context, transitionDirector, defaultTransition);
     }
 
     public async Task OpenAsync(

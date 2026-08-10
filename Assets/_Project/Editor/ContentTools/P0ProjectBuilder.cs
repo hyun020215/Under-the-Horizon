@@ -86,6 +86,14 @@ public static class P0ProjectBuilder
         EditorApplication.Exit(0);
     }
 
+    public static void RefreshGameSceneFromCommandLine()
+    {
+        BuildGameScene();
+        AssetDatabase.SaveAssets();
+        AssetDatabase.Refresh();
+        EditorApplication.Exit(0);
+    }
+
     private static void CreatePlaceholderAssets()
     {
         string absoluteContent = Path.GetFullPath(ContentRoot);
@@ -1080,6 +1088,8 @@ public static class P0ProjectBuilder
         SetArray(transitions, "players", new UnityEngine.Object[] { fade });
         SetObject(transitions, "blocker", blocker);
         SetObject(transitions, "sfx", sfx);
+        SetObject(router, "transitionDirector", transitions);
+        SetObject(router, "defaultTransition", FindTransition("TRANS_FADE_STANDARD"));
 
         UiFeedbackInstaller feedback = uiFrame.gameObject.AddComponent<UiFeedbackInstaller>();
         SetObject(feedback, "sfx", sfx);
