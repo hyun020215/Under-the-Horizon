@@ -943,6 +943,7 @@ public static class P0ProjectBuilder
         var chapterLabels = new Text[3];
         var statusLabels = new Text[3];
         var actionLabels = new Text[3];
+        var deleteButtons = new Button[3];
         for (var index = 0; index < buttons.Length; index++)
         {
             buttons[index] = CreateTitleButton(
@@ -980,14 +981,21 @@ public static class P0ProjectBuilder
             float left = 0.075f + index * 0.2925f;
             SetRect(
                 (RectTransform)buttons[index].transform,
-                new Vector2(left, 0.22f),
+                new Vector2(left, 0.27f),
                 new Vector2(left + 0.275f, 0.68f)
             );
+            deleteButtons[index] = CreateTitleButton(
+                $"DeleteSlot{index + 1}Button", root, font, "삭제", false);
+            deleteButtons[index].GetComponent<Image>().color =
+                new Color(0.16f, 0.035f, 0.045f, 0.96f);
+            SetRect((RectTransform)deleteButtons[index].transform,
+                new Vector2(left, 0.205f), new Vector2(left + 0.275f, 0.255f));
         }
         SetArray(screen, "slotButtons", buttons.Cast<UnityEngine.Object>().ToArray());
         SetArray(screen, "chapterLabels", chapterLabels.Cast<UnityEngine.Object>().ToArray());
         SetArray(screen, "statusLabels", statusLabels.Cast<UnityEngine.Object>().ToArray());
         SetArray(screen, "actionLabels", actionLabels.Cast<UnityEngine.Object>().ToArray());
+        SetArray(screen, "deleteButtons", deleteButtons.Cast<UnityEngine.Object>().ToArray());
     }
 
     private static Text CreateText(
@@ -1124,6 +1132,10 @@ public static class P0ProjectBuilder
         ScreenRouter router = new GameObject("ScreenRouter").AddComponent<ScreenRouter>();
         router.transform.SetParent(root.transform);
         SetArray(router, "screens", screens.Cast<UnityEngine.Object>().ToArray());
+        ModalRouter modals = BuildModalRouter(uiFrame);
+        SaveSlotScreen saveSlotScreenView = screens.OfType<SaveSlotScreen>().FirstOrDefault();
+        if (saveSlotScreenView != null)
+            SetObject(saveSlotScreenView, "modals", modals);
         foreach (ScreenBase screen in screens)
         {
             if (screen is TitleScreen || screen is SettingsScreen || screen is CreditsScreen)
@@ -1322,6 +1334,47 @@ public static class P0ProjectBuilder
         scaler.screenMatchMode = CanvasScaler.ScreenMatchMode.MatchWidthOrHeight;
         scaler.matchWidthOrHeight = 0.5f;
         return canvas;
+    }
+
+    private static ModalRouter BuildModalRouter(Transform parent)
+    {
+        Font font = LoadUiFont("Pretendard/FONT_Pretendard-SemiBold.ttf");
+        GameObject routerObject = new("ModalRouter");
+        routerObject.transform.SetParent(parent, false);
+        ModalRouter router = routerObject.AddComponent<ModalRouter>();
+
+        GameObject confirmObject = new("ConfirmModal", typeof(RectTransform),
+            typeof(CanvasRenderer), typeof(Image), typeof(ConfirmDialog));
+        confirmObject.transform.SetParent(parent, false);
+        SetRect((RectTransform)confirmObject.transform, Vector2.zero, Vector2.one);
+        Image dim = confirmObject.GetComponent<Image>();
+        dim.color = new Color(0.005f, 0.008f, 0.015f, 0.82f);
+
+        Image panel = CreateLayer("Confirm Panel", confirmObject.transform)
+            .gameObject.AddComponent<Image>();
+        panel.sprite = AssetDatabase.LoadAssetAtPath<Sprite>(ThemePanelPath);
+        panel.type = Image.Type.Sliced;
+        panel.color = new Color(0.06f, 0.08f, 0.11f, 0.99f);
+        SetRect(panel.rectTransform, new Vector2(0.30f, 0.32f), new Vector2(0.70f, 0.68f));
+
+        Text message = CreateText("Message", panel.transform, font, 28, TextAnchor.MiddleCenter);
+        message.color = new Color(0.965f, 0.941f, 0.867f, 1f);
+        SetRect(message.rectTransform, new Vector2(0.08f, 0.38f), new Vector2(0.92f, 0.88f));
+        Button cancel = CreateTitleButton("CancelButton", panel.transform, font, "취소", false);
+        SetRect((RectTransform)cancel.transform,
+            new Vector2(0.08f, 0.10f), new Vector2(0.46f, 0.30f));
+        Button confirm = CreateTitleButton("ConfirmButton", panel.transform, font, "확인", true);
+        SetRect((RectTransform)confirm.transform,
+            new Vector2(0.54f, 0.10f), new Vector2(0.92f, 0.30f));
+
+        ConfirmDialog dialog = confirmObject.GetComponent<ConfirmDialog>();
+        SetObject(dialog, "messageLabel", message);
+        SetObject(dialog, "confirmButton", confirm);
+        SetObject(dialog, "cancelButton", cancel);
+        SetObject(router, "confirm", confirmObject);
+        SetObject(router, "confirmDialog", dialog);
+        confirmObject.SetActive(false);
+        return router;
     }
 
     private static void BuildPersistentHud(

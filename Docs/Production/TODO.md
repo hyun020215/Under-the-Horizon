@@ -43,8 +43,9 @@
 
 ### 부분 이식 — 기존 시스템을 확장한다
 
-- [ ] 저장 슬롯 삭제와 시작/이어하기 확인 UX를 완성한다.
-  - 기존 `ModalRouter`를 확장해 공통 확인 모달로 구현하며 화면 내부 임시 패널을 만들지 않는다.
+- [x] 저장 슬롯 삭제와 시작/이어하기 확인 UX를 완성했다.
+  - 기존 `ModalRouter`와 `ConfirmDialog`를 확장한 공통 확인 모달을 사용한다.
+  - `SaveService`가 기본·백업·임시 저장 파일 삭제를 소유하며 EditMode/Bootstrap PlayMode로 검증했다.
 - [ ] Persistent HUD를 이전 프로젝트의 목표 중심 HUD로 완성한다.
   - 기존 `PersistentHud`, `ObjectiveWidget`, `GameStateStore`를 사용한다.
   - 내부 수치는 제품 디자인이 승인한 정성 표현으로 바꾸기 전까지 추가 노출하지 않는다.

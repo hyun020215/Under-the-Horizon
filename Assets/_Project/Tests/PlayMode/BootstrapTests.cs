@@ -55,6 +55,8 @@ public sealed class BootstrapTests
         Assert.That(slots.gameObject.activeInHierarchy, Is.True);
         slots.transform.Find("Slot3Button").GetComponent<Button>().onClick.Invoke();
         yield return null;
+        GameObject.Find("ConfirmButton").GetComponent<Button>().onClick.Invoke();
+        yield return null;
 
         NarrativeDirector narrative = Object.FindFirstObjectByType<NarrativeDirector>();
         DialogueScreen dialogue = Object.FindFirstObjectByType<DialogueScreen>(

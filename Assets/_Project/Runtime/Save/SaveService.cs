@@ -15,6 +15,19 @@ public sealed class SaveService
 
     public bool Exists(SaveSlot slot) => File.Exists(GetPath(slot));
 
+    public void Delete(SaveSlot slot)
+    {
+        string path = GetPath(slot);
+        if (File.Exists(path))
+            File.Delete(path);
+        string backup = path + ".bak";
+        if (File.Exists(backup))
+            File.Delete(backup);
+        string temporary = path + ".tmp";
+        if (File.Exists(temporary))
+            File.Delete(temporary);
+    }
+
     public void Save(SaveSlot slot, GameState state)
     {
         Directory.CreateDirectory(directory);

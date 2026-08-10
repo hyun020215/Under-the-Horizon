@@ -36,7 +36,7 @@ public static class PresentationCaptureRunner
             Screen.SetResolution(1600, 900, false);
             EditorApplication.update += Update;
         }
-        else if (change == PlayModeStateChange.EnteredEditMode && stage >= 5)
+        else if (change == PlayModeStateChange.EnteredEditMode && stage >= 6)
         {
             EditorApplication.playModeStateChanged -= OnPlayModeChanged;
             EditorApplication.Exit(0);
@@ -66,10 +66,15 @@ public static class PresentationCaptureRunner
             Click("Slot1Button");
             NextStage();
         }
-        else if (stage == 4 && frame >= 240)
+        else if (stage == 4 && frame >= 20)
+        {
+            Click("ConfirmButton");
+            NextStage();
+        }
+        else if (stage == 5 && frame >= 240)
         {
             Capture("03-gameplay.png");
-            stage = 5;
+            stage = 6;
             EditorApplication.update -= Update;
             EditorApplication.isPlaying = false;
         }
