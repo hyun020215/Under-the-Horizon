@@ -24,6 +24,7 @@ MonoBehaviour:
   characterSet: {fileID: 11400000, guid: 74ce6e4f0bc51e040b7ec3cd70426da0, type: 2}
   interactionSet: {fileID: 11400000, guid: f6a2958956876c648b1dab55871c86b0, type: 2}
   entryDialogue: {fileID: 11400000, guid: 080eb020495c41c4da082f57197066af, type: 2}
+  deferEntryDialogue: 0
   puzzle: {fileID: 11400000, guid: ac17ad11f59655e4d862ca71eda3422b, type: 2}
   audioProfile: {fileID: 11400000, guid: c0717ef40518b6a4e8f91bcd61ffc7e3, type: 2}
   entrySequence: {fileID: 0}
@@ -33,7 +34,14 @@ MonoBehaviour:
   onEnterEffects: []
   onCompleteEffects:
   - {fileID: 11400000, guid: 45241e52c1e057a4f9285e44bfa41eff, type: 2}
-  authoringRequirements: {minimumInteractionCount: 1, requiresPuzzle: 1, requiresEntrySequence: 0, requiresExitSequence: 0}
   routes:
   - targetSceneId: D7-04
     conditions: []
+  authoringRequirements:
+    minimumInteractionCount: 2
+    requiresPuzzle: 1
+    requiresEntrySequence: 0
+    requiresExitSequence: 0
+    requiredInteractionTypes: 05000000
+    requiresEvidenceAcquisition: 0
+    requiresSceneChoice: 0

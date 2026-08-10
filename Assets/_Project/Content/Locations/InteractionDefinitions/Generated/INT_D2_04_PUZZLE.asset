@@ -1,0 +1,28 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0eb5a31aeabd45947bf8c5b6c03af2ab, type: 3}
+  m_Name: INT_D2_04_PUZZLE
+  m_EditorClassIdentifier: UTH.Runtime::InteractionDefinition
+  id: INT_D2_04_PUZZLE
+  type: 5
+  displayName: "\uCE74\uBA54\uB77C\uC758 \uB9F9\uC810 \uD37C\uC990"
+  targetId: 
+  hasWorldHotspot: 1
+  normalizedRect:
+    serializedVersion: 2
+    x: 0.35
+    y: 0.25
+    width: 0.3
+    height: 0.3
+  conditions: []
+  action: {fileID: 11400000, guid: d3d23d6f32bf6c641975980d16faad71, type: 2}
+  repeatable: 0

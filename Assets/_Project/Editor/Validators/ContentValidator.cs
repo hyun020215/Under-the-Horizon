@@ -155,7 +155,8 @@ public static class ContentValidator
                 || rect.yMax > 1f)
             {
                 errors.Add(
-                    $"{scene.Id}/{interaction.Id} has an invalid normalized hotspot.");
+                    $"{scene.Id}/{interaction.Id} has an invalid normalized hotspot "
+                    + $"{rect}.");
             }
         }
     }
@@ -169,6 +170,8 @@ public static class ContentValidator
             return;
 
         int interactionCount = scene.InteractionSet?.Interactions?.Length ?? 0;
+        InteractionDefinition[] interactions =
+            scene.InteractionSet?.Interactions ?? Array.Empty<InteractionDefinition>();
         if (interactionCount < requirements.MinimumInteractionCount)
         {
             errors.Add(
@@ -179,13 +182,19 @@ public static class ContentValidator
 
         if (requirements.RequiresPuzzle && scene.Puzzle == null)
             errors.Add($"{scene.Id} requires a Puzzle.");
+        else if (requirements.RequiresPuzzle
+            && !interactions.Any(interaction =>
+                interaction?.Action is PuzzleInteractionAction action
+                && action.Puzzle == scene.Puzzle))
+        {
+            errors.Add(
+                $"{scene.Id} has no interaction for its assigned Puzzle.");
+        }
         if (requirements.RequiresEntrySequence && scene.EntrySequence == null)
             errors.Add($"{scene.Id} requires an entry Sequence.");
         if (requirements.RequiresExitSequence && scene.ExitSequence == null)
             errors.Add($"{scene.Id} requires an exit Sequence.");
 
-        InteractionDefinition[] interactions =
-            scene.InteractionSet?.Interactions ?? Array.Empty<InteractionDefinition>();
         if (requirements.RequiredInteractionTypes != null)
         {
             foreach (InteractionType requiredType in

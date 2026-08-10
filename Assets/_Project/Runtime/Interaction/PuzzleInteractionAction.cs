@@ -7,6 +7,8 @@ public sealed class PuzzleInteractionAction : InteractionAction
     [SerializeField]
     private PuzzleDefinition puzzle;
 
+    public PuzzleDefinition Puzzle => puzzle;
+
     public override async Task<InteractionResult> ExecuteAsync(InteractionContext context)
     {
         if (context.Puzzles == null)

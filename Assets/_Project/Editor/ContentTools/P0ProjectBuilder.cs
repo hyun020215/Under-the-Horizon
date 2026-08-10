@@ -49,6 +49,7 @@ public static class P0ProjectBuilder
         PopulateCharacters();
         PopulateMaps();
         PopulateStoryScenes(scenes);
+        PuzzleInteractionContentMigrator.MigrateAll();
         PopulateDatabases();
         BuildPrefabs();
         BuildScenes();

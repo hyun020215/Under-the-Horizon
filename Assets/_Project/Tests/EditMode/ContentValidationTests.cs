@@ -31,4 +31,27 @@ public sealed class ContentValidationTests
             choices.All(choice => !string.IsNullOrWhiteSpace(choice.Text)),
             Is.True);
     }
+
+    [Test]
+    public void EveryAssignedPuzzleHasAReachableWorldInteraction()
+    {
+        StorySceneDefinition[] puzzleScenes = AssetDatabase
+            .FindAssets("t:StorySceneDefinition")
+            .Select(AssetDatabase.GUIDToAssetPath)
+            .Select(AssetDatabase.LoadAssetAtPath<StorySceneDefinition>)
+            .Where(scene => scene?.Puzzle != null)
+            .ToArray();
+
+        Assert.That(puzzleScenes, Has.Length.EqualTo(13));
+        foreach (StorySceneDefinition scene in puzzleScenes)
+        {
+            InteractionDefinition interaction = scene.InteractionSet.Interactions
+                .SingleOrDefault(item =>
+                    item?.Action is PuzzleInteractionAction action
+                    && action.Puzzle == scene.Puzzle);
+
+            Assert.That(interaction, Is.Not.Null, scene.Id);
+            Assert.That(interaction.HasWorldHotspot, Is.True, scene.Id);
+        }
+    }
 }

@@ -14,3 +14,4 @@ MonoBehaviour:
   m_EditorClassIdentifier: UTH.Runtime::InteractionSet
   interactions:
   - {fileID: 11400000, guid: 7dec5186f5d897e4087363c8a97a473c, type: 2}
+  - {fileID: 11400000, guid: e8a681c237c54ed40bda721813ff5fa0, type: 2}
