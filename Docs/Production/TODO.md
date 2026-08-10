@@ -70,6 +70,8 @@
   - [x] 이전 프로젝트의 6개 canonical 추론 ID·설명·필요 증거 조합을 `TheoryDefinition` 콘텐츠로 이식했다.
   - [x] `EvidenceInventory`를 읽기만 하는 순수 `TheoryResolver` 판정 계층을 복구했다.
   - [ ] 기존 `ScreenRouter`와 보드 스텁을 확장해 발견 증거 노드·연결·추론 상태를 표시한다.
+    - [x] 조사 기록에서 라우터로 진입하고 18개 증거 노드, 6개 추론 슬롯, 연결 증거 상세와 부족 상태를 표시한다.
+    - [ ] 실제 선을 직접 배치·편집하는 상호작용과 추론 완료 효과는 후속 퍼즐 규칙 이식과 함께 연결한다.
   - [ ] 추론 완료의 논리 상태와 효과 적용은 기존 `GameStateStore`/`GameEffect` 계약에 맞춰 연결한다.
 - [ ] Investigation/Puzzle 공통 셸의 열기·닫기·힌트·결과 표시를 이전 UX에 맞춘다.
   - 기존 `PuzzleDirector`와 각 전용 Puzzle controller의 규칙 코드는 재사용한다.

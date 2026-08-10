@@ -15,6 +15,7 @@ public sealed class InvestigationRecordScreen : ScreenBase
     [SerializeField] private Text detailBody;
     [SerializeField] private Text emptyLabel;
     [SerializeField] private Button backButton;
+    [SerializeField] private Button boardButton;
     private EvidenceDefinition[] visibleEvidence = System.Array.Empty<EvidenceDefinition>();
 
     private void Awake()
@@ -25,6 +26,7 @@ public sealed class InvestigationRecordScreen : ScreenBase
             cardButtons[index]?.onClick.AddListener(() => Select(selected));
         }
         backButton?.onClick.AddListener(Back);
+        boardButton?.onClick.AddListener(OpenBoard);
     }
 
     public override Task OpenAsync(ScreenContext context)
@@ -76,5 +78,11 @@ public sealed class InvestigationRecordScreen : ScreenBase
     {
         if (screens != null)
             await screens.OpenAsync(ScreenId.Exploration);
+    }
+
+    private async void OpenBoard()
+    {
+        if (screens != null)
+            await screens.OpenAsync(ScreenId.EvidenceBoard);
     }
 }

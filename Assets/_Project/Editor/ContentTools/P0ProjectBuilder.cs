@@ -149,6 +149,19 @@ public static class P0ProjectBuilder
         EditorApplication.Exit(0);
     }
 
+    public static void RefreshEvidenceBoardFromCommandLine()
+    {
+        Sprite panel = AssetDatabase.LoadAssetAtPath<Sprite>(ThemePanelPath);
+        SavePrefab(PrefabRoot + "/UI/PF_EvidenceBoardScreen.prefab",
+            CreateScreen("PF_EvidenceBoardScreen", typeof(EvidenceBoardScreen), ScreenId.EvidenceBoard, panel));
+        SavePrefab(PrefabRoot + "/UI/PF_RecordScreen.prefab",
+            CreateScreen("PF_RecordScreen", typeof(InvestigationRecordScreen), ScreenId.InvestigationRecord, panel));
+        BuildGameScene();
+        AssetDatabase.SaveAssets();
+        AssetDatabase.Refresh();
+        EditorApplication.Exit(0);
+    }
+
     private static void EnsurePresentationProfiles()
     {
         EnsureAsset<AmbientParticleProfile>(
@@ -607,6 +620,8 @@ public static class P0ProjectBuilder
             BuildMapScreen(root.transform, map);
         else if (screen is InvestigationRecordScreen record)
             BuildInvestigationRecordScreen(root.transform, record);
+        else if (screen is EvidenceBoardScreen evidenceBoard)
+            BuildEvidenceBoardScreen(root.transform, evidenceBoard);
         else if (screen is ExplorationScreen)
         {
             Image image = root.GetComponent<Image>();
@@ -705,6 +720,72 @@ public static class P0ProjectBuilder
         SetObject(screen, "detailBody", detailBody);
         SetObject(screen, "emptyLabel", empty);
         SetObject(screen, "backButton", back);
+        Button board = CreateTitleButton("EvidenceBoardButton", root, font, "증거 보드", true);
+        SetRect((RectTransform)board.transform, new Vector2(0.20f, 0.055f), new Vector2(0.36f, 0.12f));
+        SetObject(screen, "boardButton", board);
+    }
+
+    private static void BuildEvidenceBoardScreen(Transform root, EvidenceBoardScreen screen)
+    {
+        Font font = LoadUiFont("Pretendard/FONT_Pretendard-SemiBold.ttf");
+        root.GetComponent<Image>().color = new Color(0.008f, 0.015f, 0.025f, 1f);
+        Text title = CreateText("Board Title", root, font, 42, TextAnchor.MiddleLeft);
+        title.text = "증거 보드"; title.color = new Color(0.965f, 0.827f, 0.529f, 1f);
+        SetRect(title.rectTransform, new Vector2(0.045f, 0.89f), new Vector2(0.42f, 0.97f));
+        Text progress = CreateText("Progress", root, font, 19, TextAnchor.MiddleRight);
+        progress.color = new Color(0.78f, 0.74f, 0.66f, 1f);
+        SetRect(progress.rectTransform, new Vector2(0.55f, 0.90f), new Vector2(0.95f, 0.96f));
+        Image evidencePanel = CreateLayer("Evidence Nodes", root).gameObject.AddComponent<Image>();
+        evidencePanel.color = new Color(0.022f, 0.038f, 0.055f, 0.97f);
+        SetRect(evidencePanel.rectTransform, new Vector2(0.045f, 0.16f), new Vector2(0.52f, 0.87f));
+        var evidenceButtons = new Button[18]; var evidenceImages = new Image[18]; var evidenceLabels = new Text[18];
+        for (var index = 0; index < 18; index++)
+        {
+            Button button = CreateTitleButton($"EvidenceNode{index + 1}", evidencePanel.transform, font, string.Empty, false);
+            int column = index % 3; int row = index / 3;
+            float left = 0.025f + column * 0.325f; float top = 0.97f - row * 0.158f;
+            SetRect((RectTransform)button.transform, new Vector2(left, top - 0.135f), new Vector2(left + 0.30f, top));
+            Image thumbnail = CreateLayer("Image", button.transform).gameObject.AddComponent<Image>();
+            thumbnail.preserveAspect = true; thumbnail.raycastTarget = false;
+            SetRect(thumbnail.rectTransform, new Vector2(0.05f, 0.30f), new Vector2(0.35f, 0.90f));
+            Text label = button.GetComponentInChildren<Text>(); label.alignment = TextAnchor.MiddleLeft;
+            SetRect(label.rectTransform, new Vector2(0.38f, 0.08f), new Vector2(0.96f, 0.92f));
+            evidenceButtons[index] = button; evidenceImages[index] = thumbnail; evidenceLabels[index] = label;
+        }
+        Text empty = CreateText("Empty Label", evidencePanel.transform, font, 22, TextAnchor.MiddleCenter);
+        empty.text = "연결할 증거가 없습니다."; empty.color = new Color(0.7f, 0.67f, 0.61f, 1f);
+        SetRect(empty.rectTransform, new Vector2(0.15f, 0.4f), new Vector2(0.85f, 0.6f));
+        Image theoryPanel = CreateLayer("Theory Slots", root).gameObject.AddComponent<Image>();
+        theoryPanel.color = new Color(0.035f, 0.025f, 0.045f, 0.98f);
+        SetRect(theoryPanel.rectTransform, new Vector2(0.54f, 0.38f), new Vector2(0.955f, 0.87f));
+        var theoryButtons = new Button[6]; var theoryLabels = new Text[6];
+        for (var index = 0; index < 6; index++)
+        {
+            Button button = CreateTitleButton($"TheorySlot{index + 1}", theoryPanel.transform, font, string.Empty, false);
+            int column = index % 2; int row = index / 2;
+            float left = 0.035f + column * 0.49f; float top = 0.95f - row * 0.30f;
+            SetRect((RectTransform)button.transform, new Vector2(left, top - 0.24f), new Vector2(left + 0.45f, top));
+            Text label = button.GetComponentInChildren<Text>(); label.fontSize = 18;
+            theoryButtons[index] = button; theoryLabels[index] = label;
+        }
+        Image detail = CreateLayer("Connection Detail", root).gameObject.AddComponent<Image>();
+        detail.color = new Color(0.055f, 0.06f, 0.075f, 0.98f);
+        SetRect(detail.rectTransform, new Vector2(0.54f, 0.16f), new Vector2(0.955f, 0.36f));
+        Text detailTitle = CreateText("Detail Title", detail.transform, font, 24, TextAnchor.MiddleLeft);
+        detailTitle.color = new Color(0.965f, 0.827f, 0.529f, 1f);
+        SetRect(detailTitle.rectTransform, new Vector2(0.05f, 0.62f), new Vector2(0.95f, 0.94f));
+        Text detailBody = CreateText("Detail Body", detail.transform, font, 16, TextAnchor.UpperLeft);
+        detailBody.color = new Color(0.86f, 0.83f, 0.77f, 1f); detailBody.horizontalOverflow = HorizontalWrapMode.Wrap;
+        SetRect(detailBody.rectTransform, new Vector2(0.05f, 0.06f), new Vector2(0.95f, 0.62f));
+        Button back = CreateTitleButton("BackButton", root, font, "조사 기록", false);
+        SetRect((RectTransform)back.transform, new Vector2(0.045f, 0.055f), new Vector2(0.18f, 0.12f));
+        SetArray(screen, "evidenceButtons", evidenceButtons.Cast<UnityEngine.Object>().ToArray());
+        SetArray(screen, "evidenceImages", evidenceImages.Cast<UnityEngine.Object>().ToArray());
+        SetArray(screen, "evidenceLabels", evidenceLabels.Cast<UnityEngine.Object>().ToArray());
+        SetArray(screen, "theoryButtons", theoryButtons.Cast<UnityEngine.Object>().ToArray());
+        SetArray(screen, "theoryLabels", theoryLabels.Cast<UnityEngine.Object>().ToArray());
+        SetObject(screen, "detailTitle", detailTitle); SetObject(screen, "detailBody", detailBody);
+        SetObject(screen, "progressLabel", progress); SetObject(screen, "emptyLabel", empty); SetObject(screen, "backButton", back);
     }
 
     private static void BuildMapScreen(Transform root, MapScreen screen)
@@ -1303,6 +1384,13 @@ public static class P0ProjectBuilder
         SetObject(evidenceDirector, "database",
             AssetDatabase.LoadAssetAtPath<EvidenceDatabase>(
                 ContentRoot + "/Game/DATABASE_Evidence.asset"));
+        EvidenceBoardDirector evidenceBoardDirector = new GameObject("EvidenceBoardDirector")
+            .AddComponent<EvidenceBoardDirector>();
+        evidenceBoardDirector.transform.SetParent(root.transform);
+        SetObject(evidenceBoardDirector, "evidence", evidenceDirector);
+        SetArray(evidenceBoardDirector, "theories",
+            LoadAll<TheoryDefinition>().OrderBy(item => item.Id, StringComparer.Ordinal)
+                .Cast<UnityEngine.Object>().ToArray());
 
         Canvas world = CreateCanvas("WorldCanvas", root.transform);
         world.sortingOrder = 0;
@@ -1351,6 +1439,11 @@ public static class P0ProjectBuilder
             {
                 SetObject(recordScreen, "screens", router);
                 SetObject(recordScreen, "evidence", evidenceDirector);
+            }
+            if (screen is EvidenceBoardScreen evidenceBoardScreen)
+            {
+                SetObject(evidenceBoardScreen, "screens", router);
+                SetObject(evidenceBoardScreen, "board", evidenceBoardDirector);
             }
         }
         BuildPersistentHud(uiFrame, router, state);
