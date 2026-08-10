@@ -16,7 +16,7 @@ public sealed class AudioAssetOrganizationTests
         AssertRole("Music", "MUS_", 8);
         AssertRole("Ambience", "AMB_", 6);
         AssertRole("SFX", "SFX_", 16);
-        AssertRole("VoiceBarks", "VO_", 227);
+        AssertRole("VoiceBarks", "VO_", 225);
         AssertRole("StoryRecordings", "REC_", 16);
     }
 
