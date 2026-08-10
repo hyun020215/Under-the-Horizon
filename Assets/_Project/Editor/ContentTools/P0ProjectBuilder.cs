@@ -104,6 +104,16 @@ public static class P0ProjectBuilder
         EditorApplication.Exit(0);
     }
 
+    public static void RefreshSaveSlotFromCommandLine()
+    {
+        Sprite panel = AssetDatabase.LoadAssetAtPath<Sprite>(ThemePanelPath);
+        SavePrefab(PrefabRoot + "/UI/PF_SaveSlotScreen.prefab",
+            CreateScreen("PF_SaveSlotScreen", typeof(SaveSlotScreen), ScreenId.SaveSlot, panel));
+        AssetDatabase.SaveAssets();
+        AssetDatabase.Refresh();
+        EditorApplication.Exit(0);
+    }
+
     private static void EnsurePresentationProfiles()
     {
         EnsureAsset<AmbientParticleProfile>(
@@ -930,6 +940,9 @@ public static class P0ProjectBuilder
         SetRect(subtitle.rectTransform, new Vector2(0.25f, 0.70f), new Vector2(0.75f, 0.76f));
 
         var buttons = new Button[3];
+        var chapterLabels = new Text[3];
+        var statusLabels = new Text[3];
+        var actionLabels = new Text[3];
         for (var index = 0; index < buttons.Length; index++)
         {
             buttons[index] = CreateTitleButton(
@@ -944,16 +957,37 @@ public static class P0ProjectBuilder
                 ? new Color(0.20f, 0.12f, 0.035f, 0.98f)
                 : new Color(0.035f, 0.07f, 0.10f, 0.96f);
             Text slotLabel = buttons[index].GetComponentInChildren<Text>();
-            slotLabel.fontSize = 26;
+            slotLabel.fontSize = 28;
             slotLabel.color = new Color(0.965f, 0.941f, 0.867f, 1f);
-            float top = 0.64f - index * 0.145f;
+            slotLabel.alignment = TextAnchor.UpperCenter;
+            SetRect(slotLabel.rectTransform,
+                new Vector2(0.08f, 0.74f), new Vector2(0.92f, 0.94f));
+            chapterLabels[index] = CreateText(
+                "Chapter", buttons[index].transform, font, 28, TextAnchor.MiddleCenter);
+            chapterLabels[index].color = new Color(0.80f, 0.61f, 0.30f, 1f);
+            SetRect(chapterLabels[index].rectTransform,
+                new Vector2(0.08f, 0.50f), new Vector2(0.92f, 0.68f));
+            statusLabels[index] = CreateText(
+                "Status", buttons[index].transform, font, 20, TextAnchor.MiddleCenter);
+            statusLabels[index].color = new Color(0.74f, 0.72f, 0.66f, 1f);
+            SetRect(statusLabels[index].rectTransform,
+                new Vector2(0.08f, 0.29f), new Vector2(0.92f, 0.48f));
+            actionLabels[index] = CreateText(
+                "Action", buttons[index].transform, font, 22, TextAnchor.MiddleCenter);
+            actionLabels[index].color = new Color(0.965f, 0.827f, 0.529f, 1f);
+            SetRect(actionLabels[index].rectTransform,
+                new Vector2(0.08f, 0.07f), new Vector2(0.92f, 0.24f));
+            float left = 0.08f + index * 0.305f;
             SetRect(
                 (RectTransform)buttons[index].transform,
-                new Vector2(0.30f, top - 0.10f),
-                new Vector2(0.70f, top)
+                new Vector2(left, 0.22f),
+                new Vector2(left + 0.285f, 0.68f)
             );
         }
         SetArray(screen, "slotButtons", buttons.Cast<UnityEngine.Object>().ToArray());
+        SetArray(screen, "chapterLabels", chapterLabels.Cast<UnityEngine.Object>().ToArray());
+        SetArray(screen, "statusLabels", statusLabels.Cast<UnityEngine.Object>().ToArray());
+        SetArray(screen, "actionLabels", actionLabels.Cast<UnityEngine.Object>().ToArray());
     }
 
     private static Text CreateText(
