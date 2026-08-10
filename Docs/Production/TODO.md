@@ -53,6 +53,8 @@
   - 목표 단계/guidance 데이터와 목표 변경 애니메이션은 남아 있다.
 - [ ] Dialogue UI의 화자/내레이션/선택지 모드, 초상화 포커스와 타이포그래피를 완성한다.
   - 기존 `DialogueScreen`, `NarrativeDirector`, `DialogueLine` 데이터를 확장한다.
+  - 화자 없는 line의 NARRATION 이름표·중앙 정렬과 내부 Dialogue/Story ID 비노출은 완료했다.
+  - 화자 초상화 포커스, 선택지 등장 연출, 대사 길이별 반응형 타이포그래피는 남아 있다.
 - [ ] Map 화면을 실제 Location/Condition 데이터와 연결한다.
   - 기존 `MapScreen`, `MapDefinition`, `ScreenRouter`를 사용한다.
   - Deck별 Base/Restricted/Technical 레이어, 덱 탭, 현재 위치 표시와 뒤로가기는 이식 완료했다.

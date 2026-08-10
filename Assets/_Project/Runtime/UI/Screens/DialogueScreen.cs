@@ -56,8 +56,8 @@ public sealed class DialogueScreen : ScreenBase
 
     public override Task OpenAsync(ScreenContext context)
     {
-        if (context.Payload is DialogueSequence sequence && sceneLabel != null)
-            sceneLabel.text = sequence.Id;
+        if (sceneLabel != null)
+            sceneLabel.text = string.Empty;
 
         return base.OpenAsync(context);
     }
@@ -69,8 +69,13 @@ public sealed class DialogueScreen : ScreenBase
             TaskCreationOptions.RunContinuationsAsynchronously
         );
 
+        bool narration = line.speaker == null;
         if (speakerLabel != null)
-            speakerLabel.text = line.speaker?.DisplayName ?? string.Empty;
+            speakerLabel.text = narration ? "NARRATION" : line.speaker.DisplayName;
+        if (bodyLabel != null)
+            bodyLabel.alignment = narration
+                ? TextAnchor.UpperCenter
+                : TextAnchor.UpperLeft;
         fullText = line.text ?? string.Empty;
         if (bodyLabel != null)
             bodyLabel.text = string.Empty;
