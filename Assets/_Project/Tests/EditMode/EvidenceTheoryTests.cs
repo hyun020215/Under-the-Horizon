@@ -23,6 +23,22 @@ public sealed class EvidenceTheoryTests
     }
 
     [Test]
+    public void BoardGraphRequiresTheExactAuthoredEvidenceSet()
+    {
+        TheoryDefinition theory = AssetDatabase
+            .FindAssets("t:TheoryDefinition")
+            .Select(AssetDatabase.GUIDToAssetPath)
+            .Select(AssetDatabase.LoadAssetAtPath<TheoryDefinition>)
+            .First(item => item.RequiredEvidence.Length > 1);
+        var graph = new EvidenceBoardGraph();
+        foreach (EvidenceDefinition evidence in theory.RequiredEvidence)
+            graph.Toggle(evidence);
+        Assert.That(graph.Matches(theory), Is.True);
+        graph.Toggle(theory.RequiredEvidence[0]);
+        Assert.That(graph.Matches(theory), Is.False);
+    }
+
+    [Test]
     public void EveryTheoryResolvesThroughAContentEffect()
     {
         TheoryDefinition[] theories = AssetDatabase

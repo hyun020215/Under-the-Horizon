@@ -39,5 +39,7 @@ public sealed class EvidenceBoardPresentationTests
         Assert.That(source, Does.Not.Contain("AddEvidence"));
         Assert.That(source, Does.Contain("board.TryResolve"));
         Assert.That(source, Does.Not.Contain("ResolveTheory("));
+        Assert.That(source, Does.Contain("EvidenceConnectionGraphic"));
+        Assert.That(source, Does.Contain("EvidenceBoardGraph"));
     }
 }

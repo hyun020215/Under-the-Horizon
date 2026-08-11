@@ -71,13 +71,13 @@
   - 발견한 증거만 표시하는 카드 목록과 이미지·명칭·설명 상세 보기는 완료했다.
   - [x] 아직 직접 열지 않은 증거 카드에 `NEW`와 짧은 강조 애니메이션을 표시하며 Reduced Motion에서는 정적으로 표시한다.
   - 인물 탭과 증거 분류/필터는 관련 Character/category 콘텐츠 필드 이식과 함께 남아 있다.
-- [ ] Evidence Board의 노드·연결·이론 슬롯 UX를 완성한다.
+- [x] Evidence Board의 노드·연결·이론 슬롯 UX를 완성한다.
   - 기존 `EvidenceBoardDirector`, `EvidenceBoardGraph`, `TheoryResolver`를 사용한다.
   - [x] 이전 프로젝트의 6개 canonical 추론 ID·설명·필요 증거 조합을 `TheoryDefinition` 콘텐츠로 이식했다.
   - [x] `EvidenceInventory`를 읽기만 하는 순수 `TheoryResolver` 판정 계층을 복구했다.
-  - [ ] 기존 `ScreenRouter`와 보드 스텁을 확장해 발견 증거 노드·연결·추론 상태를 표시한다.
+  - [x] 기존 `ScreenRouter`와 보드 스텁을 확장해 발견 증거 노드·연결·추론 상태를 표시한다.
     - [x] 조사 기록에서 라우터로 진입하고 18개 증거 노드, 6개 추론 슬롯, 연결 증거 상세와 부족 상태를 표시한다.
-    - [ ] 실제 선을 직접 배치·편집하는 상호작용과 추론 완료 효과는 후속 퍼즐 규칙 이식과 함께 연결한다.
+    - [x] 증거 노드를 선택해 이론 슬롯에 연결선을 직접 구성하고 정확한 필요 증거 집합일 때만 추론 완료를 허용한다.
   - [x] 추론 완료는 `ResolveTheoryEffect`가 기존 `GameStateStore.flags`의 안정 키로 기록하고 이론별 후속 효과 배열을 적용한다.
   - [x] 보드 화면은 Director에 완료를 요청할 뿐 상태를 직접 변경하지 않으며 완료·논증 가능·부족 상태를 구분한다.
 - [ ] Investigation/Puzzle 공통 셸의 열기·닫기·힌트·결과 표시를 이전 UX에 맞춘다.

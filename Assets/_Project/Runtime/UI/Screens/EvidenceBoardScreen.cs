@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.UI;
@@ -20,13 +21,16 @@ public sealed class EvidenceBoardScreen : ScreenBase
     [SerializeField] private Button backButton;
     private EvidenceDefinition[] discovered = Array.Empty<EvidenceDefinition>();
     private TheoryEvaluation[] theories = Array.Empty<TheoryEvaluation>();
+    private readonly EvidenceBoardGraph graph = new();
+    private EvidenceConnectionGraphic connections;
+    private int activeTheoryIndex = -1;
 
     private void Awake()
     {
         for (var index = 0; index < evidenceButtons?.Length; index++)
         {
             int selected = index;
-            evidenceButtons[index]?.onClick.AddListener(() => SelectEvidence(selected));
+            evidenceButtons[index]?.onClick.AddListener(() => SelectEvidence(selected, true));
         }
         for (var index = 0; index < theoryButtons?.Length; index++)
         {
@@ -34,6 +38,16 @@ public sealed class EvidenceBoardScreen : ScreenBase
             theoryButtons[index]?.onClick.AddListener(() => SelectTheory(selected, true));
         }
         backButton?.onClick.AddListener(Back);
+        GameObject lines = new("Evidence Connections", typeof(RectTransform),
+            typeof(CanvasRenderer), typeof(EvidenceConnectionGraphic));
+        lines.transform.SetParent(transform, false);
+        RectTransform lineRect = (RectTransform)lines.transform;
+        lineRect.anchorMin = Vector2.zero; lineRect.anchorMax = Vector2.one;
+        lineRect.offsetMin = Vector2.zero; lineRect.offsetMax = Vector2.zero;
+        connections = lines.GetComponent<EvidenceConnectionGraphic>();
+        connections.color = new Color(0.85f, 0.60f, 0.18f, .82f);
+        connections.raycastTarget = false;
+        lines.transform.SetSiblingIndex(Mathf.Min(1, transform.childCount - 1));
     }
 
     public override Task OpenAsync(ScreenContext context)
@@ -54,6 +68,9 @@ public sealed class EvidenceBoardScreen : ScreenBase
             EvidenceDefinition item = discovered[index];
             if (index < evidenceImages.Length) evidenceImages[index].sprite = item.Image;
             if (index < evidenceLabels.Length) evidenceLabels[index].text = item.DisplayName;
+            evidenceButtons[index].image.color = graph.Connected.Contains(item)
+                ? new Color(0.42f, 0.31f, 0.12f, 1f)
+                : new Color(0.13f, 0.12f, 0.11f, 1f);
         }
         for (var index = 0; index < theoryButtons?.Length; index++)
         {
@@ -75,13 +92,20 @@ public sealed class EvidenceBoardScreen : ScreenBase
         if (progressLabel != null)
             progressLabel.text = $"수집 증거 {discovered.Length} · 완료한 추론 {theories.Count(item => item.Resolved)} · 논증 가능 {theories.Count(item => item.CanResolve && !item.Resolved)}";
         if (emptyLabel != null) emptyLabel.gameObject.SetActive(discovered.Length == 0);
-        if (discovered.Length > 0) SelectEvidence(0); else if (theories.Length > 0) SelectTheory(0, false);
+        UpdateConnections();
+        if (discovered.Length > 0) SelectEvidence(0, false); else if (theories.Length > 0) SelectTheory(0, false);
     }
 
-    private void SelectEvidence(int index)
+    private void SelectEvidence(int index, bool toggle)
     {
         if (index < 0 || index >= discovered.Length) return;
         EvidenceDefinition item = discovered[index];
+        if (toggle)
+        {
+            graph.Toggle(item);
+            RefreshNodeColors();
+            UpdateConnections();
+        }
         detailTitle.text = item.DisplayName;
         detailBody.text = item.Description;
     }
@@ -90,9 +114,11 @@ public sealed class EvidenceBoardScreen : ScreenBase
     {
         if (index < 0 || index >= theories.Length) return;
         TheoryEvaluation evaluation = theories[index];
+        activeTheoryIndex = index;
         if (resolve && evaluation.CanResolve && !evaluation.Resolved
-            && board != null && board.TryResolve(evaluation.Theory))
+            && board != null && board.TryResolve(evaluation.Theory, graph))
         {
+            graph.Clear();
             Refresh();
             return;
         }
@@ -102,6 +128,33 @@ public sealed class EvidenceBoardScreen : ScreenBase
             evaluation.CanResolve ? "모든 연결 증거가 확보되었습니다. 선택하여 추론을 완료하세요." :
             "미확보: " + string.Join(" · ", evaluation.MissingEvidence.Select(item => item.DisplayName));
         detailBody.text = $"{evaluation.Theory.Description}\n\n연결 증거: {required}\n{missing}";
+        UpdateConnections();
+    }
+
+    private void RefreshNodeColors()
+    {
+        for (int index = 0; index < discovered.Length && index < evidenceButtons.Length; index++)
+            evidenceButtons[index].image.color = graph.Connected.Contains(discovered[index])
+                ? new Color(0.42f, 0.31f, 0.12f, 1f)
+                : new Color(0.13f, 0.12f, 0.11f, 1f);
+    }
+
+    private void UpdateConnections()
+    {
+        if (connections == null || activeTheoryIndex < 0 || activeTheoryIndex >= theoryButtons.Length)
+        {
+            connections?.SetConnections(null);
+            return;
+        }
+        RectTransform target = (RectTransform)theoryButtons[activeTheoryIndex].transform;
+        var lines = new List<(RectTransform from, RectTransform to)>();
+        foreach (EvidenceDefinition selected in graph.Connected)
+        {
+            int index = Array.IndexOf(discovered, selected);
+            if (index >= 0 && index < evidenceButtons.Length)
+                lines.Add(((RectTransform)evidenceButtons[index].transform, target));
+        }
+        connections.SetConnections(lines);
     }
 
     private async void Back()

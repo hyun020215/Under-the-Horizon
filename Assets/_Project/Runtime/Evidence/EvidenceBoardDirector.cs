@@ -48,10 +48,10 @@ public sealed class EvidenceBoardDirector : MonoBehaviour
             .ToArray();
     }
 
-    public bool TryResolve(TheoryDefinition theory)
+    public bool TryResolve(TheoryDefinition theory, EvidenceBoardGraph graph)
     {
         if (theory == null || State == null || State.IsTheoryResolved(theory.Id)
-            || evidence?.Inventory == null)
+            || evidence?.Inventory == null || graph?.Matches(theory) != true)
             return false;
         resolver ??= new TheoryResolver(evidence.Inventory);
         if (!resolver.Evaluate(theory).CanResolve)
