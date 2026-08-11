@@ -1074,6 +1074,15 @@ public static class P0ProjectBuilder
         dim.raycastTarget = false;
         SetRect(dimObject.GetComponent<RectTransform>(), Vector2.zero, Vector2.one);
 
+        GameObject portraitObject = new("Speaker Portrait", typeof(RectTransform),
+            typeof(CanvasRenderer), typeof(Image), typeof(CanvasGroup));
+        portraitObject.transform.SetParent(root, false);
+        Image portrait = portraitObject.GetComponent<Image>();
+        portrait.preserveAspect = true;
+        portrait.raycastTarget = false;
+        SetRect(portrait.rectTransform, new Vector2(0.035f, 0.32f), new Vector2(0.31f, 0.94f));
+        portraitObject.SetActive(false);
+
         GameObject panelObject = new("Dialogue Panel", typeof(RectTransform), typeof(CanvasRenderer), typeof(Image));
         panelObject.transform.SetParent(root, false);
         Image panel = panelObject.GetComponent<Image>();
@@ -1128,6 +1137,8 @@ public static class P0ProjectBuilder
         SetObject(screen, "sceneLabel", scene);
         SetObject(screen, "speakerLabel", speaker);
         SetObject(screen, "bodyLabel", body);
+        SetObject(screen, "portraitImage", portrait);
+        SetObject(screen, "portraitGroup", portraitObject.GetComponent<CanvasGroup>());
         SetObject(screen, "advanceButton", advance);
         SetObject(screen, "advanceLabel", advanceText);
         SetArray(screen, "choiceButtons", choices.Cast<UnityEngine.Object>().ToArray());

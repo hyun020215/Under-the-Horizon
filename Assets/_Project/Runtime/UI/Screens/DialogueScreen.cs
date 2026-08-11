@@ -11,6 +11,8 @@ public sealed class DialogueScreen : ScreenBase
     [SerializeField] private Text sceneLabel;
     [SerializeField] private Text speakerLabel;
     [SerializeField] private Text bodyLabel;
+    [SerializeField] private Image portraitImage;
+    [SerializeField] private CanvasGroup portraitGroup;
     [SerializeField] private Button advanceButton;
     [SerializeField] private Text advanceLabel;
     [SerializeField] private Button[] choiceButtons;
@@ -28,6 +30,7 @@ public sealed class DialogueScreen : ScreenBase
     private readonly List<DialogueChoice> availableChoices = new();
     private AccessibilitySettingsService accessibility;
     private int defaultBodyFontSize;
+    private Coroutine portraitRoutine;
     public bool IsRevealing => revealing;
 
     private void Awake()
@@ -90,6 +93,7 @@ public sealed class DialogueScreen : ScreenBase
                 defaultBodyFontSize, fullText.Length, narration);
             bodyLabel.text = string.Empty;
         }
+        PresentPortrait(line, narration);
 
         availableChoices.Clear();
         if (line.choices != null)
@@ -107,6 +111,44 @@ public sealed class DialogueScreen : ScreenBase
         revealRoutine = StartCoroutine(RevealText());
 
         return pendingLine.Task;
+    }
+
+    private void PresentPortrait(DialogueLine line, bool narration)
+    {
+        if (portraitImage == null)
+            return;
+        Sprite portrait = narration ? null : line.speaker?.Character?.Portrait;
+        portraitImage.sprite = portrait;
+        portraitImage.gameObject.SetActive(portrait != null);
+        if (portraitGroup == null || portrait == null)
+            return;
+        if (portraitRoutine != null)
+            StopCoroutine(portraitRoutine);
+        if (accessibility?.ReducedMotion == true)
+        {
+            portraitGroup.alpha = 1f;
+            return;
+        }
+        portraitRoutine = StartCoroutine(RevealPortrait());
+    }
+
+    private IEnumerator RevealPortrait()
+    {
+        RectTransform rect = portraitImage.rectTransform;
+        Vector2 rest = rect.anchoredPosition;
+        Vector2 start = rest + Vector2.left * 24f;
+        portraitGroup.alpha = 0f;
+        for (float elapsed = 0f; elapsed < .22f; elapsed += Time.unscaledDeltaTime)
+        {
+            float t = Mathf.Clamp01(elapsed / .22f);
+            t = 1f - Mathf.Pow(1f - t, 3f);
+            portraitGroup.alpha = t;
+            rect.anchoredPosition = Vector2.LerpUnclamped(start, rest, t);
+            yield return null;
+        }
+        portraitGroup.alpha = 1f;
+        rect.anchoredPosition = rest;
+        portraitRoutine = null;
     }
 
     private void Advance()

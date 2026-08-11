@@ -1,5 +1,8 @@
 using System.IO;
 using NUnit.Framework;
+using UnityEditor;
+using UnityEngine;
+using UnityEngine.UI;
 
 public sealed class DialoguePresentationTests
 {
@@ -12,6 +15,24 @@ public sealed class DialoguePresentationTests
         Assert.That(source, Does.Contain("\"NARRATION\""));
         Assert.That(source, Does.Contain("TextAnchor.UpperCenter"));
         Assert.That(source, Does.Not.Contain("sceneLabel.text = sequence.Id"));
+    }
+
+    [Test]
+    public void DialoguePrefabProvidesASeparateSpeakerPortrait()
+    {
+        GameObject root = PrefabUtility.LoadPrefabContents(
+            "Assets/_Project/Prefabs/UI/PF_DialogueScreen.prefab");
+        try
+        {
+            Transform portrait = root.transform.Find("Speaker Portrait");
+            Assert.That(portrait, Is.Not.Null);
+            Assert.That(portrait.GetComponent<Image>(), Is.Not.Null);
+            Assert.That(portrait.GetComponent<CanvasGroup>(), Is.Not.Null);
+        }
+        finally
+        {
+            PrefabUtility.UnloadPrefabContents(root);
+        }
     }
 
     [Test]

@@ -52,14 +52,14 @@
   - 시간·Location 표시명·현재 Story Scene 표시명을 목표로 렌더하고 시스템 화면에서 숨기는 작업은 완료했다.
   - [x] 장면의 기존 `InteractionSet`과 완료 상태를 목표 단계/guidance 데이터로 해석해 중복 목표 시스템을 만들지 않았다.
   - [x] 목표 진행 변경 시 위로 사라지고 새 guidance가 들어오는 전환을 적용하며 Reduced Motion에서는 즉시 갱신한다.
-- [ ] Dialogue UI의 화자/내레이션/선택지 모드, 초상화 포커스와 타이포그래피를 완성한다.
+- [x] Dialogue UI의 화자/내레이션/선택지 모드, 초상화 포커스와 타이포그래피를 완성한다.
   - 기존 `DialogueScreen`, `NarrativeDirector`, `DialogueLine` 데이터를 확장한다.
   - 화자 없는 line의 NARRATION 이름표·중앙 정렬과 내부 Dialogue/Story ID 비노출은 완료했다.
   - 기존 `NarrativeDirector` 알림과 `CharacterStage`를 연결한 화자 포커스/비화자 dim,
     선택지 stagger 등장 연출은 완료했다.
   - [x] `DialogueLine.expression`을 현재 화자의 기존 `CharacterView`에 적용해 장면 데이터가 표정 전환을 소유한다.
   - [x] 짧은 대사는 강조하고 긴 대사·내레이션은 단계적으로 축소하는 반응형 본문 타이포그래피를 적용했다.
-  - 별도 대화 초상화 슬롯은 남아 있다.
+  - [x] `CharacterDefinition.Portrait`를 사용하는 별도 화자 초상화 슬롯과 Reduced Motion 대응 등장 연출을 추가했다.
 - [ ] Map 화면을 실제 Location/Condition 데이터와 연결한다.
   - 기존 `MapScreen`, `MapDefinition`, `ScreenRouter`를 사용한다.
   - Deck별 Base/Restricted/Technical 레이어, 덱 탭, 현재 위치 표시와 뒤로가기는 이식 완료했다.
