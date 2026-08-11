@@ -16,3 +16,8 @@ MonoBehaviour:
   baseLayer: {fileID: 21300000, guid: 8a7062ac8b096134cb323e5c7d0978ea, type: 3}
   restrictedLayer: {fileID: 21300000, guid: 20a6a0ce780514947be8e941c87845f9, type: 3}
   technicalLayer: {fileID: 21300000, guid: df5d34d2977bdff4b9b60a86da6ea10f, type: 3}
+  locations:
+  - {fileID: 11400000, guid: d45a956ac8b73344fb8ea6d566ba9fb0, type: 2}
+  - {fileID: 11400000, guid: b87f761ca1c864249919e57c50e7d4f8, type: 2}
+  - {fileID: 11400000, guid: 97905465270b72849b3062d3de068a45, type: 2}
+  - {fileID: 11400000, guid: 3d123b56e23b2ea489bd05af2dbba2a9, type: 2}

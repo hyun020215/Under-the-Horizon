@@ -25,4 +25,29 @@ public sealed class MapPresentationTests
             PrefabUtility.UnloadPrefabContents(root);
         }
     }
+
+    [Test]
+    public void AuthoredMapsOwnLocationNodesWithValidNormalizedPositions()
+    {
+        string[] paths = AssetDatabase.FindAssets("t:MapDefinition", new[]
+            { "Assets/_Project/Content/Locations/Map" });
+        Assert.That(paths, Has.Length.EqualTo(5));
+        int nodes = 0;
+        foreach (string guid in paths)
+        {
+            MapDefinition map = AssetDatabase.LoadAssetAtPath<MapDefinition>(
+                AssetDatabase.GUIDToAssetPath(guid));
+            Assert.That(map.Locations, Is.Not.Null, map.name);
+            foreach (LocationDefinition location in map.Locations)
+            {
+                Assert.That(location, Is.Not.Null, map.name);
+                Assert.That(location.MapNode, Is.Not.Null, location.name);
+                Vector2 position = location.MapNode.NormalizedPosition;
+                Assert.That(position.x, Is.InRange(0f, 1f), location.name);
+                Assert.That(position.y, Is.InRange(0f, 1f), location.name);
+                nodes++;
+            }
+        }
+        Assert.That(nodes, Is.GreaterThanOrEqualTo(15));
+    }
 }

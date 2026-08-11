@@ -15,8 +15,12 @@ public sealed class MapDefinition : ScriptableObject
     [SerializeField]
     private Sprite technicalLayer;
 
+    [SerializeField]
+    private LocationDefinition[] locations;
+
     public string Id => id;
     public Sprite BaseLayer => baseLayer;
     public Sprite RestrictedLayer => restrictedLayer;
     public Sprite TechnicalLayer => technicalLayer;
+    public LocationDefinition[] Locations => locations;
 }

@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.UI;
@@ -17,6 +18,7 @@ public sealed class MapScreen : ScreenBase
     [SerializeField] private Toggle technicalToggle;
     [SerializeField] private Button backButton;
     private int selectedIndex;
+    private readonly List<Button> locationNodes = new();
 
     private void Awake()
     {
@@ -58,7 +60,69 @@ public sealed class MapScreen : ScreenBase
             technicalLayer.sprite = map?.TechnicalLayer;
         if (deckLabel != null)
             deckLabel.text = map?.Id?.Replace("MAP_", string.Empty) ?? string.Empty;
+        BuildLocationNodes(map);
         RefreshLayers();
+    }
+
+    private void BuildLocationNodes(MapDefinition map)
+    {
+        foreach (Button node in locationNodes)
+            if (node != null)
+                Destroy(node.gameObject);
+        locationNodes.Clear();
+        if (map?.Locations == null || baseLayer == null || deckButtons == null || deckButtons.Length == 0)
+            return;
+
+        Transform parent = baseLayer.transform.parent;
+        foreach (LocationDefinition location in map.Locations)
+        {
+            MapNodeDefinition definition = location?.MapNode;
+            if (definition == null)
+                continue;
+            Button node = Instantiate(deckButtons[0], parent);
+            node.name = $"LocationNode_{location.Id}";
+            RectTransform rect = (RectTransform)node.transform;
+            rect.anchorMin = rect.anchorMax = definition.NormalizedPosition;
+            rect.pivot = new Vector2(.5f, .5f);
+            rect.anchoredPosition = Vector2.zero;
+            rect.sizeDelta = new Vector2(180f, 58f);
+            bool current = state?.State.currentLocationId == location.Id;
+            bool objective = IsObjectiveDestination(location);
+            bool unlocked = current || state?.State.unlockedLocations.Contains(location.Id) == true;
+            Text label = node.GetComponentInChildren<Text>(true);
+            if (label != null)
+                label.text = current
+                    ? $"현재 · {location.DisplayName}"
+                    : objective
+                        ? $"◆ {location.DisplayName}"
+                        : unlocked ? location.DisplayName : $"잠김 · {location.DisplayName}";
+            node.interactable = unlocked && !current;
+            LocationDefinition destination = location;
+            node.onClick.RemoveAllListeners();
+            node.onClick.AddListener(() => Travel(destination));
+            node.transform.SetAsLastSibling();
+            locationNodes.Add(node);
+        }
+    }
+
+    private bool IsObjectiveDestination(LocationDefinition location)
+    {
+        if (location == null || state == null)
+            return false;
+        if (AppContext.Services == null ||
+            !AppContext.Services.TryGet(out ContentDatabase content) ||
+            !content.TryGetStoryScene(state.State.currentStorySceneId, out StorySceneDefinition scene))
+            return false;
+        return scene.Location == location;
+    }
+
+    private async void Travel(LocationDefinition destination)
+    {
+        if (destination == null || state == null)
+            return;
+        state.SetCurrentLocation(destination.Id);
+        if (screens != null)
+            await screens.OpenAsync(ScreenId.Exploration);
     }
 
     private void RefreshLayers()

@@ -20,5 +20,5 @@ MonoBehaviour:
   exits: []
   defaultAudio: {fileID: 11400000, guid: cf0842df6d1724b4d88682e9361a4d81, type: 2}
   mapNode:
-    id: 
-    normalizedPosition: {x: 0, y: 0}
+    id: LOC_STAIR_B
+    normalizedPosition: {x: 0.87, y: 0.36}

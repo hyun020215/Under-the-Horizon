@@ -63,7 +63,9 @@
 - [ ] Map 화면을 실제 Location/Condition 데이터와 연결한다.
   - 기존 `MapScreen`, `MapDefinition`, `ScreenRouter`를 사용한다.
   - Deck별 Base/Restricted/Technical 레이어, 덱 탭, 현재 위치 표시와 뒤로가기는 이식 완료했다.
-  - Location 이동 노드와 Condition 기반 잠금·목표 목적지 표시는 남아 있다.
+  - [x] `MapDefinition`이 덱별 `LocationDefinition`을 참조하고 기존 `MapNodeDefinition` 좌표로 이동 노드를 구성한다.
+  - [x] `GameStateStore.unlockedLocations`를 잠금 조건으로 사용하고 현재 Story Scene의 Location을 목표 목적지로 강조한다.
+  - 각 장면의 위치 해금 Effect와 지도 이동 가능 범위 최종 조정은 콘텐츠 완성 단계에 남아 있다.
 - [ ] 조사 기록·증거 노트 UI를 완성한다.
   - 기존 EvidenceDefinition/Inventory/Director와 Investigation Record 화면을 사용한다.
   - 발견한 증거만 표시하는 카드 목록과 이미지·명칭·설명 상세 보기는 완료했다.

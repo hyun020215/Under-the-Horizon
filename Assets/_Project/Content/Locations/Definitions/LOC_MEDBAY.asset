@@ -20,5 +20,5 @@ MonoBehaviour:
   exits: []
   defaultAudio: {fileID: 11400000, guid: ae4df05403ce07e4caa2e4580ac28dca, type: 2}
   mapNode:
-    id: 
-    normalizedPosition: {x: 0, y: 0}
+    id: LOC_MEDBAY
+    normalizedPosition: {x: 0.27, y: 0.36}

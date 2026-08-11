@@ -20,5 +20,5 @@ MonoBehaviour:
   exits: []
   defaultAudio: {fileID: 11400000, guid: 02826a2c0e21c6c4f9ae714da2cc32a0, type: 2}
   mapNode:
-    id: 
-    normalizedPosition: {x: 0, y: 0}
+    id: LOC_ENGINE_CONTROL
+    normalizedPosition: {x: 0.69, y: 0.36}
