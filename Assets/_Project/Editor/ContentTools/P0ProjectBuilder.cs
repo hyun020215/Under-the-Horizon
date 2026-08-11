@@ -81,6 +81,7 @@ public static class P0ProjectBuilder
         SavePrefab(
             PrefabRoot + "/UI/PF_SettingsScreen.prefab",
             CreateScreen("PF_SettingsScreen", typeof(SettingsScreen), ScreenId.Settings, panel));
+        BuildGameScene();
         AssetDatabase.SaveAssets();
         AssetDatabase.Refresh();
         EditorApplication.Exit(0);
@@ -922,21 +923,25 @@ public static class P0ProjectBuilder
         SetRect(body.rectTransform, new Vector2(0.2f, 0.35f), new Vector2(0.8f, 0.68f));
         if (screen is SettingsScreen settings)
         {
-            Slider master = CreateSettingsSlider(root, font, "전체 음량", 0.66f);
-            Slider music = CreateSettingsSlider(root, font, "배경 음악", 0.56f);
-            Slider sfx = CreateSettingsSlider(root, font, "효과음", 0.46f);
-            Dropdown resolution = CreateSettingsDropdown(root, font, "해상도", 0.32f);
-            Toggle fullscreen = CreateSettingsToggle(root, font, "전체 화면", 0.23f);
+            Slider master = CreateSettingsSlider(root, font, "전체 음량", 0.68f);
+            Slider music = CreateSettingsSlider(root, font, "배경 음악", 0.60f);
+            Slider sfx = CreateSettingsSlider(root, font, "효과음", 0.52f);
+            Dropdown resolution = CreateSettingsDropdown(root, font, "해상도", 0.42f);
+            Toggle fullscreen = CreateSettingsToggle(root, font, "전체 화면", 0.34f);
+            Toggle reducedMotion = CreateSettingsToggle(root, font, "움직임 줄이기", 0.26f);
+            Dropdown textSpeed = CreateSettingsDropdown(root, font, "대화 표시 속도", 0.18f);
             Button apply = CreateTitleButton(
                 "ApplyDisplayButton", root, font, "화면 설정 적용", true);
             SetRect((RectTransform)apply.transform,
-                new Vector2(0.44f, 0.13f), new Vector2(0.72f, 0.19f));
+                new Vector2(0.44f, 0.08f), new Vector2(0.72f, 0.14f));
             SetObject(settings, "masterSlider", master);
             SetObject(settings, "musicSlider", music);
             SetObject(settings, "sfxSlider", sfx);
             SetObject(settings, "resolutionDropdown", resolution);
             SetObject(settings, "fullscreenToggle", fullscreen);
             SetObject(settings, "applyDisplayButton", apply);
+            SetObject(settings, "reducedMotionToggle", reducedMotion);
+            SetObject(settings, "textSpeedDropdown", textSpeed);
         }
         Button back = CreateTitleButton("BackButton", root, font, "뒤로", false);
         SetRect((RectTransform)back.transform, new Vector2(0.05f, 0.06f), new Vector2(0.20f, 0.12f));

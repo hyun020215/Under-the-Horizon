@@ -26,10 +26,12 @@ public sealed class DialogueScreen : ScreenBase
     private string fullText = string.Empty;
     private bool revealing;
     private readonly List<DialogueChoice> availableChoices = new();
+    private AccessibilitySettingsService accessibility;
     public bool IsRevealing => revealing;
 
     private void Awake()
     {
+        AppContext.Services?.TryGet(out accessibility);
         if (advanceButton != null)
             advanceButton.onClick.AddListener(Advance);
 
@@ -128,10 +130,16 @@ public sealed class DialogueScreen : ScreenBase
         revealing = true;
         sfx?.PlayLoop(typewriterClip, 0.35f);
 
+        float speed = accessibility?.CharactersPerSecond ?? charactersPerSecond;
+        if (float.IsPositiveInfinity(speed))
+        {
+            FinishReveal();
+            yield break;
+        }
         float visibleCharacters = 0f;
         while (visibleCharacters < fullText.Length)
         {
-            visibleCharacters += charactersPerSecond * Time.unscaledDeltaTime;
+            visibleCharacters += speed * Time.unscaledDeltaTime;
             if (bodyLabel != null)
                 bodyLabel.text = fullText.Substring(
                     0,
@@ -189,6 +197,12 @@ public sealed class DialogueScreen : ScreenBase
             yield break;
         RectTransform rect = (RectTransform)button.transform;
         Vector2 rest = rect.anchoredPosition;
+        if (accessibility?.ReducedMotion == true)
+        {
+            group.alpha = 1f;
+            rect.anchoredPosition = rest;
+            yield break;
+        }
         group.alpha = 0f;
         rect.anchoredPosition = rest + Vector2.down * choiceRevealDistance;
         float delay = index * .045f;

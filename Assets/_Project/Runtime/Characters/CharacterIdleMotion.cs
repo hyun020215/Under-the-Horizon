@@ -11,6 +11,7 @@ public sealed class CharacterIdleMotion : MonoBehaviour
     private float elapsed;
     private int seed;
     private CharacterPresentationProfile profile;
+    private AccessibilitySettingsService accessibility;
 
     public void Configure(int deterministicSeed, CharacterPresentationProfile settings)
     {
@@ -23,12 +24,21 @@ public sealed class CharacterIdleMotion : MonoBehaviour
         elapsed = 0f;
     }
 
-    private void Awake() => rect = GetComponent<RectTransform>();
+    private void Awake()
+    {
+        rect = GetComponent<RectTransform>();
+        AppContext.Services?.TryGet(out accessibility);
+    }
 
     private void Update()
     {
         if (rect == null || profile == null)
             return;
+        if (accessibility?.ReducedMotion == true)
+        {
+            Restore();
+            return;
+        }
         elapsed += Time.unscaledDeltaTime;
         float breathingCycle = Mathf.Lerp(profile.BreathingCycleRange.x,
             profile.BreathingCycleRange.y, Hash01(seed, 0));

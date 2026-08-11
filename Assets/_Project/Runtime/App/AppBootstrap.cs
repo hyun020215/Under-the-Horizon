@@ -23,8 +23,10 @@ public sealed class AppBootstrap : MonoBehaviour
             var saves = new SaveService();
             var audioSettings = new AudioSettingsService();
             var displaySettings = new DisplaySettingsService();
+            var accessibilitySettings = new AccessibilitySettingsService();
             audioSettings.Load();
             displaySettings.Load();
+            accessibilitySettings.Load();
 
             AppContext.Services.Register(gameDefinition);
             AppContext.Services.Register(contentLoader.Database);
@@ -32,6 +34,7 @@ public sealed class AppBootstrap : MonoBehaviour
             AppContext.Services.Register(saves);
             AppContext.Services.Register(audioSettings);
             AppContext.Services.Register(displaySettings);
+            AppContext.Services.Register(accessibilitySettings);
         }
         catch (System.Exception exception)
         {

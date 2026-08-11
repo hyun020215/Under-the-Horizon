@@ -16,6 +16,7 @@ public sealed class UiButtonFeedback : MonoBehaviour,
     private Graphic graphic;
     private Vector3 baseScale;
     private Color baseColor;
+    private AccessibilitySettingsService accessibility;
 
     private void Awake()
     {
@@ -24,6 +25,7 @@ public sealed class UiButtonFeedback : MonoBehaviour,
         baseScale = transform.localScale;
         if (graphic != null)
             baseColor = graphic.color;
+        AppContext.Services?.TryGet(out accessibility);
     }
 
     public void Configure(SfxController controller, AudioClip hover, AudioClip click)
@@ -67,7 +69,9 @@ public sealed class UiButtonFeedback : MonoBehaviour,
 
     private void Apply(float scale, float brightness)
     {
-        transform.localScale = baseScale * scale;
+        transform.localScale = accessibility?.ReducedMotion == true
+            ? baseScale
+            : baseScale * scale;
         if (graphic == null)
             return;
         graphic.color = new Color(

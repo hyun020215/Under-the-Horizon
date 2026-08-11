@@ -13,8 +13,11 @@ public sealed class SettingsScreen : ScreenBase
     [SerializeField] private Dropdown resolutionDropdown;
     [SerializeField] private Toggle fullscreenToggle;
     [SerializeField] private Button applyDisplayButton;
+    [SerializeField] private Toggle reducedMotionToggle;
+    [SerializeField] private Dropdown textSpeedDropdown;
 
     private DisplaySettingsService displaySettings;
+    private AccessibilitySettingsService accessibilitySettings;
 
     private void Awake()
     {
@@ -28,6 +31,12 @@ public sealed class SettingsScreen : ScreenBase
         {
             displaySettings = settings;
             PopulateDisplaySettings();
+        }
+        if (AppContext.Services != null &&
+            AppContext.Services.TryGet(out AccessibilitySettingsService accessibility))
+        {
+            accessibilitySettings = accessibility;
+            PopulateAccessibilitySettings();
         }
     }
 
@@ -61,5 +70,17 @@ public sealed class SettingsScreen : ScreenBase
             : displaySettings.SelectedIndex;
         bool fullscreen = fullscreenToggle == null || fullscreenToggle.isOn;
         displaySettings.Apply(index, fullscreen);
+        accessibilitySettings?.Apply(
+            reducedMotionToggle != null && reducedMotionToggle.isOn,
+            textSpeedDropdown?.value ?? accessibilitySettings.TextSpeedIndex);
+    }
+
+    private void PopulateAccessibilitySettings()
+    {
+        reducedMotionToggle?.SetIsOnWithoutNotify(accessibilitySettings.ReducedMotion);
+        if (textSpeedDropdown == null) return;
+        textSpeedDropdown.ClearOptions();
+        textSpeedDropdown.AddOptions(new List<string> { "느리게", "보통", "빠르게", "즉시" });
+        textSpeedDropdown.SetValueWithoutNotify(accessibilitySettings.TextSpeedIndex);
     }
 }
