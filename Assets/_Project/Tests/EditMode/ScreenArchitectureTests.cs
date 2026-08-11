@@ -21,6 +21,7 @@ public sealed class ScreenArchitectureTests
         Assert.That(source, Does.Contain("transitionDirector"));
         Assert.That(source, Does.Contain("defaultTransition"));
         Assert.That(source,
-            Does.Contain("OpenAsync(id, context, transitionDirector, defaultTransition)"));
+            Does.Contain("OpenAsync(id, context, transitionDirector, ResolveTransition(id))"));
+        Assert.That(source, Does.Contain("return defaultTransition"));
     }
 }

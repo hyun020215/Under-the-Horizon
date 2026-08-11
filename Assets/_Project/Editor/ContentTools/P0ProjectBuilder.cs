@@ -1543,6 +1543,13 @@ public static class P0ProjectBuilder
         SetObject(transitions, "sfx", sfx);
         SetObject(router, "transitionDirector", transitions);
         SetObject(router, "defaultTransition", FindTransition("TRANS_FADE_STANDARD"));
+        SetScreenTransitions(router,
+            (ScreenId.Investigation, FindTransition("TRANS_INVESTIGATION_OPEN")),
+            (ScreenId.InvestigationRecord, FindTransition("TRANS_DISCOVERY")),
+            (ScreenId.EvidenceBoard, FindTransition("TRANS_DISCOVERY")),
+            (ScreenId.Puzzle, FindTransition("TRANS_PUZZLE_OPEN")),
+            (ScreenId.Ending, FindTransition("TRANS_ENDING")),
+            (ScreenId.Map, FindTransition("TRANS_SCREEN_PUSH_RIGHT")));
 
         UiFeedbackInstaller feedback = uiFrame.gameObject.AddComponent<UiFeedbackInstaller>();
         SetObject(feedback, "sfx", sfx);
@@ -2043,6 +2050,23 @@ public static class P0ProjectBuilder
             property.GetArrayElementAtIndex(index).objectReferenceValue = values[index];
         serialized.ApplyModifiedPropertiesWithoutUndo();
         EditorUtility.SetDirty(target);
+    }
+
+    private static void SetScreenTransitions(
+        ScreenRouter router,
+        params (ScreenId screen, TransitionProfile profile)[] routes)
+    {
+        SerializedObject serialized = new(router);
+        SerializedProperty property = serialized.FindProperty("transitionRoutes");
+        property.arraySize = routes.Length;
+        for (var index = 0; index < routes.Length; index++)
+        {
+            SerializedProperty route = property.GetArrayElementAtIndex(index);
+            route.FindPropertyRelative("screen").enumValueIndex = (int)routes[index].screen;
+            route.FindPropertyRelative("profile").objectReferenceValue = routes[index].profile;
+        }
+        serialized.ApplyModifiedPropertiesWithoutUndo();
+        EditorUtility.SetDirty(router);
     }
 
     private static List<T> LoadAll<T>()

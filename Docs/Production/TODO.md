@@ -90,6 +90,10 @@
   - [x] 기존 `InteractionPointView`는 피드백을 위임하고 실행 명령은 계속 `InteractionDirector`에 전달한다.
   - [ ] 이미지별 alpha/polygon hit shape는 최종 hotspot 아트가 확정되면 동일 View의 Raycast 계약으로 추가한다.
 - [ ] 타이틀 수면/광선, 발견·증거 획득·이론 해금 화면 효과를 Sequence/Transition 데이터로 이식한다.
+  - [x] `ScreenRouter`가 화면별 `TransitionProfile` 매핑을 사용하도록 확장했다.
+  - [x] 조사·발견/기록·증거 보드·퍼즐·지도·엔딩에 기존 TRANS 자산을 연결했다.
+  - [x] Reduced Motion에서는 동일 `TransitionDirector` 경로에서 화면 연출을 생략한다.
+  - [ ] 개별 증거 획득·이론 해금 순간의 오버레이와 타이틀 수면/광선은 기존 이벤트·Sequence 명령에 연결한다.
 - [ ] 지도·증거·퍼즐·모달 화면을 포함한 1280×720, 1920×1080, 2560×1440 시각 회귀 캡처를 구축한다.
 
 > UI/UX 작업 시 이 목록을 매 기능 커밋마다 갱신한다. 기존 Runtime/Content/Prefab이 있는 기능은

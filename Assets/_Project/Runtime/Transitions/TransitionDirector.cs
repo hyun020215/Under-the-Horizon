@@ -11,6 +11,9 @@ public sealed class TransitionDirector : MonoBehaviour
 
     [SerializeField]
     private SfxController sfx;
+    private AccessibilitySettingsService accessibility;
+
+    private void Awake() => AppContext.Services?.TryGet(out accessibility);
 
     public Task BeginAsync(TransitionProfile profile) => Play(profile, true);
 
@@ -20,6 +23,14 @@ public sealed class TransitionDirector : MonoBehaviour
     {
         if (profile == null)
             return;
+        if (accessibility == null)
+            AppContext.Services?.TryGet(out accessibility);
+        if (accessibility?.ReducedMotion == true)
+        {
+            if (blocker != null)
+                blocker.SetBlocked(false);
+            return;
+        }
         if (blocker != null && profile.blockInput)
             blocker.SetBlocked(true);
         if (profile.stinger != null)

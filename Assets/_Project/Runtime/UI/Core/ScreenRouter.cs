@@ -5,12 +5,19 @@ using UnityEngine;
 
 public sealed class ScreenRouter : MonoBehaviour
 {
+    [Serializable]
+    private sealed class ScreenTransitionRoute
+    {
+        public ScreenId screen;
+        public TransitionProfile profile;
+    }
     [SerializeField]
     private ScreenBase[] screens;
     [SerializeField]
     private TransitionDirector transitionDirector;
     [SerializeField]
     private TransitionProfile defaultTransition;
+    [SerializeField] private ScreenTransitionRoute[] transitionRoutes;
     private readonly Dictionary<ScreenId, ScreenBase> index = new();
     public ScreenId? Current { get; private set; }
     public event Action<ScreenId> Opened;
@@ -26,7 +33,16 @@ public sealed class ScreenRouter : MonoBehaviour
 
     public async Task OpenAsync(ScreenId id, ScreenContext context = default)
     {
-        await OpenAsync(id, context, transitionDirector, defaultTransition);
+        await OpenAsync(id, context, transitionDirector, ResolveTransition(id));
+    }
+
+    private TransitionProfile ResolveTransition(ScreenId id)
+    {
+        if (transitionRoutes != null)
+            foreach (ScreenTransitionRoute route in transitionRoutes)
+                if (route != null && route.screen == id && route.profile != null)
+                    return route.profile;
+        return defaultTransition;
     }
 
     public async Task OpenAsync(
