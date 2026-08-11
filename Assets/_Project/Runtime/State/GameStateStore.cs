@@ -7,6 +7,7 @@ public sealed class GameStateStore : MonoBehaviour
     private GameState state = new();
     public GameState State => state;
     public event Action<GameState> Changed;
+    public event Action<string> EvidenceAdded;
 
     public void Replace(GameState replacement)
     {
@@ -42,7 +43,16 @@ public sealed class GameStateStore : MonoBehaviour
 
     public bool HasEvidence(string id) => state.discoveredEvidence.Contains(Normalize(id));
 
-    public bool AddEvidence(string id) => Add(state.discoveredEvidence, id);
+    public bool AddEvidence(string id)
+    {
+        string normalized = Normalize(id);
+        bool changed = !string.IsNullOrEmpty(normalized) && state.discoveredEvidence.Add(normalized);
+        if (!changed)
+            return false;
+        Notify();
+        EvidenceAdded?.Invoke(normalized);
+        return true;
+    }
 
     public bool IsInteractionCompleted(string id) =>
         state.completedInteractions.Contains(Normalize(id));

@@ -94,6 +94,9 @@
   - [x] 조사·발견/기록·증거 보드·퍼즐·지도·엔딩에 기존 TRANS 자산을 연결했다.
   - [x] Reduced Motion에서는 동일 `TransitionDirector` 경로에서 화면 연출을 생략한다.
   - [ ] 개별 증거 획득·이론 해금 순간의 오버레이와 타이틀 수면/광선은 기존 이벤트·Sequence 명령에 연결한다.
+    - [x] 모든 `GameStateStore.AddEvidence` 성공 알림을 `EvidenceDirector`가 콘텐츠 정의로 변환한다.
+    - [x] `TRANS_DISCOVERY` 타이밍을 사용하는 공통 증거 카드 오버레이를 Game UI 셸에 연결했다.
+    - [ ] 이론 해금 순간 오버레이와 타이틀 수면/광선은 계속 남아 있다.
 - [ ] 지도·증거·퍼즐·모달 화면을 포함한 1280×720, 1920×1080, 2560×1440 시각 회귀 캡처를 구축한다.
 
 > UI/UX 작업 시 이 목록을 매 기능 커밋마다 갱신한다. 기존 Runtime/Content/Prefab이 있는 기능은

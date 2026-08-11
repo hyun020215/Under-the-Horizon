@@ -1502,6 +1502,7 @@ public static class P0ProjectBuilder
                 SetObject(puzzleScreenView, "screens", router);
         }
         BuildPersistentHud(uiFrame, router, state);
+        BuildEvidenceDiscoveryPresenter(uiFrame, evidenceDirector);
         transitionRoot.SetAsLastSibling();
 
         CharacterView characterPrefab = AssetDatabase.LoadAssetAtPath<CharacterView>(PrefabRoot + "/Characters/PF_CharacterView.prefab");
@@ -1753,6 +1754,37 @@ public static class P0ProjectBuilder
         SetObject(router, "confirmDialog", dialog);
         confirmObject.SetActive(false);
         return router;
+    }
+
+    private static void BuildEvidenceDiscoveryPresenter(
+        RectTransform parent, EvidenceDirector evidence)
+    {
+        Font font = LoadUiFont("Pretendard/FONT_Pretendard-SemiBold.ttf");
+        RectTransform root = CreateLayer("EvidenceDiscoveryOverlay", parent);
+        CanvasGroup group = root.gameObject.AddComponent<CanvasGroup>();
+        group.alpha = 0f; group.interactable = false; group.blocksRaycasts = false;
+        Image panel = CreateLayer("Card", root).gameObject.AddComponent<Image>();
+        panel.sprite = AssetDatabase.LoadAssetAtPath<Sprite>(ThemePanelPath);
+        panel.type = Image.Type.Sliced; panel.color = new Color(0.055f, 0.07f, 0.085f, 0.98f);
+        SetRect(panel.rectTransform, new Vector2(0.31f, 0.31f), new Vector2(0.69f, 0.69f));
+        Image image = CreateLayer("Evidence Image", panel.transform).gameObject.AddComponent<Image>();
+        image.preserveAspect = true; image.raycastTarget = false;
+        SetRect(image.rectTransform, new Vector2(0.07f, 0.25f), new Vector2(0.38f, 0.84f));
+        Text heading = CreateText("Heading", panel.transform, font, 17, TextAnchor.MiddleLeft);
+        heading.text = "NEW EVIDENCE"; heading.color = new Color(0.80f, 0.61f, 0.30f, 1f);
+        SetRect(heading.rectTransform, new Vector2(0.42f, 0.72f), new Vector2(0.93f, 0.86f));
+        Text title = CreateText("Title", panel.transform, font, 27, TextAnchor.MiddleLeft);
+        title.color = new Color(0.965f, 0.827f, 0.529f, 1f);
+        SetRect(title.rectTransform, new Vector2(0.42f, 0.53f), new Vector2(0.93f, 0.72f));
+        Text description = CreateText("Description", panel.transform, font, 17, TextAnchor.UpperLeft);
+        description.color = new Color(0.86f, 0.83f, 0.77f, 1f);
+        description.horizontalOverflow = HorizontalWrapMode.Wrap;
+        SetRect(description.rectTransform, new Vector2(0.42f, 0.18f), new Vector2(0.93f, 0.52f));
+        EvidenceDiscoveryPresenter presenter = root.gameObject.AddComponent<EvidenceDiscoveryPresenter>();
+        SetObject(presenter, "evidence", evidence); SetObject(presenter, "group", group);
+        SetObject(presenter, "image", image); SetObject(presenter, "title", title);
+        SetObject(presenter, "description", description);
+        SetObject(presenter, "profile", FindTransition("TRANS_DISCOVERY"));
     }
 
     private static void BuildPersistentHud(
