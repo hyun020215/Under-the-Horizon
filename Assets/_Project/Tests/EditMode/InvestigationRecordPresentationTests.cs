@@ -1,4 +1,5 @@
 using System.Linq;
+using System.IO;
 using NUnit.Framework;
 using UnityEditor;
 using UnityEngine;
@@ -26,5 +27,19 @@ public sealed class InvestigationRecordPresentationTests
         {
             PrefabUtility.UnloadPrefabContents(root);
         }
+    }
+
+    [Test]
+    public void RecordMarksUnviewedEvidenceWithoutAddingSaveState()
+    {
+        string source = File.ReadAllText(
+            "Assets/_Project/Runtime/UI/Screens/InvestigationRecordScreen.cs");
+        Assert.That(source, Does.Contain("HashSet<string> viewedEvidence"));
+        Assert.That(source, Does.Contain("NEW ·"));
+        Assert.That(source, Does.Contain("accessibility?.ReducedMotion"));
+
+        string gameState = File.ReadAllText(
+            "Assets/_Project/Runtime/State/GameState.cs");
+        Assert.That(gameState, Does.Not.Contain("viewedEvidence"));
     }
 }

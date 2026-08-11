@@ -69,7 +69,8 @@
 - [ ] 조사 기록·증거 노트 UI를 완성한다.
   - 기존 EvidenceDefinition/Inventory/Director와 Investigation Record 화면을 사용한다.
   - 발견한 증거만 표시하는 카드 목록과 이미지·명칭·설명 상세 보기는 완료했다.
-  - 인물 탭, 증거 분류/필터와 새 증거 획득 표시 애니메이션은 남아 있다.
+  - [x] 아직 직접 열지 않은 증거 카드에 `NEW`와 짧은 강조 애니메이션을 표시하며 Reduced Motion에서는 정적으로 표시한다.
+  - 인물 탭과 증거 분류/필터는 관련 Character/category 콘텐츠 필드 이식과 함께 남아 있다.
 - [ ] Evidence Board의 노드·연결·이론 슬롯 UX를 완성한다.
   - 기존 `EvidenceBoardDirector`, `EvidenceBoardGraph`, `TheoryResolver`를 사용한다.
   - [x] 이전 프로젝트의 6개 canonical 추론 ID·설명·필요 증거 조합을 `TheoryDefinition` 콘텐츠로 이식했다.
