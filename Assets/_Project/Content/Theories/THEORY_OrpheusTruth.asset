@@ -13,7 +13,10 @@ MonoBehaviour:
   m_Name: THEORY_OrpheusTruth
   m_EditorClassIdentifier: UTH.Runtime::TheoryDefinition
   id: past_event
-  displayName: 오르페우스 과거 사건
-  description: 과거 보험 사기 설계와 현재 살인은 구분해야 한다.
+  displayName: "\uC624\uB974\uD398\uC6B0\uC2A4 \uACFC\uAC70 \uC0AC\uAC74"
+  description: "\uACFC\uAC70 \uBCF4\uD5D8 \uC0AC\uAE30 \uC124\uACC4\uC640 \uD604\uC7AC
+    \uC0B4\uC778\uC740 \uAD6C\uBD84\uD574\uC57C \uD55C\uB2E4."
   requiredEvidence:
   - {fileID: 11400000, guid: c81a9d6db0b56404484b8e79c66f4e60, type: 2}
+  onResolvedEffects:
+  - {fileID: 11400000, guid: d8b677bc878a94540a204549ef823de7, type: 2}

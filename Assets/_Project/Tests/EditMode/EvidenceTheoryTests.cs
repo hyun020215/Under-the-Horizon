@@ -23,6 +23,25 @@ public sealed class EvidenceTheoryTests
     }
 
     [Test]
+    public void EveryTheoryResolvesThroughAContentEffect()
+    {
+        TheoryDefinition[] theories = AssetDatabase
+            .FindAssets("t:TheoryDefinition")
+            .Select(AssetDatabase.GUIDToAssetPath)
+            .Select(AssetDatabase.LoadAssetAtPath<TheoryDefinition>)
+            .Where(item => item != null)
+            .ToArray();
+        foreach (TheoryDefinition theory in theories)
+        {
+            ResolveTheoryEffect effect = theory.OnResolvedEffects
+                .OfType<ResolveTheoryEffect>()
+                .SingleOrDefault();
+            Assert.That(effect, Is.Not.Null, theory.name);
+            Assert.That(effect.TheoryId, Is.EqualTo(theory.Id), theory.name);
+        }
+    }
+
+    [Test]
     public void CanonicalTheoriesHaveUniqueIdsAndEvidenceRequirements()
     {
         TheoryDefinition[] theories = AssetDatabase

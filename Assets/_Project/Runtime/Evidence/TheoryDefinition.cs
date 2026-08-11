@@ -15,8 +15,12 @@ public sealed class TheoryDefinition : ScriptableObject
     [SerializeField]
     private EvidenceDefinition[] requiredEvidence;
 
+    [SerializeField]
+    private GameEffect[] onResolvedEffects;
+
     public string Id => id;
     public string DisplayName => displayName;
     public string Description => description;
     public EvidenceDefinition[] RequiredEvidence => requiredEvidence;
+    public GameEffect[] OnResolvedEffects => onResolvedEffects;
 }

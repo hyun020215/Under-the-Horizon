@@ -31,7 +31,7 @@ public sealed class EvidenceBoardScreen : ScreenBase
         for (var index = 0; index < theoryButtons?.Length; index++)
         {
             int selected = index;
-            theoryButtons[index]?.onClick.AddListener(() => SelectTheory(selected));
+            theoryButtons[index]?.onClick.AddListener(() => SelectTheory(selected, true));
         }
         backButton?.onClick.AddListener(Back);
     }
@@ -61,17 +61,21 @@ public sealed class EvidenceBoardScreen : ScreenBase
             theoryButtons[index].gameObject.SetActive(visible);
             if (!visible) continue;
             TheoryEvaluation evaluation = theories[index];
-            string state = evaluation.CanResolve ? "논증 가능" : $"단서 {evaluation.MissingEvidence.Count}개 부족";
+            string state = evaluation.Resolved
+                ? "추론 완료"
+                : evaluation.CanResolve ? "논증 가능" : $"단서 {evaluation.MissingEvidence.Count}개 부족";
             if (index < theoryLabels.Length)
                 theoryLabels[index].text = $"{evaluation.Theory.DisplayName}\n{state}";
-            theoryButtons[index].image.color = evaluation.CanResolve
+            theoryButtons[index].image.color = evaluation.Resolved
+                ? new Color(0.18f, 0.34f, 0.25f, 1f)
+                : evaluation.CanResolve
                 ? new Color(0.42f, 0.31f, 0.12f, 1f)
                 : new Color(0.09f, 0.11f, 0.15f, 1f);
         }
         if (progressLabel != null)
-            progressLabel.text = $"수집 증거 {discovered.Length} · 논증 가능 {theories.Count(item => item.CanResolve)}/{theories.Length}";
+            progressLabel.text = $"수집 증거 {discovered.Length} · 완료한 추론 {theories.Count(item => item.Resolved)} · 논증 가능 {theories.Count(item => item.CanResolve && !item.Resolved)}";
         if (emptyLabel != null) emptyLabel.gameObject.SetActive(discovered.Length == 0);
-        if (discovered.Length > 0) SelectEvidence(0); else if (theories.Length > 0) SelectTheory(0);
+        if (discovered.Length > 0) SelectEvidence(0); else if (theories.Length > 0) SelectTheory(0, false);
     }
 
     private void SelectEvidence(int index)
@@ -82,13 +86,20 @@ public sealed class EvidenceBoardScreen : ScreenBase
         detailBody.text = item.Description;
     }
 
-    private void SelectTheory(int index)
+    private void SelectTheory(int index, bool resolve)
     {
         if (index < 0 || index >= theories.Length) return;
         TheoryEvaluation evaluation = theories[index];
+        if (resolve && evaluation.CanResolve && !evaluation.Resolved
+            && board != null && board.TryResolve(evaluation.Theory))
+        {
+            Refresh();
+            return;
+        }
         detailTitle.text = evaluation.Theory.DisplayName;
         string required = string.Join(" · ", evaluation.Theory.RequiredEvidence.Select(item => item.DisplayName));
-        string missing = evaluation.CanResolve ? "모든 연결 증거가 확보되었습니다." :
+        string missing = evaluation.Resolved ? "추론이 완료되어 기록되었습니다." :
+            evaluation.CanResolve ? "모든 연결 증거가 확보되었습니다. 선택하여 추론을 완료하세요." :
             "미확보: " + string.Join(" · ", evaluation.MissingEvidence.Select(item => item.DisplayName));
         detailBody.text = $"{evaluation.Theory.Description}\n\n연결 증거: {required}\n{missing}";
     }

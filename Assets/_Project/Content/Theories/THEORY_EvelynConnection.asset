@@ -13,9 +13,12 @@ MonoBehaviour:
   m_Name: THEORY_EvelynConnection
   m_EditorClassIdentifier: UTH.Runtime::TheoryDefinition
   id: culprit_link
-  displayName: 에블린 연결
-  description: 초대장, 문장 습관, DNA가 에블린을 범행에 연결한다.
+  displayName: "\uC5D0\uBE14\uB9B0 \uC5F0\uACB0"
+  description: "\uCD08\uB300\uC7A5, \uBB38\uC7A5 \uC2B5\uAD00, DNA\uAC00 \uC5D0\uBE14\uB9B0\uC744
+    \uBC94\uD589\uC5D0 \uC5F0\uACB0\uD55C\uB2E4."
   requiredEvidence:
   - {fileID: 11400000, guid: 30e0f6ddc1ff59e4fa39fc074504ee0f, type: 2}
   - {fileID: 11400000, guid: 23e8c04454aa99749acb3e69ae19333d, type: 2}
   - {fileID: 11400000, guid: 588b65efec1a56644b9ae2dce5230bca, type: 2}
+  onResolvedEffects:
+  - {fileID: 11400000, guid: ec544dd0a4389e849a416917c8ab2f62, type: 2}

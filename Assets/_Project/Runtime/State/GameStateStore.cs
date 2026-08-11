@@ -69,6 +69,10 @@ public sealed class GameStateStore : MonoBehaviour
 
     public bool CompleteObjective(string id) => Add(state.completedObjectives, id);
 
+    public bool IsTheoryResolved(string id) => HasFlag(TheoryFlag(id));
+
+    public bool ResolveTheory(string id) => SetFlag(TheoryFlag(id));
+
     public bool UnlockLocation(string id) => Add(state.unlockedLocations, id);
 
     public int GetTrust(string characterId) =>
@@ -131,4 +135,7 @@ public sealed class GameStateStore : MonoBehaviour
     private void Notify() => Changed?.Invoke(state);
 
     private static string Normalize(string value) => value?.Trim() ?? string.Empty;
+
+    private static string TheoryFlag(string id) =>
+        $"THEORY_RESOLVED_{Normalize(id).Replace('-', '_')}";
 }

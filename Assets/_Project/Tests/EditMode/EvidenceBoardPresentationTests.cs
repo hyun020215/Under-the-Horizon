@@ -37,5 +37,7 @@ public sealed class EvidenceBoardPresentationTests
         Assert.That(source, Does.Not.Contain("GameStateStore"));
         Assert.That(source, Does.Not.Contain("SetFlag"));
         Assert.That(source, Does.Not.Contain("AddEvidence"));
+        Assert.That(source, Does.Contain("board.TryResolve"));
+        Assert.That(source, Does.Not.Contain("ResolveTheory("));
     }
 }

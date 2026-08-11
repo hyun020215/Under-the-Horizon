@@ -7,6 +7,7 @@ public sealed class EvidenceBoardDirector : MonoBehaviour
 {
     [SerializeField] private EvidenceDirector evidence;
     [SerializeField] private TheoryDefinition[] theories;
+    [SerializeField] private GameStateStore state;
     private TheoryResolver resolver;
     private readonly HashSet<string> announcedReadyTheories = new(StringComparer.Ordinal);
     public event Action<TheoryDefinition> TheoryReady;
@@ -36,8 +37,38 @@ public sealed class EvidenceBoardDirector : MonoBehaviour
         return (theories ?? Array.Empty<TheoryDefinition>())
             .Where(item => item != null)
             .OrderBy(item => item.Id, StringComparer.Ordinal)
-            .Select(resolver.Evaluate)
+            .Select(item =>
+            {
+                TheoryEvaluation evaluation = resolver.Evaluate(item);
+                return new TheoryEvaluation(
+                    item,
+                    evaluation.MissingEvidence,
+                    State?.IsTheoryResolved(item.Id) == true);
+            })
             .ToArray();
+    }
+
+    public bool TryResolve(TheoryDefinition theory)
+    {
+        if (theory == null || State == null || State.IsTheoryResolved(theory.Id)
+            || evidence?.Inventory == null)
+            return false;
+        resolver ??= new TheoryResolver(evidence.Inventory);
+        if (!resolver.Evaluate(theory).CanResolve)
+            return false;
+        foreach (GameEffect effect in theory.OnResolvedEffects ?? Array.Empty<GameEffect>())
+            effect?.Apply(State);
+        return State.IsTheoryResolved(theory.Id);
+    }
+
+    private GameStateStore State
+    {
+        get
+        {
+            if (state == null)
+                AppContext.Services?.TryGet(out state);
+            return state;
+        }
     }
 
     private void OnEvidenceDiscovered(EvidenceDefinition discovered)

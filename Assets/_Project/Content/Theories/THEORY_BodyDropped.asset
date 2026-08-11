@@ -13,8 +13,11 @@ MonoBehaviour:
   m_Name: THEORY_BodyDropped
   m_EditorClassIdentifier: UTH.Runtime::TheoryDefinition
   id: body_insertion
-  displayName: 천장 시신 반입
-  description: 시신은 사망 뒤 천장 레일을 통해 호라이즌 룸에 반입됐다.
+  displayName: "\uCC9C\uC7A5 \uC2DC\uC2E0 \uBC18\uC785"
+  description: "\uC2DC\uC2E0\uC740 \uC0AC\uB9DD \uB4A4 \uCC9C\uC7A5 \uB808\uC77C\uC744
+    \uD1B5\uD574 \uD638\uB77C\uC774\uC98C \uB8F8\uC5D0 \uBC18\uC785\uB410\uB2E4."
   requiredEvidence:
   - {fileID: 11400000, guid: 0fc60466088e54c4bbe1ec4f6d95f255, type: 2}
   - {fileID: 11400000, guid: 608bfd174f2eb2e4eaf4d5eccca0176e, type: 2}
+  onResolvedEffects:
+  - {fileID: 11400000, guid: 4e70571a0f2cb1140b79d5f2c19af5c3, type: 2}

@@ -4,15 +4,20 @@ using System.Linq;
 
 public readonly struct TheoryEvaluation
 {
-    public TheoryEvaluation(TheoryDefinition theory, IReadOnlyList<EvidenceDefinition> missingEvidence)
+    public TheoryEvaluation(
+        TheoryDefinition theory,
+        IReadOnlyList<EvidenceDefinition> missingEvidence,
+        bool resolved = false)
     {
         Theory = theory;
         MissingEvidence = missingEvidence ?? Array.Empty<EvidenceDefinition>();
+        Resolved = resolved;
     }
 
     public TheoryDefinition Theory { get; }
     public IReadOnlyList<EvidenceDefinition> MissingEvidence { get; }
     public bool CanResolve => Theory != null && MissingEvidence.Count == 0;
+    public bool Resolved { get; }
 }
 
 public sealed class TheoryResolver

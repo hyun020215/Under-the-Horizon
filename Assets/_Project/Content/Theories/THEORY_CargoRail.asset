@@ -13,8 +13,11 @@ MonoBehaviour:
   m_Name: THEORY_CargoRail
   m_EditorClassIdentifier: UTH.Runtime::TheoryDefinition
   id: transport_route
-  displayName: 서비스 운송 경로
-  description: 86kg 하중은 서비스 레일을 따라 7층에서 8층으로 이동했다.
+  displayName: "\uC11C\uBE44\uC2A4 \uC6B4\uC1A1 \uACBD\uB85C"
+  description: "86kg \uD558\uC911\uC740 \uC11C\uBE44\uC2A4 \uB808\uC77C\uC744 \uB530\uB77C
+    7\uCE35\uC5D0\uC11C 8\uCE35\uC73C\uB85C \uC774\uB3D9\uD588\uB2E4."
   requiredEvidence:
   - {fileID: 11400000, guid: 910f570e241ed9b489148e5d4cceaf4a, type: 2}
   - {fileID: 11400000, guid: 2dabd4f0316a75849843c8559ee2adc5, type: 2}
+  onResolvedEffects:
+  - {fileID: 11400000, guid: 9102d78eee29bd946a3dca30294356bb, type: 2}
