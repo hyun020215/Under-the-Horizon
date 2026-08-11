@@ -1,12 +1,27 @@
 using System;
 using System.Linq;
 using UnityEngine;
+using System.Collections.Generic;
 
 public sealed class EvidenceBoardDirector : MonoBehaviour
 {
     [SerializeField] private EvidenceDirector evidence;
     [SerializeField] private TheoryDefinition[] theories;
     private TheoryResolver resolver;
+    private readonly HashSet<string> announcedReadyTheories = new(StringComparer.Ordinal);
+    public event Action<TheoryDefinition> TheoryReady;
+
+    private void OnEnable()
+    {
+        if (evidence != null)
+            evidence.EvidenceDiscovered += OnEvidenceDiscovered;
+    }
+
+    private void OnDisable()
+    {
+        if (evidence != null)
+            evidence.EvidenceDiscovered -= OnEvidenceDiscovered;
+    }
 
     public EvidenceDefinition[] Discovered => evidence?.Inventory?.Discovered
         .Where(item => item != null)
@@ -23,5 +38,20 @@ public sealed class EvidenceBoardDirector : MonoBehaviour
             .OrderBy(item => item.Id, StringComparer.Ordinal)
             .Select(resolver.Evaluate)
             .ToArray();
+    }
+
+    private void OnEvidenceDiscovered(EvidenceDefinition discovered)
+    {
+        if (discovered == null)
+            return;
+        foreach (TheoryEvaluation evaluation in EvaluateTheories())
+        {
+            TheoryDefinition theory = evaluation.Theory;
+            if (!evaluation.CanResolve || theory == null ||
+                !theory.RequiredEvidence.Contains(discovered) ||
+                !announcedReadyTheories.Add(theory.Id))
+                continue;
+            TheoryReady?.Invoke(theory);
+        }
     }
 }

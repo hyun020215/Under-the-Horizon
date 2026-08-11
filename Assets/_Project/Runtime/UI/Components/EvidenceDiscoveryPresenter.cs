@@ -5,11 +5,13 @@ using UnityEngine.UI;
 public sealed class EvidenceDiscoveryPresenter : MonoBehaviour
 {
     [SerializeField] private EvidenceDirector evidence;
+    [SerializeField] private EvidenceBoardDirector board;
     [SerializeField] private TransitionProfile profile;
     [SerializeField] private CanvasGroup group;
     [SerializeField] private Image image;
     [SerializeField] private Text title;
     [SerializeField] private Text description;
+    [SerializeField] private Text heading;
     private AccessibilitySettingsService accessibility;
     private Coroutine routine;
 
@@ -22,20 +24,34 @@ public sealed class EvidenceDiscoveryPresenter : MonoBehaviour
     private void OnEnable()
     {
         if (evidence != null) evidence.EvidenceDiscovered += Present;
+        if (board != null) board.TheoryReady += PresentTheory;
     }
 
     private void OnDisable()
     {
         if (evidence != null) evidence.EvidenceDiscovered -= Present;
+        if (board != null) board.TheoryReady -= PresentTheory;
         if (routine != null) StopCoroutine(routine);
     }
 
     private void Present(EvidenceDefinition definition)
     {
         if (definition == null || group == null) return;
-        if (image != null) { image.sprite = definition.Image; image.gameObject.SetActive(definition.Image != null); }
-        if (title != null) title.text = definition.DisplayName;
-        if (description != null) description.text = definition.Description;
+        Present(definition.Image, "NEW EVIDENCE", definition.DisplayName, definition.Description);
+    }
+
+    private void PresentTheory(TheoryDefinition theory)
+    {
+        if (theory == null || group == null) return;
+        Present(null, "DEDUCTION READY", theory.DisplayName, theory.Description);
+    }
+
+    private void Present(Sprite sprite, string headingText, string titleText, string bodyText)
+    {
+        if (image != null) { image.sprite = sprite; image.gameObject.SetActive(sprite != null); }
+        if (heading != null) heading.text = headingText;
+        if (title != null) title.text = titleText;
+        if (description != null) description.text = bodyText;
         if (routine != null) StopCoroutine(routine);
         routine = StartCoroutine(Play());
     }

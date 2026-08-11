@@ -29,4 +29,18 @@ public sealed class EvidenceDiscoveryPresentationTests
         Assert.That(presenter, Does.Contain("evidence.EvidenceDiscovered += Present"));
         Assert.That(presenter, Does.Not.Contain("AddEvidence"));
     }
+
+    [Test]
+    public void TheoryReadyNotificationReusesEvidenceBoardEvaluationAndDiscoveryOverlay()
+    {
+        string board = File.ReadAllText(
+            "Assets/_Project/Runtime/Evidence/EvidenceBoardDirector.cs");
+        string presenter = File.ReadAllText(
+            "Assets/_Project/Runtime/UI/Components/EvidenceDiscoveryPresenter.cs");
+        Assert.That(board, Does.Contain("foreach (TheoryEvaluation evaluation in EvaluateTheories())"));
+        Assert.That(board, Does.Contain("TheoryReady?.Invoke(theory)"));
+        Assert.That(presenter, Does.Contain("board.TheoryReady += PresentTheory"));
+        Assert.That(presenter, Does.Contain("DEDUCTION READY"));
+        Assert.That(presenter, Does.Not.Contain("SetFlag"));
+    }
 }

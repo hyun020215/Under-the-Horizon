@@ -1502,7 +1502,7 @@ public static class P0ProjectBuilder
                 SetObject(puzzleScreenView, "screens", router);
         }
         BuildPersistentHud(uiFrame, router, state);
-        BuildEvidenceDiscoveryPresenter(uiFrame, evidenceDirector);
+        BuildEvidenceDiscoveryPresenter(uiFrame, evidenceDirector, evidenceBoardDirector);
         transitionRoot.SetAsLastSibling();
 
         CharacterView characterPrefab = AssetDatabase.LoadAssetAtPath<CharacterView>(PrefabRoot + "/Characters/PF_CharacterView.prefab");
@@ -1757,7 +1757,7 @@ public static class P0ProjectBuilder
     }
 
     private static void BuildEvidenceDiscoveryPresenter(
-        RectTransform parent, EvidenceDirector evidence)
+        RectTransform parent, EvidenceDirector evidence, EvidenceBoardDirector board)
     {
         Font font = LoadUiFont("Pretendard/FONT_Pretendard-SemiBold.ttf");
         RectTransform root = CreateLayer("EvidenceDiscoveryOverlay", parent);
@@ -1782,6 +1782,7 @@ public static class P0ProjectBuilder
         SetRect(description.rectTransform, new Vector2(0.42f, 0.18f), new Vector2(0.93f, 0.52f));
         EvidenceDiscoveryPresenter presenter = root.gameObject.AddComponent<EvidenceDiscoveryPresenter>();
         SetObject(presenter, "evidence", evidence); SetObject(presenter, "group", group);
+        SetObject(presenter, "board", board); SetObject(presenter, "heading", heading);
         SetObject(presenter, "image", image); SetObject(presenter, "title", title);
         SetObject(presenter, "description", description);
         SetObject(presenter, "profile", FindTransition("TRANS_DISCOVERY"));
