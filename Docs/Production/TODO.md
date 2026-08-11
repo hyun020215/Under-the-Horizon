@@ -86,6 +86,9 @@
   - [x] 캐릭터 유휴 움직임, 선택지 등장, 버튼 크기 피드백과 대화 타이핑이 공통 설정을 따른다.
   - [ ] 자막 크기·고대비·색각 보조는 최종 접근성 범위 확정 후 같은 서비스에 추가한다.
 - [ ] 게임 커서, 클릭 가능 지점 피드백, alpha/polygon hit 영역을 공통 Interaction View로 이식한다.
+  - [x] `InteractionFeedbackService`가 클릭 가능 커서와 hover/click 오디오를 공통 소유한다.
+  - [x] 기존 `InteractionPointView`는 피드백을 위임하고 실행 명령은 계속 `InteractionDirector`에 전달한다.
+  - [ ] 이미지별 alpha/polygon hit shape는 최종 hotspot 아트가 확정되면 동일 View의 Raycast 계약으로 추가한다.
 - [ ] 타이틀 수면/광선, 발견·증거 획득·이론 해금 화면 효과를 Sequence/Transition 데이터로 이식한다.
 - [ ] 지도·증거·퍼즐·모달 화면을 포함한 1280×720, 1920×1080, 2560×1440 시각 회귀 캡처를 구축한다.
 

@@ -62,6 +62,8 @@ public sealed class AppBootstrap : MonoBehaviour
     {
         GameStateStore state = FindFirstObjectByType<GameStateStore>();
         AudioDirector audio = FindFirstObjectByType<AudioDirector>();
+        InteractionFeedbackService interactionFeedback =
+            FindFirstObjectByType<InteractionFeedbackService>();
 
         if (state != null)
             AppContext.Services.Register(state);
@@ -71,5 +73,7 @@ public sealed class AppBootstrap : MonoBehaviour
             if (AppContext.Services.TryGet(out AudioSettingsService settings))
                 settings.Apply(audio);
         }
+        if (interactionFeedback != null)
+            AppContext.Services.Register(interactionFeedback);
     }
 }

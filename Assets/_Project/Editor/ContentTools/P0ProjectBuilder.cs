@@ -1527,6 +1527,15 @@ public static class P0ProjectBuilder
             out VoiceController voice,
             out SfxController sfx
         );
+        InteractionFeedbackService interactionFeedback =
+            new GameObject("InteractionFeedbackService").AddComponent<InteractionFeedbackService>();
+        interactionFeedback.transform.SetParent(root.transform);
+        SetObject(interactionFeedback, "interactiveCursor",
+            AssetDatabase.LoadAssetAtPath<Texture2D>(
+                ProjectRoot + "/Art/UI/Cursors/UI_cursor_magic_arrow.png"));
+        SetObject(interactionFeedback, "sfx", sfx);
+        SetObject(interactionFeedback, "hoverClip", FindAudio("UIWhoop_02"));
+        SetObject(interactionFeedback, "clickClip", FindAudio("FingerSnap"));
         TransitionDirector transitions = new GameObject("TransitionDirector").AddComponent<TransitionDirector>();
         transitions.transform.SetParent(root.transform);
         SetArray(transitions, "players", new UnityEngine.Object[] { fade });
