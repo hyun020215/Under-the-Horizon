@@ -146,7 +146,11 @@ public sealed class CharacterStage : MonoBehaviour
         CharacterDefinition speaker = line.speaker?.Character;
         foreach (CharacterView view in views)
             if (view != null)
+            {
+                if (speaker != null && view.Definition == speaker)
+                    view.ApplyExpression(line.expression);
                 view.SetDialogueFocus(true, speaker != null && view.Definition == speaker);
+            }
     }
 
     private void ClearDialogueFocus()

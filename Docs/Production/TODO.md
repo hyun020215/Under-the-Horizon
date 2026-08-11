@@ -57,7 +57,9 @@
   - 화자 없는 line의 NARRATION 이름표·중앙 정렬과 내부 Dialogue/Story ID 비노출은 완료했다.
   - 기존 `NarrativeDirector` 알림과 `CharacterStage`를 연결한 화자 포커스/비화자 dim,
     선택지 stagger 등장 연출은 완료했다.
-  - 별도 대화 초상화, 표정 전환과 대사 길이별 반응형 타이포그래피는 남아 있다.
+  - [x] `DialogueLine.expression`을 현재 화자의 기존 `CharacterView`에 적용해 장면 데이터가 표정 전환을 소유한다.
+  - [x] 짧은 대사는 강조하고 긴 대사·내레이션은 단계적으로 축소하는 반응형 본문 타이포그래피를 적용했다.
+  - 별도 대화 초상화 슬롯은 남아 있다.
 - [ ] Map 화면을 실제 Location/Condition 데이터와 연결한다.
   - 기존 `MapScreen`, `MapDefinition`, `ScreenRouter`를 사용한다.
   - Deck별 Base/Restricted/Technical 레이어, 덱 탭, 현재 위치 표시와 뒤로가기는 이식 완료했다.

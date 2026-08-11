@@ -15,6 +15,8 @@ public sealed class CharacterView : MonoBehaviour, IPointerClickHandler
     private Outline silhouette;
     private CharacterPresentationProfile defaultPresentation;
     private CharacterPresentationProfile activePresentation;
+    private CharacterPose pose;
+    private CharacterExpression expression;
 
     private void Awake()
     {
@@ -34,9 +36,11 @@ public sealed class CharacterView : MonoBehaviour, IPointerClickHandler
     public void Apply(CharacterPlacement placement)
     {
         Definition = placement.character;
+        pose = placement.pose;
+        expression = placement.expression;
         if (image != null)
         {
-            image.sprite = Definition?.Resolve(placement.pose, placement.expression);
+            image.sprite = Definition?.Resolve(pose, expression);
             image.raycastTarget = placement.clickable;
         }
         clickable = placement.clickable;
@@ -57,6 +61,16 @@ public sealed class CharacterView : MonoBehaviour, IPointerClickHandler
         }
         idleMotion?.Configure(StableHash(Definition?.Id), presentation);
         gameObject.SetActive(Definition != null);
+    }
+
+    public void ApplyExpression(CharacterExpression next)
+    {
+        expression = next;
+        if (image == null || Definition == null)
+            return;
+        Sprite resolved = Definition.Resolve(pose, expression);
+        if (resolved != null)
+            image.sprite = resolved;
     }
 
     public void SetDialogueFocus(bool dialogueActive, bool focused)

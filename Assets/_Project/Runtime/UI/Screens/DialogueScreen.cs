@@ -27,11 +27,14 @@ public sealed class DialogueScreen : ScreenBase
     private bool revealing;
     private readonly List<DialogueChoice> availableChoices = new();
     private AccessibilitySettingsService accessibility;
+    private int defaultBodyFontSize;
     public bool IsRevealing => revealing;
 
     private void Awake()
     {
         AppContext.Services?.TryGet(out accessibility);
+        if (bodyLabel != null)
+            defaultBodyFontSize = bodyLabel.fontSize;
         if (advanceButton != null)
             advanceButton.onClick.AddListener(Advance);
 
@@ -82,7 +85,11 @@ public sealed class DialogueScreen : ScreenBase
                 : TextAnchor.UpperLeft;
         fullText = line.text ?? string.Empty;
         if (bodyLabel != null)
+        {
+            bodyLabel.fontSize = DialogueTypography.ResolveFontSize(
+                defaultBodyFontSize, fullText.Length, narration);
             bodyLabel.text = string.Empty;
+        }
 
         availableChoices.Clear();
         if (line.choices != null)
