@@ -46,11 +46,12 @@
 - [x] 저장 슬롯 삭제와 시작/이어하기 확인 UX를 완성했다.
   - 기존 `ModalRouter`와 `ConfirmDialog`를 확장한 공통 확인 모달을 사용한다.
   - `SaveService`가 기본·백업·임시 저장 파일 삭제를 소유하며 EditMode/Bootstrap PlayMode로 검증했다.
-- [ ] Persistent HUD를 이전 프로젝트의 목표 중심 HUD로 완성한다.
-  - 기존 `PersistentHud`, `ObjectiveWidget`, `GameStateStore`를 사용한다.
+- [x] Persistent HUD를 이전 프로젝트의 목표 중심 HUD로 완성한다.
+  - 기존 `PersistentHud`, `InteractionSet`, `GameStateStore`를 사용한다.
   - 내부 수치는 제품 디자인이 승인한 정성 표현으로 바꾸기 전까지 추가 노출하지 않는다.
   - 시간·Location 표시명·현재 Story Scene 표시명을 목표로 렌더하고 시스템 화면에서 숨기는 작업은 완료했다.
-  - 목표 단계/guidance 데이터와 목표 변경 애니메이션은 남아 있다.
+  - [x] 장면의 기존 `InteractionSet`과 완료 상태를 목표 단계/guidance 데이터로 해석해 중복 목표 시스템을 만들지 않았다.
+  - [x] 목표 진행 변경 시 위로 사라지고 새 guidance가 들어오는 전환을 적용하며 Reduced Motion에서는 즉시 갱신한다.
 - [ ] Dialogue UI의 화자/내레이션/선택지 모드, 초상화 포커스와 타이포그래피를 완성한다.
   - 기존 `DialogueScreen`, `NarrativeDirector`, `DialogueLine` 데이터를 확장한다.
   - 화자 없는 line의 NARRATION 이름표·중앙 정렬과 내부 Dialogue/Story ID 비노출은 완료했다.
