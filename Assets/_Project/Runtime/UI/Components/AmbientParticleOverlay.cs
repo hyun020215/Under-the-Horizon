@@ -9,6 +9,11 @@ public sealed class AmbientParticleOverlay : MonoBehaviour
     private RectTransform host;
     private float elapsed;
     private AmbientParticleProfile profile;
+    private RectTransform lightShaft;
+    private Image lightShaftImage;
+    private RectTransform waterShimmer;
+    private Image waterShimmerImage;
+    private AccessibilitySettingsService accessibility;
     private static Sprite glowSprite;
 
     public void Initialize(RectTransform target, AmbientParticleProfile settings)
@@ -23,6 +28,7 @@ public sealed class AmbientParticleOverlay : MonoBehaviour
 
     private void Awake()
     {
+        AppContext.Services?.TryGet(out accessibility);
         host ??= transform as RectTransform;
         if (host != null && profile != null && particles == null)
             Build();
@@ -43,6 +49,7 @@ public sealed class AmbientParticleOverlay : MonoBehaviour
     private void Build()
     {
         EnsureGlowSprite();
+        BuildLayeredAtmosphere();
         particles = new RectTransform[profile.Count];
         images = new Image[profile.Count];
         for (int index = 0; index < profile.Count; index++)
@@ -69,6 +76,7 @@ public sealed class AmbientParticleOverlay : MonoBehaviour
             particles.Length == 0 || host.rect.width <= 0f)
             return;
         elapsed += Time.unscaledDeltaTime;
+        UpdateLayeredAtmosphere();
         Rect bounds = host.rect;
         for (int index = 0; index < particles.Length; index++)
         {
@@ -86,6 +94,57 @@ public sealed class AmbientParticleOverlay : MonoBehaviour
             color.a *= Mathf.Lerp(profile.AlphaRange.x, profile.AlphaRange.y,
                 (Mathf.Sin(elapsed * 1.2f + index) + 1f) * 0.5f);
             images[index].color = color;
+        }
+    }
+
+    private void BuildLayeredAtmosphere()
+    {
+        if (profile.LightShaftSprite != null && profile.LightShaftOpacity > 0f)
+        {
+            GameObject layer = new("Ambient Light Shafts", typeof(RectTransform),
+                typeof(CanvasRenderer), typeof(Image));
+            layer.transform.SetParent(host, false);
+            lightShaft = layer.GetComponent<RectTransform>();
+            lightShaft.anchorMin = Vector2.zero; lightShaft.anchorMax = Vector2.one;
+            lightShaft.offsetMin = lightShaft.offsetMax = Vector2.zero;
+            lightShaftImage = layer.GetComponent<Image>();
+            lightShaftImage.sprite = profile.LightShaftSprite;
+            lightShaftImage.material = profile.LightShaftMaterial;
+            lightShaftImage.raycastTarget = false;
+        }
+        if (profile.WaterShimmerOpacity > 0f)
+        {
+            GameObject layer = new("Ambient Water Shimmer", typeof(RectTransform),
+                typeof(CanvasRenderer), typeof(Image));
+            layer.transform.SetParent(host, false);
+            waterShimmer = layer.GetComponent<RectTransform>();
+            waterShimmer.anchorMin = new Vector2(0f, 0f);
+            waterShimmer.anchorMax = new Vector2(1f, .38f);
+            waterShimmer.offsetMin = waterShimmer.offsetMax = Vector2.zero;
+            waterShimmerImage = layer.GetComponent<Image>();
+            waterShimmerImage.sprite = glowSprite;
+            waterShimmerImage.raycastTarget = false;
+        }
+    }
+
+    private void UpdateLayeredAtmosphere()
+    {
+        if (accessibility == null) AppContext.Services?.TryGet(out accessibility);
+        bool reduced = accessibility?.ReducedMotion == true;
+        float wave = reduced ? 0f : Mathf.Sin(elapsed * Mathf.PI * 2f /
+            Mathf.Max(.05f, profile.WaterShimmerCycle));
+        if (lightShaftImage != null)
+        {
+            lightShaftImage.color = new Color(1f, 1f, 1f,
+                profile.LightShaftOpacity * (reduced ? .75f : .82f + wave * .18f));
+            lightShaft.anchoredPosition = reduced ? Vector2.zero :
+                Vector2.right * wave * host.rect.width * profile.LightShaftDrift;
+        }
+        if (waterShimmerImage != null)
+        {
+            waterShimmerImage.color = new Color(.45f, .72f, 1f,
+                profile.WaterShimmerOpacity * (reduced ? .65f : .72f + wave * .28f));
+            waterShimmer.localScale = new Vector3(1f, reduced ? 1f : 1f + wave * .05f, 1f);
         }
     }
 

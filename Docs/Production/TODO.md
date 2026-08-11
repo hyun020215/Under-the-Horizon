@@ -97,7 +97,8 @@
     - [x] 모든 `GameStateStore.AddEvidence` 성공 알림을 `EvidenceDirector`가 콘텐츠 정의로 변환한다.
     - [x] `TRANS_DISCOVERY` 타이밍을 사용하는 공통 증거 카드 오버레이를 Game UI 셸에 연결했다.
     - [x] 새 증거로 `TheoryResolver` 조건이 처음 충족되면 같은 오버레이가 이론 논증 가능 상태를 표시한다.
-    - [ ] 타이틀 수면/광선은 계속 남아 있다.
+    - [x] 기존 `AmbientParticleProfile`에 선택적 광선·수면 레이어 값을 추가하고 타이틀 프로필에만 적용했다.
+    - [x] 타이틀 광선 drift와 수면 shimmer는 Reduced Motion에서 정적인 저강도 표현으로 바뀐다.
 - [ ] 지도·증거·퍼즐·모달 화면을 포함한 1280×720, 1920×1080, 2560×1440 시각 회귀 캡처를 구축한다.
 
 > UI/UX 작업 시 이 목록을 매 기능 커밋마다 갱신한다. 기존 Runtime/Content/Prefab이 있는 기능은

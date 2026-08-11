@@ -18,3 +18,9 @@ MonoBehaviour:
   speedRange: {x: 4, y: 10}
   alphaRange: {x: 0.15, y: 0.6}
   sway: 0.06
+  lightShaftSprite: {fileID: 21300000, guid: b65f136bc7c477e4ab0257e8f08935f1, type: 3}
+  lightShaftMaterial: {fileID: 2100000, guid: e15969fba96b69041a9ad443e538c1b2, type: 2}
+  lightShaftOpacity: 0.34
+  lightShaftDrift: 0.012
+  waterShimmerOpacity: 0.18
+  waterShimmerCycle: 5.2
