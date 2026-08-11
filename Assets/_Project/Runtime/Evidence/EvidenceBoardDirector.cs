@@ -7,7 +7,7 @@ public sealed class EvidenceBoardDirector : MonoBehaviour
 {
     [SerializeField] private EvidenceDirector evidence;
     [SerializeField] private TheoryDefinition[] theories;
-    [SerializeField] private GameStateStore state;
+    private GameStateStore state;
     private TheoryResolver resolver;
     private readonly HashSet<string> announcedReadyTheories = new(StringComparer.Ordinal);
     public event Action<TheoryDefinition> TheoryReady;
