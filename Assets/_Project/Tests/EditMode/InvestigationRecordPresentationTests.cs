@@ -22,11 +22,26 @@ public sealed class InvestigationRecordPresentationTests
             Assert.That(root.transform.Find("Evidence Detail/Detail Title"), Is.Not.Null);
             Assert.That(root.transform.Find("Evidence Detail/Detail Body"), Is.Not.Null);
             Assert.That(root.transform.Find("Evidence List/Empty Label"), Is.Not.Null);
+            Assert.That(root.transform.Find("EvidenceFilterButton"), Is.Not.Null);
         }
         finally
         {
             PrefabUtility.UnloadPrefabContents(root);
         }
+    }
+
+    [Test]
+    public void EveryEvidenceHasCanonicalClassificationMetadata()
+    {
+        EvidenceDefinition[] evidence = AssetDatabase.FindAssets("t:EvidenceDefinition")
+            .Select(AssetDatabase.GUIDToAssetPath)
+            .Select(AssetDatabase.LoadAssetAtPath<EvidenceDefinition>)
+            .Where(item => item != null)
+            .ToArray();
+        Assert.That(evidence, Has.Length.EqualTo(18));
+        Assert.That(evidence, Has.All.Matches<EvidenceDefinition>(
+            item => !string.IsNullOrWhiteSpace(item.Category)));
+        Assert.That(evidence.Count(item => item.IsDirect), Is.EqualTo(9));
     }
 
     [Test]

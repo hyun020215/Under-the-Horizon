@@ -18,3 +18,5 @@ MonoBehaviour:
     \uACC4\uD68D"
   image: {fileID: 21300000, guid: 5484ebad6dc5478f9cbc5820ffd839f0, type: 3}
   quality: 0
+  category: history
+  isDirect: 0

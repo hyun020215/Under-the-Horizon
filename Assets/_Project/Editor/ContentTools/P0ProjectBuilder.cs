@@ -737,6 +737,10 @@ public static class P0ProjectBuilder
         Button board = CreateTitleButton("EvidenceBoardButton", root, font, "증거 보드", true);
         SetRect((RectTransform)board.transform, new Vector2(0.20f, 0.055f), new Vector2(0.36f, 0.12f));
         SetObject(screen, "boardButton", board);
+        Button filter = CreateTitleButton("EvidenceFilterButton", root, font, "전체 증거", false);
+        SetRect((RectTransform)filter.transform, new Vector2(0.38f, 0.055f), new Vector2(0.54f, 0.12f));
+        SetObject(screen, "filterButton", filter);
+        SetObject(screen, "filterLabel", filter.GetComponentInChildren<Text>());
     }
 
     private static void BuildEvidenceBoardScreen(Transform root, EvidenceBoardScreen screen)

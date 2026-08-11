@@ -18,3 +18,5 @@ MonoBehaviour:
     \uBC1C\uC1A1 \uC11C\uBC84\uB294 \uBE44\uC11C\uC2E4"
   image: {fileID: 21300000, guid: 7e5c03d211844cb5b476016cc0197336, type: 3}
   quality: 0
+  category: invitation
+  isDirect: 0

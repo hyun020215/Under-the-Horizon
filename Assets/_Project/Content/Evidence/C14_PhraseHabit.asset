@@ -17,3 +17,5 @@ MonoBehaviour:
   description: "\uC774\uBE14\uB9B0\uC758 \uBC18\uBCF5 \uD45C\uD604"
   image: {fileID: 21300000, guid: c0e532f9ae6a4f6eb70edfcfc14fbf18, type: 3}
   quality: 0
+  category: communication
+  isDirect: 0

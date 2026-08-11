@@ -18,3 +18,5 @@ MonoBehaviour:
     \uC120\uD0DD\uC801 \uC9C4\uC2E4"
   image: {fileID: 21300000, guid: 4ca61a172c1a405e94273d24a4b91624, type: 3}
   quality: 0
+  category: communication
+  isDirect: 0

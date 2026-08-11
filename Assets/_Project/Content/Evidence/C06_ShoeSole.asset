@@ -18,3 +18,5 @@ MonoBehaviour:
     \uBC14\uB2E5 \uACE0\uBB34"
   image: {fileID: 21300000, guid: 042aa35221004639807564e1adeacc04, type: 3}
   quality: 0
+  category: forensic
+  isDirect: 1

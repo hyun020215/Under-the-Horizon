@@ -18,3 +18,5 @@ MonoBehaviour:
     \uBB38\uC81C"
   image: {fileID: 21300000, guid: 4ff80de077e441f9aec2deb983726616, type: 3}
   quality: 0
+  category: exit
+  isDirect: 1

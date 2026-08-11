@@ -17,3 +17,5 @@ MonoBehaviour:
   description: "\uAE08\uACE0 \uC811\uADFC \uC9C0\uC6D0"
   image: {fileID: 21300000, guid: ae7e3b736f2e4ff09ca935c2e0fafc76, type: 3}
   quality: 0
+  category: authentication
+  isDirect: 0

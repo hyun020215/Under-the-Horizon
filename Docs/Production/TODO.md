@@ -70,7 +70,8 @@
   - 기존 EvidenceDefinition/Inventory/Director와 Investigation Record 화면을 사용한다.
   - 발견한 증거만 표시하는 카드 목록과 이미지·명칭·설명 상세 보기는 완료했다.
   - [x] 아직 직접 열지 않은 증거 카드에 `NEW`와 짧은 강조 애니메이션을 표시하며 Reduced Motion에서는 정적으로 표시한다.
-  - 인물 탭과 증거 분류/필터는 관련 Character/category 콘텐츠 필드 이식과 함께 남아 있다.
+  - [x] 이전 canonical category·직접/정황 분류를 18개 `EvidenceDefinition`에 이식하고 전체/직접/정황 필터를 추가했다.
+  - 인물 탭은 증거–Character 관계 원본 데이터가 없어 남아 있다.
 - [x] Evidence Board의 노드·연결·이론 슬롯 UX를 완성한다.
   - 기존 `EvidenceBoardDirector`, `EvidenceBoardGraph`, `TheoryResolver`를 사용한다.
   - [x] 이전 프로젝트의 6개 canonical 추론 ID·설명·필요 증거 조합을 `TheoryDefinition` 콘텐츠로 이식했다.

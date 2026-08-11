@@ -18,9 +18,12 @@ public sealed class InvestigationRecordScreen : ScreenBase
     [SerializeField] private Text emptyLabel;
     [SerializeField] private Button backButton;
     [SerializeField] private Button boardButton;
+    [SerializeField] private Button filterButton;
+    [SerializeField] private Text filterLabel;
     private EvidenceDefinition[] visibleEvidence = System.Array.Empty<EvidenceDefinition>();
     private readonly HashSet<string> viewedEvidence = new(System.StringComparer.Ordinal);
     private AccessibilitySettingsService accessibility;
+    private EvidenceRecordFilter filter;
 
     private void Awake()
     {
@@ -32,6 +35,7 @@ public sealed class InvestigationRecordScreen : ScreenBase
         }
         backButton?.onClick.AddListener(Back);
         boardButton?.onClick.AddListener(OpenBoard);
+        filterButton?.onClick.AddListener(CycleFilter);
     }
 
     public override Task OpenAsync(ScreenContext context)
@@ -44,6 +48,7 @@ public sealed class InvestigationRecordScreen : ScreenBase
     {
         visibleEvidence = evidence?.Inventory?.Discovered
             .Where(item => item != null)
+            .Where(MatchesFilter)
             .OrderBy(item => item.Id, System.StringComparer.Ordinal)
             .ToArray() ?? System.Array.Empty<EvidenceDefinition>();
         for (var index = 0; index < cardButtons?.Length; index++)
@@ -83,7 +88,29 @@ public sealed class InvestigationRecordScreen : ScreenBase
         if (detailTitle != null)
             detailTitle.text = item?.DisplayName ?? "수집된 증거 없음";
         if (detailBody != null)
-            detailBody.text = item?.Description ?? "현장을 조사해 증거를 확보하세요.";
+            detailBody.text = item == null
+                ? "현장을 조사해 증거를 확보하세요."
+                : $"{item.Category} · {(item.IsDirect ? "직접 증거" : "정황 증거")}\n\n{item.Description}";
+    }
+
+    private bool MatchesFilter(EvidenceDefinition item) => filter switch
+    {
+        EvidenceRecordFilter.Direct => item.IsDirect,
+        EvidenceRecordFilter.Circumstantial => !item.IsDirect,
+        _ => true,
+    };
+
+    private void CycleFilter()
+    {
+        filter = (EvidenceRecordFilter)(((int)filter + 1) % 3);
+        if (filterLabel != null)
+            filterLabel.text = filter switch
+            {
+                EvidenceRecordFilter.Direct => "직접 증거",
+                EvidenceRecordFilter.Circumstantial => "정황 증거",
+                _ => "전체 증거",
+            };
+        Refresh();
     }
 
     private IEnumerator AnimateNewCard(Button card)
@@ -114,4 +141,11 @@ public sealed class InvestigationRecordScreen : ScreenBase
         if (screens != null)
             await screens.OpenAsync(ScreenId.EvidenceBoard);
     }
+}
+
+public enum EvidenceRecordFilter
+{
+    All,
+    Direct,
+    Circumstantial,
 }
