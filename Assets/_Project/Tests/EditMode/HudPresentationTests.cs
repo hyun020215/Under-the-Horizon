@@ -4,6 +4,7 @@ using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 public sealed class HudPresentationTests
 {
@@ -22,6 +23,19 @@ public sealed class HudPresentationTests
             Assert.That(hud.Find("StatusBar/ObjectivePanel"), Is.Not.Null);
             Assert.That(hud.Find("StatusBar/AnxietyPanel"), Is.Null);
             Assert.That(hud.Find("StatusBar/IntegrityPanel"), Is.Null);
+
+            RectTransform statusBar = hud.Find("StatusBar").GetComponent<RectTransform>();
+            Image statusBackground = statusBar.GetComponent<Image>();
+            Outline goldRule = statusBar.GetComponent<Outline>();
+            Assert.That(statusBar.anchorMin.y, Is.GreaterThanOrEqualTo(0.88f));
+            Assert.That(statusBackground.color.a, Is.LessThanOrEqualTo(0.15f));
+            Assert.That(goldRule, Is.Not.Null);
+            Assert.That(goldRule.effectColor.r, Is.GreaterThan(goldRule.effectColor.b));
+            foreach (string panelName in new[] { "TimePanel", "LocationPanel", "ObjectivePanel" })
+            {
+                Image panel = hud.Find($"StatusBar/{panelName}").GetComponent<Image>();
+                Assert.That(panel.color.a, Is.LessThanOrEqualTo(0.16f));
+            }
         }
         finally
         {
