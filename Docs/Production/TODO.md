@@ -143,9 +143,16 @@
 - [ ] 13개 퍼즐 각각에 대해 정답 → `PuzzleResult` → `GameEffect` → Save/Load 회귀 테스트를 추가한다.
 - [ ] Puzzle 직접 미리보기와 공통 Preview 계약을 구현한다.
 - [ ] 필요한 Addressables 등록·레이블과 깨진 직렬화 참조 검증을 추가한다.
-- [ ] Unity Editor에서 EditMode/PlayMode 전체 테스트와 Bootstrap 대표 플레이스루를 통과시킨다.
-  - 2026-08-11 기준 EditMode 28/28, Bootstrap PlayMode 1/1과 실제 화면 캡처를 통과했다.
-  - 전체 PlayMode 모음과 전 Story Scene 대표 플레이스루는 계속 확장한다.
+- [x] Unity Editor에서 EditMode/PlayMode 전체 테스트와 Bootstrap 대표 플레이스루를 통과시킨다.
+  - 2026-08-12 기준 커밋 `b53a09f1416cb2a3ad838d0d4ac9d7eef4d810c6`, Unity `6000.3.20f1`
+    (`c9ba695d4f07`)에서 Build Preflight, EditMode 64/64, PlayMode 11/11을 통과했다. 실패·건너뜀은 0건이다.
+  - `BootstrapTests.BootstrapLoadsPersistentGameShell`이 실제 버튼과 `ScreenRouter` 경로로
+    Bootstrap → Title → Save Slot 3 → Dialogue → Exploration → Map → Record → 캐릭터 상호작용을 통과했다.
+  - 대화형 Editor에서는 Bootstrap → Title → Save Slot 3 → Dialogue까지 화면 표시를 직접 확인했다.
+    Map과 Record의 자동 PlayMode 경로는 통과했지만 별도 수동 시각 확인은 완료하지 않았다.
+  - Cold import에서 기존 0바이트 Input·Rendering·Audio·Addressables 설정 자산의 import 오류가 확인됐다.
+    이는 현재 Build Preflight와 테스트 범위 밖이며 P2 플랫폼 설정 검증에서 별도로 복구·검증한다.
+  - 전 Story Scene 대표 플레이스루는 콘텐츠 완성과 함께 계속 확장한다.
 
 ## P2 — 출시 설정과 품질
 
