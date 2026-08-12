@@ -59,7 +59,16 @@ public sealed class DialoguePresentationTests
             Assert.That(body, Is.Not.Null);
             Assert.That(body.fontSize, Is.GreaterThanOrEqualTo(34));
             RectTransform panel = root.transform.Find("Dialogue Panel") as RectTransform;
-            Assert.That(panel.anchorMax.y - panel.anchorMin.y, Is.GreaterThanOrEqualTo(.3f));
+            Assert.That(panel.anchorMax.y - panel.anchorMin.y, Is.GreaterThanOrEqualTo(.36f));
+            Assert.That(panel.anchorMax.x - panel.anchorMin.x, Is.InRange(.55f, .65f));
+            RectTransform bodyRect = body.rectTransform;
+            Assert.That(bodyRect.anchorMin.x, Is.GreaterThanOrEqualTo(.08f));
+            Assert.That(bodyRect.anchorMax.x, Is.LessThanOrEqualTo(.92f));
+            RectTransform nameplate = root.transform.Find("Speaker Nameplate") as RectTransform;
+            RectTransform advance = root.transform.Find("AdvanceButton") as RectTransform;
+            Assert.That(nameplate.anchorMax.y, Is.LessThanOrEqualTo(panel.anchorMax.y));
+            Assert.That(advance.anchorMin.x, Is.GreaterThan(panel.anchorMin.x));
+            Assert.That(advance.anchorMax.x, Is.LessThanOrEqualTo(panel.anchorMax.x));
         }
         finally
         {
