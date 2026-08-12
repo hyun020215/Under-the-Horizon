@@ -130,8 +130,10 @@
 - [ ] 13개 PuzzleDefinition에 입력 항목, 정답·순서, 오답 판정, 힌트 단계와 저장할 중간 진행을
   데이터로 작성하고 실제 Puzzle Interaction에 연결한다.
   - Puzzle Interaction 진입 연결은 완료했다. 규칙 데이터와 최종 핫스팟 좌표가 남았다.
-- [ ] D8-01 최종 심문의 6단계 논증과 A/B/C/Bad 엔딩 판정·라우팅을 현재 Condition/GameEffect와
-  `GameStateStore.endingId`로 이식한다.
+- [x] D8-01 최종 심문의 6단계 논증과 A/B/C/Bad 엔딩 판정·라우팅을 현재 Condition/GameEffect와
+  `GameStateStore.endingId`로 이식했다.
+  - 기존 대화의 6단계 선택 플래그와 이론 해금 상태를 재사용하며 별도 판정 UI/상태 관리자를 만들지 않았다.
+  - Bad → A → B → C 우선순위, 최초 엔딩 확정, A/B → D8-02 및 C/Bad → D8-03 라우트를 콘텐츠로 구성했다.
 - [ ] Story Recording 파일과 Dialogue line ID의 승인된 대응표를 AudioCue/Sequence에 연결한다.
 - [ ] 클릭·호버·확인·취소·증거 발견·이론 해금 공통 효과음을 선정하고 라이선스를 기록한다.
 - [ ] 최종 게임 로고와 앱 아이콘 승인본을 적용한다.
@@ -139,7 +141,7 @@
 ## P1 — 검증 및 제작 도구
 
 - [ ] P-01부터 모든 엔딩까지 도달 가능한지 검사하는 Story graph 회귀 검증을 추가한다.
-  - D8-01 분기 규칙이 아직 이식되지 않아 현재 D8-02가 그래프에서 도달 불가능하다.
+  - D8-01의 네 엔딩별 라우트 단위 검증은 완료했다. P-01부터의 전체 조건 충족 경로 탐색이 남았다.
 - [ ] 13개 퍼즐 각각에 대해 정답 → `PuzzleResult` → `GameEffect` → Save/Load 회귀 테스트를 추가한다.
 - [ ] Puzzle 직접 미리보기와 공통 Preview 계약을 구현한다.
 - [ ] 필요한 Addressables 등록·레이블과 깨진 직렬화 참조 검증을 추가한다.

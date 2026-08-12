@@ -73,6 +73,16 @@ public sealed class GameStateStore : MonoBehaviour
 
     public bool ResolveTheory(string id) => SetFlag(TheoryFlag(id));
 
+    public bool TrySetEnding(string id)
+    {
+        string normalized = Normalize(id);
+        if (string.IsNullOrEmpty(normalized) || !string.IsNullOrEmpty(state.endingId))
+            return false;
+        state.endingId = normalized;
+        Notify();
+        return true;
+    }
+
     public bool UnlockLocation(string id) => Add(state.unlockedLocations, id);
 
     public int GetTrust(string characterId) =>

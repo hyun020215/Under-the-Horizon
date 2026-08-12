@@ -1,5 +1,297 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
+--- !u!114 &-8993890295130412800
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 91ef4df0d02cfd246986c4e2ae669207, type: 3}
+  m_Name: FX_ENDING_A
+  m_EditorClassIdentifier: UTH.Runtime::SetEndingEffect
+  endingId: ending_a_complete
+  conditions:
+  - {fileID: 5515730190660536267}
+--- !u!114 &-8880552955266659182
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a0bd5022276b13b409803f1ac7f71ae5, type: 3}
+  m_Name: COND_D8-01_A1_EVELYN
+  m_EditorClassIdentifier: UTH.Runtime::HasFlagCondition
+  flagId: DIALOGUE_CHOICE_D8-01_A1_EVELYN
+  expected: 1
+--- !u!114 &-8676141658325318397
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a0bd5022276b13b409803f1ac7f71ae5, type: 3}
+  m_Name: COND_scene_denial
+  m_EditorClassIdentifier: UTH.Runtime::HasFlagCondition
+  flagId: THEORY_RESOLVED_scene_denial
+  expected: 1
+--- !u!114 &-7729474835774949468
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a0bd5022276b13b409803f1ac7f71ae5, type: 3}
+  m_Name: COND_transport_route
+  m_EditorClassIdentifier: UTH.Runtime::HasFlagCondition
+  flagId: THEORY_RESOLVED_transport_route
+  expected: 1
+--- !u!114 &-7288939980695515119
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a0bd5022276b13b409803f1ac7f71ae5, type: 3}
+  m_Name: COND_D8-01_A3_SUFFOCATION
+  m_EditorClassIdentifier: UTH.Runtime::HasFlagCondition
+  flagId: DIALOGUE_CHOICE_D8-01_A3_SUFFOCATION
+  expected: 1
+--- !u!114 &-6861808244266271187
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ead87e59164585e4e97ce8b2b69fb6ed, type: 3}
+  m_Name: COND_ENDING_BAD_ANXIETY
+  m_EditorClassIdentifier: UTH.Runtime::AnxietyCondition
+  minimum: 100
+  maximum: 100
+--- !u!114 &-6505883137816801261
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9fc5420c07f0fc74db4c771a66555c72, type: 3}
+  m_Name: COND_ENDING_BAD_INTEGRITY
+  m_EditorClassIdentifier: UTH.Runtime::IntegrityCondition
+  minimum: 0
+  maximum: 0
+--- !u!114 &-6314243314747208875
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fbd0c68dc8dbbe54190c3336fec82a0b, type: 3}
+  m_Name: COND_ENDING_B_ROUTE
+  m_EditorClassIdentifier: UTH.Runtime::EndingCondition
+  endingId: ending_b_convenient_culprit
+--- !u!114 &-5711866590302911291
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a0bd5022276b13b409803f1ac7f71ae5, type: 3}
+  m_Name: COND_D8-01_A5_MISCONCEPTION
+  m_EditorClassIdentifier: UTH.Runtime::HasFlagCondition
+  flagId: DIALOGUE_CHOICE_D8-01_A5_MISCONCEPTION
+  expected: 1
+--- !u!114 &-5568559671361889190
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a0bd5022276b13b409803f1ac7f71ae5, type: 3}
+  m_Name: COND_CONCEAL
+  m_EditorClassIdentifier: UTH.Runtime::HasFlagCondition
+  flagId: DIALOGUE_CHOICE_D8-01_END_B
+  expected: 1
+--- !u!114 &-5233975902929759837
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fbd0c68dc8dbbe54190c3336fec82a0b, type: 3}
+  m_Name: COND_ENDING_A_ROUTE
+  m_EditorClassIdentifier: UTH.Runtime::EndingCondition
+  endingId: ending_a_complete
+--- !u!114 &-4477786551615874448
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a0bd5022276b13b409803f1ac7f71ae5, type: 3}
+  m_Name: COND_DISCLOSE
+  m_EditorClassIdentifier: UTH.Runtime::HasFlagCondition
+  flagId: DIALOGUE_CHOICE_D8-01_END_A
+  expected: 1
+--- !u!114 &-4060374612314712550
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fbd0c68dc8dbbe54190c3336fec82a0b, type: 3}
+  m_Name: COND_ENDING_BAD_ROUTE
+  m_EditorClassIdentifier: UTH.Runtime::EndingCondition
+  endingId: ending_bad_panic
+--- !u!114 &-3738206800326221488
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a0bd5022276b13b409803f1ac7f71ae5, type: 3}
+  m_Name: COND_D8-01_A2_BALLAST
+  m_EditorClassIdentifier: UTH.Runtime::HasFlagCondition
+  flagId: DIALOGUE_CHOICE_D8-01_A2_BALLAST
+  expected: 1
+--- !u!114 &-3413747897095631737
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a0bd5022276b13b409803f1ac7f71ae5, type: 3}
+  m_Name: COND_D8-01_A2_BALLAST
+  m_EditorClassIdentifier: UTH.Runtime::HasFlagCondition
+  flagId: DIALOGUE_CHOICE_D8-01_A2_BALLAST
+  expected: 1
+--- !u!114 &-2101361944721268315
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a0bd5022276b13b409803f1ac7f71ae5, type: 3}
+  m_Name: COND_D8-01_A6_EVELYN
+  m_EditorClassIdentifier: UTH.Runtime::HasFlagCondition
+  flagId: DIALOGUE_CHOICE_D8-01_A6_EVELYN
+  expected: 1
+--- !u!114 &-1520129045038059362
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a0bd5022276b13b409803f1ac7f71ae5, type: 3}
+  m_Name: COND_D8-01_A6_EVELYN
+  m_EditorClassIdentifier: UTH.Runtime::HasFlagCondition
+  flagId: DIALOGUE_CHOICE_D8-01_A6_EVELYN
+  expected: 1
+--- !u!114 &-1471542210742979763
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 91ef4df0d02cfd246986c4e2ae669207, type: 3}
+  m_Name: FX_ENDING_C
+  m_EditorClassIdentifier: UTH.Runtime::SetEndingEffect
+  endingId: ending_c_wrong_person
+  conditions: []
+--- !u!114 &-1463397939011689898
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a0bd5022276b13b409803f1ac7f71ae5, type: 3}
+  m_Name: COND_transport_route
+  m_EditorClassIdentifier: UTH.Runtime::HasFlagCondition
+  flagId: THEORY_RESOLVED_transport_route
+  expected: 1
+--- !u!114 &-831632738145912995
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a0bd5022276b13b409803f1ac7f71ae5, type: 3}
+  m_Name: COND_D8-01_A1_EVELYN
+  m_EditorClassIdentifier: UTH.Runtime::HasFlagCondition
+  flagId: DIALOGUE_CHOICE_D8-01_A1_EVELYN
+  expected: 1
+--- !u!114 &-175786082595069376
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a0bd5022276b13b409803f1ac7f71ae5, type: 3}
+  m_Name: COND_D8-01_A4_RAIL
+  m_EditorClassIdentifier: UTH.Runtime::HasFlagCondition
+  flagId: DIALOGUE_CHOICE_D8-01_A4_RAIL
+  expected: 1
 --- !u!114 &11400000
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -33,8 +325,23 @@ MonoBehaviour:
   exitTransition: {fileID: 11400000, guid: dca78952fd04d4d4392054d9a3fc41e2, type: 2}
   onEnterEffects: []
   onCompleteEffects:
-  - {fileID: 11400000, guid: 5ec0df71ce6b48a40b5879464129260d, type: 2}
-  routes: []
+  - {fileID: 1340969959231038741}
+  - {fileID: -8993890295130412800}
+  - {fileID: 6620251651586419146}
+  - {fileID: -1471542210742979763}
+  routes:
+  - targetSceneId: D8-02
+    conditions:
+    - {fileID: -5233975902929759837}
+  - targetSceneId: D8-02
+    conditions:
+    - {fileID: -6314243314747208875}
+  - targetSceneId: D8-03
+    conditions:
+    - {fileID: 9039462809220804159}
+  - targetSceneId: D8-03
+    conditions:
+    - {fileID: -4060374612314712550}
   authoringRequirements:
     minimumInteractionCount: 2
     requiresPuzzle: 1
@@ -43,3 +350,269 @@ MonoBehaviour:
     requiredInteractionTypes: 05000000
     requiresEvidenceAcquisition: 0
     requiresSceneChoice: 0
+--- !u!114 &115149886521289950
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a0bd5022276b13b409803f1ac7f71ae5, type: 3}
+  m_Name: COND_culprit_link
+  m_EditorClassIdentifier: UTH.Runtime::HasFlagCondition
+  flagId: THEORY_RESOLVED_culprit_link
+  expected: 1
+--- !u!114 &520971981361581371
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a0bd5022276b13b409803f1ac7f71ae5, type: 3}
+  m_Name: COND_culprit_link
+  m_EditorClassIdentifier: UTH.Runtime::HasFlagCondition
+  flagId: THEORY_RESOLVED_culprit_link
+  expected: 1
+--- !u!114 &563109817773720754
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 675134298095f944b9a7a4a8bd2ee2e3, type: 3}
+  m_Name: COND_ENDING_BAD
+  m_EditorClassIdentifier: UTH.Runtime::CompoundCondition
+  mode: 1
+  conditions:
+  - {fileID: -6861808244266271187}
+  - {fileID: -6505883137816801261}
+--- !u!114 &1340969959231038741
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 91ef4df0d02cfd246986c4e2ae669207, type: 3}
+  m_Name: FX_ENDING_BAD
+  m_EditorClassIdentifier: UTH.Runtime::SetEndingEffect
+  endingId: ending_bad_panic
+  conditions:
+  - {fileID: 563109817773720754}
+--- !u!114 &1714850552486401307
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a0bd5022276b13b409803f1ac7f71ae5, type: 3}
+  m_Name: COND_D8-01_A3_SUFFOCATION
+  m_EditorClassIdentifier: UTH.Runtime::HasFlagCondition
+  flagId: DIALOGUE_CHOICE_D8-01_A3_SUFFOCATION
+  expected: 1
+--- !u!114 &1887827416576022426
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a0bd5022276b13b409803f1ac7f71ae5, type: 3}
+  m_Name: COND_body_insertion
+  m_EditorClassIdentifier: UTH.Runtime::HasFlagCondition
+  flagId: THEORY_RESOLVED_body_insertion
+  expected: 1
+--- !u!114 &2067351101657022211
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a0bd5022276b13b409803f1ac7f71ae5, type: 3}
+  m_Name: COND_past_event
+  m_EditorClassIdentifier: UTH.Runtime::HasFlagCondition
+  flagId: THEORY_RESOLVED_past_event
+  expected: 1
+--- !u!114 &2415126178262282260
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a0bd5022276b13b409803f1ac7f71ae5, type: 3}
+  m_Name: COND_D8-01_A4_RAIL
+  m_EditorClassIdentifier: UTH.Runtime::HasFlagCondition
+  flagId: DIALOGUE_CHOICE_D8-01_A4_RAIL
+  expected: 1
+--- !u!114 &2481476807474851776
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a0bd5022276b13b409803f1ac7f71ae5, type: 3}
+  m_Name: COND_body_insertion
+  m_EditorClassIdentifier: UTH.Runtime::HasFlagCondition
+  flagId: THEORY_RESOLVED_body_insertion
+  expected: 1
+--- !u!114 &3146827462208979162
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 675134298095f944b9a7a4a8bd2ee2e3, type: 3}
+  m_Name: COND_ENDING_B
+  m_EditorClassIdentifier: UTH.Runtime::CompoundCondition
+  mode: 0
+  conditions:
+  - {fileID: -8880552955266659182}
+  - {fileID: -3413747897095631737}
+  - {fileID: -7288939980695515119}
+  - {fileID: -175786082595069376}
+  - {fileID: 5543214207757680334}
+  - {fileID: -1520129045038059362}
+  - {fileID: 6609917669907967910}
+  - {fileID: 2481476807474851776}
+  - {fileID: -7729474835774949468}
+  - {fileID: 8510798685896449888}
+  - {fileID: 115149886521289950}
+  - {fileID: -5568559671361889190}
+--- !u!114 &5515730190660536267
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 675134298095f944b9a7a4a8bd2ee2e3, type: 3}
+  m_Name: COND_ENDING_A
+  m_EditorClassIdentifier: UTH.Runtime::CompoundCondition
+  mode: 0
+  conditions:
+  - {fileID: -831632738145912995}
+  - {fileID: -3738206800326221488}
+  - {fileID: 1714850552486401307}
+  - {fileID: 2415126178262282260}
+  - {fileID: -5711866590302911291}
+  - {fileID: -2101361944721268315}
+  - {fileID: -8676141658325318397}
+  - {fileID: 1887827416576022426}
+  - {fileID: -1463397939011689898}
+  - {fileID: 6212846530212939799}
+  - {fileID: 520971981361581371}
+  - {fileID: 2067351101657022211}
+  - {fileID: -4477786551615874448}
+--- !u!114 &5543214207757680334
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a0bd5022276b13b409803f1ac7f71ae5, type: 3}
+  m_Name: COND_D8-01_A5_MISCONCEPTION
+  m_EditorClassIdentifier: UTH.Runtime::HasFlagCondition
+  flagId: DIALOGUE_CHOICE_D8-01_A5_MISCONCEPTION
+  expected: 1
+--- !u!114 &6212846530212939799
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a0bd5022276b13b409803f1ac7f71ae5, type: 3}
+  m_Name: COND_actual_murder
+  m_EditorClassIdentifier: UTH.Runtime::HasFlagCondition
+  flagId: THEORY_RESOLVED_actual_murder
+  expected: 1
+--- !u!114 &6609917669907967910
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a0bd5022276b13b409803f1ac7f71ae5, type: 3}
+  m_Name: COND_scene_denial
+  m_EditorClassIdentifier: UTH.Runtime::HasFlagCondition
+  flagId: THEORY_RESOLVED_scene_denial
+  expected: 1
+--- !u!114 &6620251651586419146
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 91ef4df0d02cfd246986c4e2ae669207, type: 3}
+  m_Name: FX_ENDING_B
+  m_EditorClassIdentifier: UTH.Runtime::SetEndingEffect
+  endingId: ending_b_convenient_culprit
+  conditions:
+  - {fileID: 3146827462208979162}
+--- !u!114 &8510798685896449888
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a0bd5022276b13b409803f1ac7f71ae5, type: 3}
+  m_Name: COND_actual_murder
+  m_EditorClassIdentifier: UTH.Runtime::HasFlagCondition
+  flagId: THEORY_RESOLVED_actual_murder
+  expected: 1
+--- !u!114 &9039462809220804159
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fbd0c68dc8dbbe54190c3336fec82a0b, type: 3}
+  m_Name: COND_ENDING_C_ROUTE
+  m_EditorClassIdentifier: UTH.Runtime::EndingCondition
+  endingId: ending_c_wrong_person
