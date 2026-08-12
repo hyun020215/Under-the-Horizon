@@ -25,6 +25,9 @@ public sealed class MapScreen : ScreenBase
         for (var index = 0; index < deckButtons?.Length; index++)
         {
             int mapIndex = index;
+            Text label = deckButtons[index]?.GetComponentInChildren<Text>(true);
+            if (label != null && maps != null && mapIndex < maps.Length)
+                label.text = FormatDeckLabel(maps[mapIndex]?.Id);
             deckButtons[index]?.onClick.AddListener(() => SelectMap(mapIndex));
         }
         restrictedToggle?.onValueChanged.AddListener(_ => RefreshLayers());
@@ -41,7 +44,7 @@ public sealed class MapScreen : ScreenBase
             string location = state?.State.currentLocationId;
             locationLabel.text = string.IsNullOrWhiteSpace(location)
                 ? "현재 위치 확인 중"
-                : $"현재 위치 · {location}";
+                : $"현재 위치 · {ResolveLocationName(location)}";
         }
         return base.OpenAsync(context);
     }
@@ -59,7 +62,7 @@ public sealed class MapScreen : ScreenBase
         if (technicalLayer != null)
             technicalLayer.sprite = map?.TechnicalLayer;
         if (deckLabel != null)
-            deckLabel.text = map?.Id?.Replace("MAP_", string.Empty) ?? string.Empty;
+            deckLabel.text = FormatDeckLabel(map?.Id);
         BuildLocationNodes(map);
         RefreshLayers();
     }
@@ -85,7 +88,7 @@ public sealed class MapScreen : ScreenBase
             rect.anchorMin = rect.anchorMax = definition.NormalizedPosition;
             rect.pivot = new Vector2(.5f, .5f);
             rect.anchoredPosition = Vector2.zero;
-            rect.sizeDelta = new Vector2(180f, 58f);
+            rect.sizeDelta = new Vector2(220f, 64f);
             bool current = state?.State.currentLocationId == location.Id;
             bool objective = IsObjectiveDestination(location);
             bool unlocked = current || state?.State.unlockedLocations.Contains(location.Id) == true;
@@ -104,6 +107,25 @@ public sealed class MapScreen : ScreenBase
             locationNodes.Add(node);
         }
     }
+
+    private string ResolveLocationName(string id)
+    {
+        if (AppContext.Services != null &&
+            AppContext.Services.TryGet(out ContentDatabase content) &&
+            content.TryGetLocation(id, out LocationDefinition location))
+            return location.DisplayName;
+        return id;
+    }
+
+    public static string FormatDeckLabel(string id) => id switch
+    {
+        "MAP_Deck07" => "7층 갑판",
+        "MAP_Deck08" => "8층 갑판",
+        "MAP_Deck09" => "9층 갑판",
+        "MAP_Deck10" => "10층 갑판",
+        "MAP_MVElysium" => "M.V. 엘리시움",
+        _ => id?.Replace("MAP_", string.Empty) ?? string.Empty,
+    };
 
     private bool IsObjectiveDestination(LocationDefinition location)
     {

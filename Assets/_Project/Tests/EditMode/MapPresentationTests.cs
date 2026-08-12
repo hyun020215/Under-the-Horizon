@@ -19,6 +19,14 @@ public sealed class MapPresentationTests
             Button[] buttons = root.GetComponentsInChildren<Button>(true);
             Assert.That(buttons, Has.Some.Matches<Button>(button => button.name == "Deck07Button"));
             Assert.That(buttons, Has.Some.Matches<Button>(button => button.name == "BackButton"));
+
+            RectTransform viewport = root.transform.Find("Map Viewport").GetComponent<RectTransform>();
+            Text currentLocation = root.transform.Find("Current Location").GetComponent<Text>();
+            Text deckLabel = root.transform.Find("Map Viewport/Deck Label").GetComponent<Text>();
+            Assert.That(viewport.anchorMax.x - viewport.anchorMin.x, Is.GreaterThanOrEqualTo(0.78f));
+            Assert.That(viewport.anchorMax.y - viewport.anchorMin.y, Is.GreaterThanOrEqualTo(0.73f));
+            Assert.That(currentLocation.fontSize, Is.GreaterThanOrEqualTo(28));
+            Assert.That(deckLabel.fontSize, Is.GreaterThanOrEqualTo(30));
         }
         finally
         {
@@ -49,5 +57,13 @@ public sealed class MapPresentationTests
             }
         }
         Assert.That(nodes, Is.GreaterThanOrEqualTo(15));
+    }
+
+    [TestCase("MAP_Deck07", "7층 갑판")]
+    [TestCase("MAP_Deck10", "10층 갑판")]
+    [TestCase("MAP_MVElysium", "M.V. 엘리시움")]
+    public void DeckLabelsDoNotExposeInternalMapIds(string id, string expected)
+    {
+        Assert.That(MapScreen.FormatDeckLabel(id), Is.EqualTo(expected));
     }
 }
