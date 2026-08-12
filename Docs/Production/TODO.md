@@ -5,6 +5,10 @@
 
 ## 완료
 
+- [x] `UNITY_CONTENT_AUTHORING_GUIDE.md`를 현재 Runtime/Content/Editor 구조에 맞게 갱신하고,
+  개발자가 GUID를 보존하며 아트·오디오를 교체하고 배경·캐릭터·핫스팟을 조정하며 승인된
+  Story Scene을 추가할 수 있도록 검증·실행·문제 해결 절차를 문서화했다.
+
 - [x] 원본 저장소의 비생성 파일과 최신 버전을 비교하고 필요한 코드·미디어를 이식했다.
 - [x] 41개 `StorySceneDefinition`과 `C-01`~`C-18`의 canonical ID를 구성했다.
 - [x] P0 범위의 0바이트 Content ScriptableObject 212개와 Prefab 43개를 현재 스키마로

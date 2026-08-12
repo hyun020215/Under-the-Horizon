@@ -1,5 +1,8 @@
 # 아트 자산 정리 및 화질 기준
 
+실제 Sprite 교체, GUID를 보존하는 덮어쓰기, Location State 연결과 캐릭터 배치 조정 절차는
+`Docs/Production/UNITY_CONTENT_AUTHORING_GUIDE.md`를 함께 따른다.
+
 ## 역할별 폴더
 
 `Assets/_Project/Art/`에는 원본 시각 자산만 둔다. 최상위 분류는 다음과 같다.

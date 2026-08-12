@@ -25,6 +25,11 @@ ID나 직렬화 필드를 바꾸려면 참조·저장 데이터 마이그레이�
 4. 반복 Inspector 작업은 `Editor/` 도구로 자동화한다.
 5. 콘텐츠 검증과 진행 경로 검증을 통과시킨다.
 
+Unity에서 실제 자산 교체, CharacterPlacement/Interaction Rect 조정, Story Scene 수정·추가를
+수행하는 절차는 `Docs/Production/UNITY_CONTENT_AUTHORING_GUIDE.md`를 따른다.
+
 ## 현재 마이그레이션 상태
 
-원본 미디어와 CSV는 활성 폴더에 배치되어 있다. 0바이트 `.asset` 및 Prefab 파일은 유효한 Unity 직렬화 자산이 아니라 자리표시자이므로, 단일 TODO 문서에 남은 저작 작업으로 추적한다. 이를 완성된 콘텐츠로 간주하거나 검증기에서 예외 처리하지 않는다.
+원본 미디어와 CSV는 활성 폴더에 배치되어 있고 P0 범위의 Content ScriptableObject와 Prefab은
+유효한 Unity 직렬화 자산으로 복구되었다. 설정 영역에 남은 0바이트 placeholder는 완성된 콘텐츠로
+간주하거나 검증기에서 예외 처리하지 않으며 `Docs/Production/TODO.md`의 P2 작업으로 추적한다.

@@ -30,3 +30,5 @@
 - 콘텐츠 Validator 통과
 
 현재 상세 제작 현황과 남은 작업은 `Docs/Production/TODO.md`에서 단일 관리한다.
+새 Story Scene을 승인받아 추가하거나 기존 장면의 참조를 교체하는 실무 절차는
+`Docs/Production/UNITY_CONTENT_AUTHORING_GUIDE.md`를 따른다.
