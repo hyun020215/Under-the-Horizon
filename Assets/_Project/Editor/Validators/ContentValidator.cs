@@ -438,7 +438,7 @@ public static class ContentValidator
                 errors.Add($"{puzzle.Id} has no completion GameEffect.");
             }
 
-            if (puzzle.Rules != null)
+            if (puzzle.Rules?.IsAuthored == true)
             {
                 HashSet<string> allowed = puzzle.Rules.AllowedInputIds
                     .Where(id => !string.IsNullOrWhiteSpace(id))

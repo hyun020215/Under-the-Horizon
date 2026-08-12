@@ -133,6 +133,8 @@
   - Puzzle Interaction 진입 연결은 완료했다. 규칙 데이터와 최종 핫스팟 좌표가 남았다.
   - [x] D2-02 혈흔 배열과 D6-02 화물 레일의 허용 입력·정답·증거 gate·3단계 힌트를
     `PuzzleDefinition.rules`로 이식하고 기존 전용 컨트롤러가 해당 콘텐츠를 판정하도록 연결했다.
+    - 2026-08-12 병합 감사에서 미이식 퍼즐의 빈 직렬화 객체를 authored rule로 오인하던 validator를
+      수정했고, 기존 11개 퍼즐의 하위 호환을 유지한 상태로 Build Preflight를 다시 통과했다.
   - [ ] 나머지 11개 퍼즐 규칙과 퍼즐별 조작 View·중간 진행 복원을 같은 계약으로 이식한다.
 - [x] D8-01 최종 심문의 6단계 논증과 A/B/C/Bad 엔딩 판정·라우팅을 현재 Condition/GameEffect와
   `GameStateStore.endingId`로 이식했다.

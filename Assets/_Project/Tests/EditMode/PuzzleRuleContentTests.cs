@@ -63,6 +63,14 @@ public sealed class PuzzleRuleContentTests
         }
     }
 
+    [Test]
+    public void UnmigratedPuzzleRulesRemainBackwardCompatible()
+    {
+        PuzzleDefinition definition = Load("PUZ_D2_04_CCTVLogs");
+        Assert.That(definition.Rules, Is.Not.Null);
+        Assert.That(definition.Rules.IsAuthored, Is.False);
+    }
+
     private static PuzzleDefinition Load(string name) => AssetDatabase
         .FindAssets($"{name} t:PuzzleDefinition")
         .Select(AssetDatabase.GUIDToAssetPath)

@@ -15,6 +15,11 @@ public sealed class PuzzleRuleDefinition
     public string[] RequiredEvidenceIds => requiredEvidenceIds ?? Array.Empty<string>();
     public string[] Hints => hints ?? Array.Empty<string>();
     public bool OrderMatters => orderMatters;
+    public bool IsAuthored =>
+        AllowedInputIds.Length > 0
+        || SolutionIds.Length > 0
+        || RequiredEvidenceIds.Length > 0
+        || Hints.Length > 0;
 }
 
 [CreateAssetMenu(fileName = "PUZ_", menuName = "Under The Horizon/Puzzles/Definition")]
