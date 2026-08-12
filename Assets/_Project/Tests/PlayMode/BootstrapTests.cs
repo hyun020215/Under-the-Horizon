@@ -1,5 +1,7 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using NUnit.Framework;
 using UnityEngine;
@@ -7,10 +9,66 @@ using UnityEngine.EventSystems;
 using UnityEngine.SceneManagement;
 using UnityEngine.TestTools;
 using UnityEngine.UI;
+using Object = UnityEngine.Object;
 
 public sealed class BootstrapTests
 {
     private const float SceneLoadTimeoutSeconds = 10f;
+    private string saveDirectory;
+    private SaveService testSaves;
+
+    [SetUp]
+    public void SetUp()
+    {
+        saveDirectory = Path.Combine(
+            Path.GetTempPath(),
+            "UnderTheHorizonTests",
+            "Bootstrap",
+            Guid.NewGuid().ToString("N"));
+        Assert.That(
+            PathsOverlap(
+                saveDirectory,
+                Path.Combine(Application.persistentDataPath, "Saves")),
+            Is.False,
+            "Bootstrap test saves must not overlap the user save directory.");
+        Directory.CreateDirectory(saveDirectory);
+        testSaves = new SaveService(saveDirectory);
+        AppBootstrap.SaveServiceFactoryOverride = () => testSaves;
+    }
+
+    [UnityTearDown]
+    public IEnumerator TearDown()
+    {
+        AppBootstrap.SaveServiceFactoryOverride = null;
+        try
+        {
+            Scene cleanup = SceneManager.CreateScene("BootstrapTestCleanup");
+            SceneManager.SetActiveScene(cleanup);
+            foreach (AppBootstrap appBootstrap in Object.FindObjectsByType<AppBootstrap>(
+                         FindObjectsInactive.Include,
+                         FindObjectsSortMode.None))
+            {
+                Object.Destroy(appBootstrap.gameObject);
+            }
+
+            yield return null;
+            Scene game = SceneManager.GetSceneByName("Game");
+            if (game.isLoaded)
+                yield return SceneManager.UnloadSceneAsync(game);
+            Scene bootstrapScene = SceneManager.GetSceneByName("Bootstrap");
+            if (bootstrapScene.isLoaded)
+                yield return SceneManager.UnloadSceneAsync(bootstrapScene);
+        }
+        finally
+        {
+            AppContext.Services = null;
+            testSaves = null;
+
+            if (!string.IsNullOrWhiteSpace(saveDirectory) && Directory.Exists(saveDirectory))
+                Directory.Delete(saveDirectory, true);
+            saveDirectory = null;
+        }
+    }
 
     [UnityTest]
     public IEnumerator BootstrapLoadsPersistentGameShell()
@@ -33,7 +91,18 @@ public sealed class BootstrapTests
         Assert.That(AppContext.Services.Get<GameDefinition>(), Is.Not.Null);
         Assert.That(AppContext.Services.Get<ContentDatabase>(), Is.Not.Null);
         Assert.That(AppContext.Services.Get<ContentLoader>(), Is.Not.Null);
-        Assert.That(AppContext.Services.Get<SaveService>(), Is.Not.Null);
+        SaveService registeredSaves = AppContext.Services.Get<SaveService>();
+        Assert.That(registeredSaves, Is.SameAs(testSaves));
+        string slotPath = Path.GetFullPath(registeredSaves.GetPath(new SaveSlot(2)));
+        Assert.That(
+            Path.GetDirectoryName(slotPath),
+            Is.EqualTo(Path.GetFullPath(saveDirectory)));
+        Assert.That(
+            PathsOverlap(
+                saveDirectory,
+                Path.Combine(Application.persistentDataPath, "Saves")),
+            Is.False);
+        Assert.That(registeredSaves.Exists(new SaveSlot(2)), Is.False);
         Assert.That(AppContext.Services.Get<AudioSettingsService>(), Is.Not.Null);
 
         TitleScreen title = Object.FindFirstObjectByType<TitleScreen>(FindObjectsInactive.Include);
@@ -227,5 +296,25 @@ public sealed class BootstrapTests
         }
 
         Assert.That(narrative.History.Lines.Count, Is.GreaterThan(historyBeforeClick));
+    }
+
+    private static bool PathsOverlap(string first, string second) =>
+        IsSameOrChild(first, second) || IsSameOrChild(second, first);
+
+    private static bool IsSameOrChild(string candidate, string parent)
+    {
+#if UNITY_EDITOR_WIN
+        const StringComparison comparison = StringComparison.OrdinalIgnoreCase;
+#else
+        const StringComparison comparison = StringComparison.Ordinal;
+#endif
+        string fullCandidate = Path.GetFullPath(candidate)
+            .TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
+        string fullParent = Path.GetFullPath(parent)
+            .TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
+        return string.Equals(fullCandidate, fullParent, comparison)
+            || fullCandidate.StartsWith(
+                fullParent + Path.DirectorySeparatorChar,
+                comparison);
     }
 }

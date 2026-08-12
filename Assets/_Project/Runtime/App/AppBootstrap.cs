@@ -4,6 +4,11 @@ using UnityEngine.SceneManagement;
 
 public sealed class AppBootstrap : MonoBehaviour
 {
+    internal static System.Func<SaveService> SaveServiceFactoryOverride { get; set; }
+
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    private static void ResetStatics() => SaveServiceFactoryOverride = null;
+
     [SerializeField]
     private string gameScene = "Game";
 
@@ -20,7 +25,7 @@ public sealed class AppBootstrap : MonoBehaviour
         try
         {
             contentLoader = new ContentLoader(gameDefinition);
-            var saves = new SaveService();
+            SaveService saves = CreateSaveService();
             var audioSettings = new AudioSettingsService();
             var displaySettings = new DisplaySettingsService();
             var accessibilitySettings = new AccessibilitySettingsService();
@@ -42,6 +47,9 @@ public sealed class AppBootstrap : MonoBehaviour
             enabled = false;
         }
     }
+
+    private static SaveService CreateSaveService() =>
+        SaveServiceFactoryOverride?.Invoke() ?? new SaveService();
 
     private IEnumerator Start()
     {

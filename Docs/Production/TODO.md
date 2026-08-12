@@ -1,13 +1,14 @@
 # 통합 제작 TODO
 
 > 이 문서는 프로젝트의 유일한 TODO 목록이다. 자산 폴더 안에 TODO 파일을 다시 만들지 않는다.  
-> 갱신일: 2026-08-11 (`772736e` 이후 로컬 `main` 기준)
+> 갱신일: 2026-08-12 (검증 기준 `b53a09f`)
 
 ## 완료
 
 - [x] 원본 저장소의 비생성 파일과 최신 버전을 비교하고 필요한 코드·미디어를 이식했다.
 - [x] 41개 `StorySceneDefinition`과 `C-01`~`C-18`의 canonical ID를 구성했다.
-- [x] 0바이트 ScriptableObject와 Prefab을 현재 스키마로 복구하고 빈 중복 자산을 제거했다.
+- [x] P0 범위의 0바이트 Content ScriptableObject 212개와 Prefab 43개를 현재 스키마로
+  복구하고 빈 중복 콘텐츠 자산을 제거했다.
 - [x] `Bootstrap.unity`를 composition root로, `Game.unity`를 지속 런타임 셸로 연결했다.
 - [x] Title → Save Slot → Game 흐름과 화면 라우팅을 연결했다.
 - [x] 한국어 마스터 CSV의 전체 대화와 100개 선택지를 실행 가능한 그래프로 가져왔다.
@@ -148,15 +149,39 @@
 - [ ] 13개 퍼즐 각각에 대해 정답 → `PuzzleResult` → `GameEffect` → Save/Load 회귀 테스트를 추가한다.
 - [ ] Puzzle 직접 미리보기와 공통 Preview 계약을 구현한다.
 - [ ] 필요한 Addressables 등록·레이블과 깨진 직렬화 참조 검증을 추가한다.
-- [ ] Unity Editor에서 EditMode/PlayMode 전체 테스트와 Bootstrap 대표 플레이스루를 통과시킨다.
-  - 2026-08-11 기준 EditMode 28/28, Bootstrap PlayMode 1/1과 실제 화면 캡처를 통과했다.
-  - 전체 PlayMode 모음과 전 Story Scene 대표 플레이스루는 계속 확장한다.
+- [x] Unity Editor에서 현재 EditMode/PlayMode 전체 suite와 Bootstrap 자동 대표 흐름을 통과시킨다.
+  - 2026-08-12 기준 커밋 `b53a09f1416cb2a3ad838d0d4ac9d7eef4d810c6`, Unity `6000.3.20f1`
+    (`c9ba695d4f07`)에서 Build Preflight, EditMode 64/64, PlayMode 11/11을 통과했다. 실패·건너뜀은 0건이다.
+  - `BootstrapTests.BootstrapLoadsPersistentGameShell`이 런타임 UI 버튼 이벤트와 `ScreenRouter` 경로로
+    Bootstrap → Title → Save Slot 3 → Dialogue → Exploration → Map → Exploration → Record →
+    Exploration → 캐릭터 상호작용을 통과했다.
+  - 2026-08-12 `745363f` 기반 변경, Unity `6000.3.20f1`에서 Bootstrap 테스트마다 OS 임시 경로의
+    고유 디렉터리를 `SaveService`에 주입해 실제 사용자 게임 저장 폴더
+    `Application.persistentDataPath/Saves`와 겹치지 않는 빈 Slot 3에서 시작하도록 했다. 동일 Unity
+    프로세스 2회 연속 실행과 PlayMode 11/11, EditMode 64/64, Build Preflight를 통과했고
+    실패·건너뜀·불확정 결과와 남은 테스트별 고유 임시 Save 디렉터리는 0건이다.
+  - 대화형 Editor에서는 Bootstrap → Title → Save Slot 3 → Dialogue까지 화면 표시를 직접 확인했다.
+    Map과 Record의 자동 PlayMode 경로는 통과했지만 별도 수동 시각 확인은 완료하지 않았다.
+  - 새 아키텍처 scaffold 단계에서 생성되어 P2로 유보된 설정용 0바이트 placeholder 8개가 아직
+    유효한 Unity 자산으로 저작·연결되지 않아 cold import 오류가 발생한다. 최신 기능 변경의 회귀는
+    아니지만 현재 Build Preflight와 테스트 범위 밖이므로 아래 P2 작업에서 별도로 해결한다.
+- [ ] P-01부터 모든 엔딩까지 실제 대표 플레이스루를 완료한다.
+  - Story graph 도달 가능성 자동 검사와 별도로 장면별 Interaction·Puzzle·연출·저장·엔딩 흐름을 확인한다.
 
 ## P2 — 출시 설정과 품질
 
+- [ ] P2로 유보한 설정용 0바이트 placeholder 8개를 현재 아키텍처에 맞는 유효한 Unity
+  `6000.3.20f1` 자산으로 저작·교체·연결한다.
+  - Input 1개, Rendering 3개, Audio 3개, Addressables settings 1개를 대상으로 한다.
+  - 과거의 유효한 본체는 Git 이력에 없으므로 원본을 단순 복원하지 않고 현재 owner와 참조 계약을 따른다.
+  - 사용하지 않는 orphan placeholder는 serialized reference와 GUID 영향을 확인한 뒤 제거한다.
+  - Rendering은 `GraphicsSettings`·`QualitySettings`의 누락된 active URP 참조와 URP Global Settings를
+    Renderer Data·URP Pipeline·Global Volume과 함께 정상화한다.
 - [ ] Audio Mixer 그룹·스냅샷과 더킹 attack/release 및 버스별 최종 볼륨을 실제 음원으로 튜닝한다.
-- [ ] 대형 배경·캐릭터·증거·BGM·환경음·녹음을 Addressables 그룹과 레이블로 구성한다.
-- [ ] Input Actions, Render Pipeline, Renderer와 Global Volume을 타깃 플랫폼에서 검증한다.
+- [ ] Addressables 패키지와 settings를 구성하고 대형 배경·캐릭터·증거·BGM·환경음·녹음을
+  그룹과 레이블로 구성한다.
+- [ ] 프로젝트 전용 Input Actions 사용 범위와 정상화한 Rendering 설정을 타깃 플랫폼에서 검증한다.
+- [ ] Library가 없는 clean checkout에서 cold import 설정 오류 0건을 확인하고 타깃 Player build를 검증한다.
 - [ ] 앱 이름, 회사명, 아이콘, 해상도, 품질과 플랫폼별 Player Settings를 확정한다.
 - [ ] CI에서 Unity Test Runner와 Build Preflight를 push/PR마다 실행한다.
 - [ ] `Docs/QA/ReleaseChecklist.md`를 모두 확인한다.
