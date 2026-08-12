@@ -38,13 +38,33 @@ public sealed class DialoguePresentationTests
     [Test]
     public void DialogueTypographyScalesDownForLongLines()
     {
-        int shortLine = DialogueTypography.ResolveFontSize(26, 30, false);
-        int mediumLine = DialogueTypography.ResolveFontSize(26, 110, false);
-        int longLine = DialogueTypography.ResolveFontSize(26, 220, false);
+        int shortLine = DialogueTypography.ResolveFontSize(34, 30, false);
+        int mediumLine = DialogueTypography.ResolveFontSize(34, 110, false);
+        int longLine = DialogueTypography.ResolveFontSize(34, 220, false);
         Assert.That(shortLine, Is.GreaterThan(mediumLine));
         Assert.That(mediumLine, Is.GreaterThan(longLine));
-        Assert.That(DialogueTypography.ResolveFontSize(26, 30, true),
+        Assert.That(longLine, Is.GreaterThanOrEqualTo(28));
+        Assert.That(DialogueTypography.ResolveFontSize(34, 30, true),
             Is.LessThan(shortLine));
+    }
+
+    [Test]
+    public void DialoguePrefabKeepsReadableFullHdBodyType()
+    {
+        GameObject root = PrefabUtility.LoadPrefabContents(
+            "Assets/_Project/Prefabs/UI/PF_DialogueScreen.prefab");
+        try
+        {
+            Text body = root.transform.Find("Dialogue Panel/BodyLabel")?.GetComponent<Text>();
+            Assert.That(body, Is.Not.Null);
+            Assert.That(body.fontSize, Is.GreaterThanOrEqualTo(34));
+            RectTransform panel = root.transform.Find("Dialogue Panel") as RectTransform;
+            Assert.That(panel.anchorMax.y - panel.anchorMin.y, Is.GreaterThanOrEqualTo(.3f));
+        }
+        finally
+        {
+            PrefabUtility.UnloadPrefabContents(root);
+        }
     }
 
     [Test]
