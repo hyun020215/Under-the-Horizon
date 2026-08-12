@@ -36,9 +36,10 @@
 
 ### 우선순위 2 — 전환과 살아 있는 화면
 
-- [ ] 공통 화면 전환 프로필에 원본의 UI exit, cover, hold, reveal, UI enter 리듬을 재현한다.
+- [x] 공통 화면 전환 프로필에 원본의 UI exit, cover, hold, reveal, UI enter 리듬을 재현한다.
   - 타이틀→슬롯과 슬롯→게임에서 즉시 교체처럼 보이지 않도록 한다.
   - `TransitionDirector`와 기존 `TransitionProfile`만 확장한다.
+  - 기존 프로필의 미사용 `uiExitDuration`·`holdDuration`·`uiEnterDuration`을 `TransitionDirector` 단계에 연결하고 표준 Fade의 cover/reveal 시간을 1080p 실제 전환에 맞게 조정했다.
 - [ ] 원본의 원형 부유 파티클과 밝은/남색 cover를 전환 플레이어로 재현하고 Reduced Motion에서는 정적으로 대체한다.
 - [ ] 탐색 화면에 기존 `AmbientParticleOverlay`를 활용해 먼지/광점의 밀도와 속도를 원본 수준으로 조정한다.
 - [ ] `CharacterStage`/`CharacterView`의 기존 프레젠테이션 기능을 활용해 접지 그림자, 환경광, 미세 idle 이동을 보강한다.

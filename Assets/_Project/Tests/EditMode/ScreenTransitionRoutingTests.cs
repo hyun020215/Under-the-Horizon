@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.IO;
 using NUnit.Framework;
 using UnityEditor;
 using UnityEditor.SceneManagement;
@@ -6,6 +7,25 @@ using UnityEngine;
 
 public sealed class ScreenTransitionRoutingTests
 {
+    [Test]
+    public void StandardFadeAuthorsAllFivePresentationPhases()
+    {
+        TransitionProfile profile = AssetDatabase.LoadAssetAtPath<TransitionProfile>(
+            "Assets/_Project/Content/Transitions/TRANS_FADE_STANDARD.asset");
+        Assert.That(profile, Is.Not.Null);
+        Assert.That(profile.uiExitDuration, Is.GreaterThan(0f));
+        Assert.That(profile.coverDuration, Is.GreaterThan(profile.uiExitDuration));
+        Assert.That(profile.holdDuration, Is.GreaterThan(0f));
+        Assert.That(profile.revealDuration, Is.GreaterThan(0f));
+        Assert.That(profile.uiEnterDuration, Is.GreaterThan(0f));
+
+        string director = File.ReadAllText(
+            "Assets/_Project/Runtime/Transitions/TransitionDirector.cs");
+        Assert.That(director, Does.Contain("WaitAsync(profile.uiExitDuration)"));
+        Assert.That(director, Does.Contain("WaitAsync(profile.holdDuration)"));
+        Assert.That(director, Does.Contain("WaitAsync(profile.uiEnterDuration)"));
+    }
+
     [Test]
     public void GameRouterUsesAuthoredProfilesForFeatureScreens()
     {

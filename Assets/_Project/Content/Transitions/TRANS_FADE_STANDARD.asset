@@ -13,10 +13,10 @@ MonoBehaviour:
   m_Name: TRANS_FADE_STANDARD
   m_EditorClassIdentifier: UTH.Runtime::TransitionProfile
   type: 0
-  uiExitDuration: 0.15
-  coverDuration: 0.25
-  holdDuration: 0
-  revealDuration: 0.25
-  uiEnterDuration: 0.15
+  uiExitDuration: 0.18
+  coverDuration: 0.34
+  holdDuration: 0.1
+  revealDuration: 0.36
+  uiEnterDuration: 0.2
   stinger: {fileID: 0}
   blockInput: 1
