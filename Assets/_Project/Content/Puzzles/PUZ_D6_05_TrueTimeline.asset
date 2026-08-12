@@ -16,3 +16,40 @@ MonoBehaviour:
   controllerKey: TimelinePuzzleController
   completionEffects:
   - {fileID: 11400000, guid: 4f688447343786746a14052f192e317a, type: 2}
+  rules:
+    allowedInputIds:
+    - token_handoff
+    - vault_overwrite
+    - party_photo
+    - daniel_service_entry
+    - ballast_arrival
+    - nitrogen_start
+    - murder
+    - recording_created
+    - rail_departure
+    - detector_error
+    - sink_overflow
+    - body_discovery
+    solutionIds:
+    - token_handoff
+    - vault_overwrite
+    - party_photo
+    - daniel_service_entry
+    - ballast_arrival
+    - nitrogen_start
+    - murder
+    - recording_created
+    - rail_departure
+    - detector_error
+    - sink_overflow
+    - body_discovery
+    requiredEvidenceIds: []
+    hints:
+    - "\uBA3C\uC800 \uC0AC\uB78C\uC758 \uD589\uB3D9\uACFC \uC790\uB3D9 \uC7A5\uCE58\uC758
+      \uD589\uB3D9\uC744 \uB450 \uC904\uB85C \uB098\uB204\uC138\uC694."
+    - "\uB2E4\uB2C8\uC5D8\uC758 \uC11C\uBE44\uC2A4 \uC9C4\uC785 \uB2E4\uC74C\uC5D0\uB294
+      \uBC38\uB7EC\uC2A4\uD2B8 \uB3C4\uCC29, \uC9C8\uC18C \uC2DC\uC791, \uC0AC\uB9DD\uC774
+      \uC774\uC5B4\uC9D1\uB2C8\uB2E4."
+    - "\uB808\uC77C \uCD9C\uBC1C \u2192 \uAC10\uC9C0\uAE30 \uC624\uB958 \u2192 \uC138\uBA74\uB300
+      \uC791\uB3D9 \u2192 \uBC1C\uACAC \uC21C\uC11C\uC785\uB2C8\uB2E4."
+    orderMatters: 1

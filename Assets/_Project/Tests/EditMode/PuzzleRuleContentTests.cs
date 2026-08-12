@@ -89,6 +89,26 @@ public sealed class PuzzleRuleContentTests
         Assert.That(task.Result.Payload, Does.Not.Contain("invented_observation"));
     }
 
+    [Test]
+    public void TrueTimelineRequiresAllTwelveCardsInCanonicalOrder()
+    {
+        PuzzleDefinition definition = Load("PUZ_D6_05_TrueTimeline");
+        TimelinePuzzleController controller = host.AddComponent<TimelinePuzzleController>();
+        var task = controller.PlayAsync(new PuzzleContext(definition, state));
+        string[] reversed = definition.Rules.SolutionIds.Reverse().ToArray();
+
+        controller.SetOrder(reversed);
+        Assert.That(controller.SubmitAuthoredRule(), Is.False);
+        controller.SetOrder(definition.Rules.SolutionIds);
+        Assert.That(controller.RequestHint(), Does.Contain("사람의 행동"));
+        Assert.That(controller.SubmitAuthoredRule(), Is.True);
+        Assert.That(task.Result.Completed, Is.True);
+        Assert.That(definition.Rules.SolutionIds, Has.Length.EqualTo(12));
+        Assert.That(state.TryGetPuzzleProgress(definition.Id, out string progress), Is.True);
+        Assert.That(progress, Does.StartWith("token_handoff,vault_overwrite"));
+        Assert.That(progress, Does.EndWith("|hint:1"));
+    }
+
     private static PuzzleDefinition Load(string name) => AssetDatabase
         .FindAssets($"{name} t:PuzzleDefinition")
         .Select(AssetDatabase.GUIDToAssetPath)

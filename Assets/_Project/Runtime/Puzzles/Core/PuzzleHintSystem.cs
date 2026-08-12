@@ -35,9 +35,14 @@ public abstract class ValidatedPuzzleController : PuzzleControllerBase
         if (hints == null || HintLevel >= hints.Length)
             return string.Empty;
         string hint = hints[HintLevel++];
+        string progress = string.Empty;
+        Context.State?.TryGetPuzzleProgress(Context.Definition.Id, out progress);
+        int hintMarker = progress?.IndexOf("|hint:", StringComparison.Ordinal) ?? -1;
+        if (hintMarker >= 0)
+            progress = progress.Substring(0, hintMarker);
         Context.State?.SetPuzzleProgress(
             Context.Definition.Id,
-            $"hint:{HintLevel}");
+            $"{progress}|hint:{HintLevel}");
         return hint;
     }
 
