@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System;
 
 public sealed class CargoRailPuzzleController : ValidatedPuzzleController
 {
@@ -18,4 +19,26 @@ public sealed class CargoRailPuzzleController : ValidatedPuzzleController
             route.Count >= 2 && route[0] == start && route[^1] == end,
             string.Join(",", route)
         );
+
+    public bool SubmitAuthoredRule()
+    {
+        PuzzleRuleDefinition rules = Context.Definition?.Rules;
+        if (rules == null || rules.SolutionIds.Length == 0 || !HasRequiredEvidence())
+            return false;
+        if (rules.OrderMatters)
+        {
+            if (route.Count != rules.SolutionIds.Length)
+                return false;
+            for (int i = 0; i < route.Count; i++)
+                if (!string.Equals(route[i], rules.SolutionIds[i], StringComparison.Ordinal))
+                    return false;
+        }
+        else
+        {
+            foreach (string id in rules.SolutionIds)
+                if (!route.Contains(id))
+                    return false;
+        }
+        return CompleteWhen(true, string.Join(",", route));
+    }
 }

@@ -16,3 +16,25 @@ MonoBehaviour:
   controllerKey: CargoRailPuzzleController
   completionEffects:
   - {fileID: 11400000, guid: b05aad858f76db64a9901686ac80fa9a, type: 2}
+  rules:
+    allowedInputIds:
+    - horizon_branch_22_18
+    - weight_86kg
+    - ballast_horizon_route
+    solutionIds:
+    - horizon_branch_22_18
+    - weight_86kg
+    - ballast_horizon_route
+    requiredEvidenceIds:
+    - C-08
+    - C-09
+    - C-10
+    hints:
+    - "22\uC2DC 18\uBD84\uC5D0 \uD65C\uC131\uD654\uB41C \uBD84\uAE30 \uAE30\uB85D\uC744
+      \uBA3C\uC800 \uCC3E\uC73C\uC138\uC694."
+    - "86kg \uD558\uC911 \uAE30\uB85D\uACFC \uAC19\uC740 \uC2DC\uAC04\uB300\uC758
+      \uB808\uC77C\uC744 \uBE44\uAD50\uD558\uC138\uC694."
+    - "\uBC38\uB7EC\uC2A4\uD2B8 \uBCC4\uC2E4\uC5D0\uC11C \uD638\uB77C\uC774\uC98C
+      \uB8F8 \uCC9C\uC7A5\uC73C\uB85C \uC774\uC5B4\uC9C0\uB294 \uACBD\uB85C\uB97C
+      \uC120\uD0DD\uD558\uC138\uC694."
+    orderMatters: 0

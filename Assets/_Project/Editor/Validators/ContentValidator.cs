@@ -437,6 +437,21 @@ public static class ContentValidator
             {
                 errors.Add($"{puzzle.Id} has no completion GameEffect.");
             }
+
+            if (puzzle.Rules != null)
+            {
+                HashSet<string> allowed = puzzle.Rules.AllowedInputIds
+                    .Where(id => !string.IsNullOrWhiteSpace(id))
+                    .ToHashSet(StringComparer.Ordinal);
+                if (puzzle.Rules.SolutionIds.Length == 0)
+                    errors.Add($"{puzzle.Id} has an empty authored solution.");
+                foreach (string id in puzzle.Rules.SolutionIds)
+                    if (!allowed.Contains(id))
+                        errors.Add($"{puzzle.Id} solution '{id}' is not an allowed input.");
+                foreach (string id in puzzle.Rules.RequiredEvidenceIds)
+                    if (!CanonicalEvidenceIds.Contains(id))
+                        errors.Add($"{puzzle.Id} requires unknown evidence {id}.");
+            }
         }
     }
 
