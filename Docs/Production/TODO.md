@@ -150,6 +150,11 @@
   - `BootstrapTests.BootstrapLoadsPersistentGameShell`이 런타임 UI 버튼 이벤트와 `ScreenRouter` 경로로
     Bootstrap → Title → Save Slot 3 → Dialogue → Exploration → Map → Exploration → Record →
     Exploration → 캐릭터 상호작용을 통과했다.
+  - 2026-08-12 `745363f` 기반 변경, Unity `6000.3.20f1`에서 Bootstrap 테스트마다 OS 임시 경로의
+    고유 디렉터리를 `SaveService`에 주입해 실제 사용자 게임 저장 폴더
+    `Application.persistentDataPath/Saves`와 겹치지 않는 빈 Slot 3에서 시작하도록 했다. 동일 Unity
+    프로세스 2회 연속 실행과 PlayMode 11/11, EditMode 64/64, Build Preflight를 통과했고
+    실패·건너뜀·불확정 결과와 남은 테스트별 고유 임시 Save 디렉터리는 0건이다.
   - 대화형 Editor에서는 Bootstrap → Title → Save Slot 3 → Dialogue까지 화면 표시를 직접 확인했다.
     Map과 Record의 자동 PlayMode 경로는 통과했지만 별도 수동 시각 확인은 완료하지 않았다.
   - 새 아키텍처 scaffold 단계에서 생성되어 P2로 유보된 설정용 0바이트 placeholder 8개가 아직
