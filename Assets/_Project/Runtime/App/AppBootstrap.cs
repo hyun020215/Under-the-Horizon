@@ -31,6 +31,7 @@ public sealed class AppBootstrap : MonoBehaviour
             var accessibilitySettings = new AccessibilitySettingsService();
             audioSettings.Load();
             displaySettings.Load();
+            displaySettings.ApplyLoadedSettings();
             accessibilitySettings.Load();
 
             AppContext.Services.Register(gameDefinition);

@@ -53,19 +53,30 @@ public sealed class DisplaySettingsService
         Fullscreen = PlayerPrefs.GetInt(FullscreenKey, 1) != 0;
     }
 
+    public void ApplyLoadedSettings()
+    {
+        DisplayResolution resolution = Supported[SelectedIndex];
+        ApplyToScreen(resolution, Fullscreen);
+    }
+
     public void Apply(int resolutionIndex, bool fullscreen)
     {
         SelectedIndex = Mathf.Clamp(resolutionIndex, 0, Supported.Length - 1);
         Fullscreen = fullscreen;
         DisplayResolution resolution = Supported[SelectedIndex];
-        FullScreenMode mode = fullscreen
-            ? FullScreenMode.FullScreenWindow
-            : FullScreenMode.Windowed;
-        Screen.SetResolution(resolution.Width, resolution.Height, mode);
+        ApplyToScreen(resolution, fullscreen);
         PlayerPrefs.SetInt(WidthKey, resolution.Width);
         PlayerPrefs.SetInt(HeightKey, resolution.Height);
         PlayerPrefs.SetInt(FullscreenKey, fullscreen ? 1 : 0);
         PlayerPrefs.Save();
+    }
+
+    private static void ApplyToScreen(DisplayResolution resolution, bool fullscreen)
+    {
+        FullScreenMode mode = fullscreen
+            ? FullScreenMode.FullScreenWindow
+            : FullScreenMode.Windowed;
+        Screen.SetResolution(resolution.Width, resolution.Height, mode);
     }
 
     public int FindClosestIndex(int width, int height)

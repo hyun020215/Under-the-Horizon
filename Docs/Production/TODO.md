@@ -1,5 +1,51 @@
 # 통합 제작 TODO
 
+## 2026-08-13 원본/현재 Unity 직접 실행 UX 비교 후속 작업
+
+> 비교 기준: 원본 `D:\\codex-project-mystery`의 `UI Basic Scene` Play Mode와 현재
+> `Bootstrap -> Game` Play Mode를 동일한 16:9 화면 흐름에서 직접 조작했다.
+> 아래 항목은 기존 `ScreenRouter`, `ModalRouter`, `TransitionDirector`, UI Prefab,
+> `CharacterStage`를 확장하며, 별도 UI/전환 프레임워크를 만들지 않는다.
+
+### 우선순위 0 — 화면 기준과 가독성
+
+- [x] 저장된 16:9 해상도/전체 화면 설정을 앱 시작 시 실제 디스플레이에 적용한다.
+  - 현재 `DisplaySettingsService.Load()`는 선택값만 복원하고 `Screen.SetResolution`을 호출하지 않는다.
+  - 1920x1080을 권장 기본값으로 유지하고 1280x720, 1600x900, 2560x1440, 3840x2160을 설정에서 선택 가능하게 유지한다.
+  - Bootstrap과 Game Canvas가 같은 1920x1080 기준과 0.5 width/height match를 사용하는지 검증한다.
+- [ ] 원본과 현재 화면을 비교할 때 Unity Game View를 16:9 Fit 상태로 맞추는 개발용 검증 절차를 문서화한다.
+- [ ] 공통 타이포그래피 기준을 확장해 제목/섹션/본문/버튼/보조 문구의 크기, 굵기, 자간, 행간, 대비를 원본 수준으로 맞춘다.
+  - Dialogue 본문, `NARRATION` 이름표, Map/Save Slot의 작은 텍스트를 1080p 실기 기준으로 우선 개선한다.
+  - 한글/영문 fallback, 깨진 글리프, `LOC_PORT` 같은 내부 ID 노출과 언어 혼용을 검증한다.
+
+### 우선순위 1 — 핵심 화면 구성
+
+- [ ] Save Slot을 장식 프레임 안에서 축소된 카드가 아니라 원본처럼 화면 전체를 활용하는 3열 레이아웃으로 조정한다.
+- [ ] 저장 슬롯 확인 UX를 작은 중앙 팝업에서 원본의 전체 화면 dim + 큰 선택 영역에 가까운 구성으로 조정하되 `ModalRouter`/`ConfirmDialog`를 재사용한다.
+- [ ] Persistent HUD의 불투명 상단 패널을 원본의 투명 금색 라인/아이콘 중심 오버레이로 재구성한다.
+- [ ] Map 화면의 덱 선택, 지도, 선택 장소 정보, 이동 행동의 정보 계층을 원본과 맞춘다.
+  - 실제 `MapDefinition`, Location/Condition 연결은 유지한다.
+  - Deck/장소명 표기와 한글/영문 혼용, 작은 글자, 겹치는 노드 라벨을 수정한다.
+- [ ] Dialogue 프레임의 화면 점유율, 본문 여백, 이름표, 다음 버튼 크기를 원본과 맞춘다.
+
+### 우선순위 2 — 전환과 살아 있는 화면
+
+- [ ] 공통 화면 전환 프로필에 원본의 UI exit, cover, hold, reveal, UI enter 리듬을 재현한다.
+  - 타이틀→슬롯과 슬롯→게임에서 즉시 교체처럼 보이지 않도록 한다.
+  - `TransitionDirector`와 기존 `TransitionProfile`만 확장한다.
+- [ ] 원본의 원형 부유 파티클과 밝은/남색 cover를 전환 플레이어로 재현하고 Reduced Motion에서는 정적으로 대체한다.
+- [ ] 탐색 화면에 기존 `AmbientParticleOverlay`를 활용해 먼지/광점의 밀도와 속도를 원본 수준으로 조정한다.
+- [ ] `CharacterStage`/`CharacterView`의 기존 프레젠테이션 기능을 활용해 접지 그림자, 환경광, 미세 idle 이동을 보강한다.
+  - 배치 좌표와 캐릭터별 차이는 `CharacterPlacementSet`/프로필 데이터에 둔다.
+- [ ] 버튼 hover/press, 커서 glow, 화면 진입 후 focus 반응을 원본과 같은 강도로 조정한다.
+
+### 직접 실행 완료 기준
+
+- [ ] 1920x1080과 2560x1440에서 Title→Save Slot→Gameplay→Map 흐름을 각각 캡처한다.
+- [ ] 원본과 현재의 정지 화면뿐 아니라 전환 중간 프레임, hover/press, 대화 진행 반응을 나란히 비교한다.
+- [ ] 배경/캐릭터 원본 텍스처가 적절한 Game View Fit 상태에서도 흐릴 때만 Import max size/compression을 변경한다.
+- [ ] 각 기능 단위로 TODO, 관련 테스트/검증, Unity Play Mode 결과를 같은 커밋에 포함한다.
+
 > 이 문서는 프로젝트의 유일한 TODO 목록이다. 자산 폴더 안에 TODO 파일을 다시 만들지 않는다.  
 > 갱신일: 2026-08-12 (검증 기준 `b53a09f`)
 

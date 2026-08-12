@@ -1,4 +1,5 @@
 using NUnit.Framework;
+using System.IO;
 
 public sealed class DisplaySettingsTests
 {
@@ -29,5 +30,20 @@ public sealed class DisplaySettingsTests
         foreach (DisplaySettingsService.DisplayResolution resolution in settings.Resolutions)
             Assert.That(resolution.Width / (float)resolution.Height,
                 Is.EqualTo(16f / 9f).Within(0.001f));
+    }
+
+    [Test]
+    public void ShippingCanvasesShareTheRecommendedReferenceResolution()
+    {
+        foreach (string scene in new[]
+                 {
+                     "Assets/_Project/Scenes/Bootstrap.unity",
+                     "Assets/_Project/Scenes/Game.unity",
+                 })
+        {
+            string yaml = File.ReadAllText(scene);
+            Assert.That(yaml, Does.Contain("m_ReferenceResolution: {x: 1920, y: 1080}"), scene);
+            Assert.That(yaml, Does.Contain("m_MatchWidthOrHeight: 0.5"), scene);
+        }
     }
 }
