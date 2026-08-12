@@ -66,9 +66,27 @@ public sealed class PuzzleRuleContentTests
     [Test]
     public void UnmigratedPuzzleRulesRemainBackwardCompatible()
     {
-        PuzzleDefinition definition = Load("PUZ_D2_04_CCTVLogs");
+        PuzzleDefinition definition = Load("PUZ_D3_04_VaultAuthentication");
         Assert.That(definition.Rules, Is.Not.Null);
         Assert.That(definition.Rules.IsAuthored, Is.False);
+    }
+
+    [Test]
+    public void CctvRuleRequiresVideoAndFacilityLogObservations()
+    {
+        PuzzleDefinition definition = Load("PUZ_D2_04_CCTVLogs");
+        CCTVLogPuzzleController controller = host.AddComponent<CCTVLogPuzzleController>();
+        var task = controller.PlayAsync(new PuzzleContext(definition, state));
+
+        controller.Observe("invented_observation");
+        foreach (string id in definition.Rules.SolutionIds.Take(4))
+            controller.Observe(id);
+        Assert.That(controller.Submit(), Is.False);
+        controller.Observe("location_confirmed");
+        Assert.That(controller.RequestHint(), Does.Contain("카메라"));
+        Assert.That(controller.Submit(), Is.True);
+        Assert.That(task.Result.Completed, Is.True);
+        Assert.That(task.Result.Payload, Does.Not.Contain("invented_observation"));
     }
 
     private static PuzzleDefinition Load(string name) => AssetDatabase

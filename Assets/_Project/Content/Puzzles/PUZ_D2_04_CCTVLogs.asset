@@ -16,3 +16,26 @@ MonoBehaviour:
   controllerKey: CCTVLogPuzzleController
   completionEffects:
   - {fileID: 11400000, guid: 2a0433acee471064ea702e20af056cf7, type: 2}
+  rules:
+    allowedInputIds:
+    - reviewed_cctv
+    - door_log_clear
+    - logs_overlaid
+    - detector_error_selected
+    - location_confirmed
+    solutionIds:
+    - reviewed_cctv
+    - door_log_clear
+    - logs_overlaid
+    - detector_error_selected
+    - location_confirmed
+    requiredEvidenceIds: []
+    hints:
+    - "\uCE74\uBA54\uB77C\uC5D0 \uBCF4\uC774\uC9C0 \uC54A\uB294 \uC0AC\uAC74\uC740
+      \uC601\uC0C1 \uBC16 \uC2DC\uC2A4\uD15C\uC758 \uC2DC\uAC04 \uAE30\uB85D\uACFC
+      \uBE44\uAD50\uD558\uC138\uC694."
+    - "22\uC2DC 18\uBD84 \uC804\uD6C4\uC758 \uBE44\uC601\uC0C1 \uB85C\uADF8\uB97C
+      \uCC3E\uC73C\uC138\uC694."
+    - "\uD654\uC7AC\uAC10\uC9C0\uAE30 '\uCC28\uD3D0 4\uCD08' \uC774\uBCA4\uD2B8\uB97C
+      \uC120\uD0DD\uD558\uC138\uC694."
+    orderMatters: 0
