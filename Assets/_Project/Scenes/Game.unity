@@ -3925,6 +3925,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: UTH.Runtime::FadeTransitionPlayer
   overlay: {fileID: 1291007537}
+  cover: {fileID: 1291007538}
 --- !u!114 &1291007536
 MonoBehaviour:
   m_ObjectHideFlags: 0

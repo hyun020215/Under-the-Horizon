@@ -18,5 +18,8 @@ MonoBehaviour:
   holdDuration: 0.1
   revealDuration: 0.36
   uiEnterDuration: 0.2
+  coverColor: {r: 0.012, g: 0.024, b: 0.075, a: 1}
+  particleColor: {r: 0.94, g: 0.74, b: 0.34, a: 0.46}
+  particleCount: 14
   stinger: {fileID: 0}
   blockInput: 1

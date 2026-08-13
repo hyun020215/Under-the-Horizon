@@ -40,7 +40,8 @@
   - 타이틀→슬롯과 슬롯→게임에서 즉시 교체처럼 보이지 않도록 한다.
   - `TransitionDirector`와 기존 `TransitionProfile`만 확장한다.
   - 기존 프로필의 미사용 `uiExitDuration`·`holdDuration`·`uiEnterDuration`을 `TransitionDirector` 단계에 연결하고 표준 Fade의 cover/reveal 시간을 1080p 실제 전환에 맞게 조정했다.
-- [ ] 원본의 원형 부유 파티클과 밝은/남색 cover를 전환 플레이어로 재현하고 Reduced Motion에서는 정적으로 대체한다.
+- [x] 원본의 원형 부유 파티클과 밝은/남색 cover를 전환 플레이어로 재현하고 Reduced Motion에서는 정적으로 대체한다.
+  - 기존 `FadeTransitionPlayer`가 프로필의 남색 cover와 금색 원형 glow를 생성·표시하도록 확장했으며, Reduced Motion에서는 이동 없이 즉시 정적 cover 상태만 적용한다. 원형 glow sprite는 `AmbientParticleOverlay`와 공용 `UiGlowSprite`를 사용해 중복 생성을 피한다.
 - [ ] 탐색 화면에 기존 `AmbientParticleOverlay`를 활용해 먼지/광점의 밀도와 속도를 원본 수준으로 조정한다.
 - [ ] `CharacterStage`/`CharacterView`의 기존 프레젠테이션 기능을 활용해 접지 그림자, 환경광, 미세 idle 이동을 보강한다.
   - 배치 좌표와 캐릭터별 차이는 `CharacterPlacementSet`/프로필 데이터에 둔다.

@@ -14,7 +14,6 @@ public sealed class AmbientParticleOverlay : MonoBehaviour
     private RectTransform waterShimmer;
     private Image waterShimmerImage;
     private AccessibilitySettingsService accessibility;
-    private static Sprite glowSprite;
 
     public void Initialize(RectTransform target, AmbientParticleProfile settings)
     {
@@ -48,7 +47,6 @@ public sealed class AmbientParticleOverlay : MonoBehaviour
 
     private void Build()
     {
-        EnsureGlowSprite();
         BuildLayeredAtmosphere();
         particles = new RectTransform[profile.Count];
         images = new Image[profile.Count];
@@ -63,7 +61,7 @@ public sealed class AmbientParticleOverlay : MonoBehaviour
             float size = Mathf.Lerp(profile.SizeRange.x, profile.SizeRange.y, Hash01(index, 0));
             rect.sizeDelta = new Vector2(size, size);
             Image image = particle.GetComponent<Image>();
-            image.sprite = glowSprite;
+            image.sprite = UiGlowSprite.Get();
             image.raycastTarget = false;
             particles[index] = rect;
             images[index] = image;
@@ -122,7 +120,7 @@ public sealed class AmbientParticleOverlay : MonoBehaviour
             waterShimmer.anchorMax = new Vector2(1f, .38f);
             waterShimmer.offsetMin = waterShimmer.offsetMax = Vector2.zero;
             waterShimmerImage = layer.GetComponent<Image>();
-            waterShimmerImage.sprite = glowSprite;
+            waterShimmerImage.sprite = UiGlowSprite.Get();
             waterShimmerImage.raycastTarget = false;
         }
     }
@@ -146,33 +144,6 @@ public sealed class AmbientParticleOverlay : MonoBehaviour
                 profile.WaterShimmerOpacity * (reduced ? .65f : .72f + wave * .28f));
             waterShimmer.localScale = new Vector3(1f, reduced ? 1f : 1f + wave * .05f, 1f);
         }
-    }
-
-    private static void EnsureGlowSprite()
-    {
-        if (glowSprite != null)
-            return;
-        const int size = 32;
-        Texture2D texture = new(size, size, TextureFormat.RGBA32, false)
-        {
-            name = "UI Ambient Glow",
-            wrapMode = TextureWrapMode.Clamp,
-            filterMode = FilterMode.Bilinear,
-        };
-        Color[] colors = new Color[size * size];
-        Vector2 center = new((size - 1) * 0.5f, (size - 1) * 0.5f);
-        for (int y = 0; y < size; y++)
-        for (int x = 0; x < size; x++)
-        {
-            float distance = Vector2.Distance(new Vector2(x, y), center) / center.x;
-            float alpha = Mathf.Pow(Mathf.Clamp01(1f - distance), 2.2f);
-            colors[y * size + x] = new Color(1f, 1f, 1f, alpha);
-        }
-        texture.SetPixels(colors);
-        texture.Apply(false, true);
-        glowSprite = Sprite.Create(texture, new Rect(0, 0, size, size),
-            new Vector2(0.5f, 0.5f), 100f);
-        glowSprite.name = "UI Ambient Glow";
     }
 
     private static float Hash01(int seed, int channel)

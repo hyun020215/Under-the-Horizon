@@ -18,12 +18,22 @@ public sealed class ScreenTransitionRoutingTests
         Assert.That(profile.holdDuration, Is.GreaterThan(0f));
         Assert.That(profile.revealDuration, Is.GreaterThan(0f));
         Assert.That(profile.uiEnterDuration, Is.GreaterThan(0f));
+        Assert.That(profile.coverColor.b, Is.GreaterThan(profile.coverColor.r));
+        Assert.That(profile.particleCount, Is.GreaterThanOrEqualTo(10));
 
         string director = File.ReadAllText(
             "Assets/_Project/Runtime/Transitions/TransitionDirector.cs");
         Assert.That(director, Does.Contain("WaitAsync(profile.uiExitDuration)"));
         Assert.That(director, Does.Contain("WaitAsync(profile.holdDuration)"));
         Assert.That(director, Does.Contain("WaitAsync(profile.uiEnterDuration)"));
+        string fade = File.ReadAllText(
+            "Assets/_Project/Runtime/Transitions/FadeTransitionPlayer.cs");
+        Assert.That(fade, Does.Contain("Transition Particle"));
+        Assert.That(fade, Does.Contain("request.ReducedMotion"));
+        Assert.That(fade, Does.Contain("UiGlowSprite.Get()"));
+        string ambient = File.ReadAllText(
+            "Assets/_Project/Runtime/UI/Components/AmbientParticleOverlay.cs");
+        Assert.That(ambient, Does.Contain("UiGlowSprite.Get()"));
     }
 
     [Test]

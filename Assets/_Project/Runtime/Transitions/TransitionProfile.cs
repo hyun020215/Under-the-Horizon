@@ -19,6 +19,10 @@ public sealed class TransitionProfile : ScriptableObject
 
     [Min(0)]
     public float uiEnterDuration = .15f;
+    [Header("Cover presentation")]
+    public Color coverColor = new(.015f, .025f, .07f, 1f);
+    public Color particleColor = new(.92f, .76f, .42f, .42f);
+    [Range(0, 24)] public int particleCount = 12;
     public AudioClip stinger;
     public bool blockInput = true;
 }

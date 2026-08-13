@@ -27,8 +27,7 @@ public sealed class TransitionDirector : MonoBehaviour
             AppContext.Services?.TryGet(out accessibility);
         if (accessibility?.ReducedMotion == true)
         {
-            if (blocker != null)
-                blocker.SetBlocked(false);
+            await PlaySupported(profile, entering, true);
             return;
         }
         if (blocker != null && profile.blockInput)
@@ -37,19 +36,25 @@ public sealed class TransitionDirector : MonoBehaviour
             sfx?.Play(profile.stinger);
         if (entering)
             await WaitAsync(profile.uiExitDuration);
-        if (players != null)
-            foreach (var player in players)
-                if (player != null && player.Supports(profile.type))
-                {
-                    await player.PlayAsync(new TransitionRequest(profile, entering));
-                    break;
-                }
+        await PlaySupported(profile, entering, false);
         if (entering)
             await WaitAsync(profile.holdDuration);
         else
             await WaitAsync(profile.uiEnterDuration);
         if (!entering && blocker != null)
             blocker.SetBlocked(false);
+    }
+
+    private async Task PlaySupported(TransitionProfile profile, bool entering, bool reducedMotion)
+    {
+        if (players == null)
+            return;
+        foreach (TransitionPlayer player in players)
+            if (player != null && player.Supports(profile.type))
+            {
+                await player.PlayAsync(new TransitionRequest(profile, entering, reducedMotion));
+                break;
+            }
     }
 
     private static async Task WaitAsync(float duration)
