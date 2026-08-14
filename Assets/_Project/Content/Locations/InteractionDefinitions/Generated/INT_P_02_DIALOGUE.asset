@@ -13,7 +13,11 @@ MonoBehaviour:
   m_Name: INT_P_02_DIALOGUE
   m_EditorClassIdentifier: UTH.Runtime::InteractionDefinition
   id: INT_P_02_DIALOGUE
-  type: 2
+  type: 0
+  displayName: "\uB2E4\uB2C8\uC5D8\uACFC \uB300\uD654"
+  targetId: CHR_DANIEL
+  hasWorldHotspot: 0
+  normalizedRect: {x: 0, y: 0, width: 0, height: 0}
   conditions: []
   action: {fileID: 11400000, guid: 2dfb02a643d7cfd43bcc299d7f44146d, type: 2}
-  repeatable: 1
+  repeatable: 0

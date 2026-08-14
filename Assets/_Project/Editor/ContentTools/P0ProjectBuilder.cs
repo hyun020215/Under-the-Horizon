@@ -389,6 +389,15 @@ public static class P0ProjectBuilder
         foreach (SceneRow scene in scenes)
         {
             CharacterPlacementSet placements = GetOrCreate<CharacterPlacementSet>(PlacementPath(scene.Id));
+            Dictionary<string, CharacterPlacement> existingPlacements =
+                (placements.Placements ?? Array.Empty<CharacterPlacement>())
+                .Where(placement => placement.character != null
+                    && !string.IsNullOrWhiteSpace(placement.character.Id))
+                .GroupBy(placement => placement.character.Id, StringComparer.Ordinal)
+                .ToDictionary(
+                    group => group.Key,
+                    group => group.First(),
+                    StringComparer.Ordinal);
             CharacterDefinition[] sceneCharacters = SplitCharacters(scene.Characters)
                 .Select(FindCharacter)
                 .Where(character => character != null)
@@ -400,12 +409,34 @@ public static class P0ProjectBuilder
             for (int index = 0; index < sceneCharacters.Length; index++)
             {
                 SerializedProperty item = items.GetArrayElementAtIndex(index);
-                item.FindPropertyRelative("character").objectReferenceValue = sceneCharacters[index];
+                CharacterDefinition character = sceneCharacters[index];
+                item.FindPropertyRelative("character").objectReferenceValue = character;
+                if (!string.IsNullOrWhiteSpace(character.Id)
+                    && existingPlacements.TryGetValue(
+                        character.Id,
+                        out CharacterPlacement existing))
+                {
+                    item.FindPropertyRelative("normalizedX").floatValue = existing.normalizedX;
+                    item.FindPropertyRelative("normalizedY").floatValue = existing.normalizedY;
+                    item.FindPropertyRelative("scale").floatValue = existing.scale;
+                    item.FindPropertyRelative("sortingOrder").intValue = existing.sortingOrder;
+                    item.FindPropertyRelative("pose").enumValueIndex = (int)existing.pose;
+                    item.FindPropertyRelative("expression").enumValueIndex =
+                        (int)existing.expression;
+                    item.FindPropertyRelative("clickable").boolValue = existing.clickable;
+                    continue;
+                }
+
                 item.FindPropertyRelative("normalizedX").floatValue =
-                    sceneCharacters.Length == 1 ? 0.78f : 0.58f + 0.34f * index / (sceneCharacters.Length - 1f);
+                    sceneCharacters.Length == 1
+                        ? 0.78f
+                        : 0.58f + 0.34f * index / (sceneCharacters.Length - 1f);
                 item.FindPropertyRelative("normalizedY").floatValue = 0.04f;
-                item.FindPropertyRelative("scale").floatValue = sceneCharacters.Length > 2 ? 0.78f : 0.94f;
+                item.FindPropertyRelative("scale").floatValue =
+                    sceneCharacters.Length > 2 ? 0.78f : 0.94f;
                 item.FindPropertyRelative("sortingOrder").intValue = index;
+                item.FindPropertyRelative("pose").enumValueIndex = 0;
+                item.FindPropertyRelative("expression").enumValueIndex = 0;
                 item.FindPropertyRelative("clickable").boolValue = true;
             }
             placementObject.ApplyModifiedPropertiesWithoutUndo();

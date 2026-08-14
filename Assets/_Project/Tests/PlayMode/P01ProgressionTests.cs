@@ -20,7 +20,6 @@ public sealed class P01ProgressionTests
         "INT_P_01_INVITATION",
         "INT_P_01_MESSENGER",
         "INT_P_01_DIALOGUE",
-        "INT_P_01_CONTINUE",
     };
 
     private string saveDirectory;
@@ -82,7 +81,7 @@ public sealed class P01ProgressionTests
     }
 
     [UnityTest]
-    public IEnumerator FreshSlotCompletesP01AndRestoresP02AfterRestart()
+    public IEnumerator FreshSlotCompletesP01TravelsThroughMapAndRestoresP02()
     {
         yield return LoadGameShell();
         yield return SelectSlot3ThroughUi();
@@ -252,46 +251,121 @@ public sealed class P01ProgressionTests
             Does.Not.Contain("P-01_008"),
             "Daniel's conversation must not replay the messenger inspection.");
 
-        InteractionPointView continueHotspot = null;
         yield return WaitFor(
-            () => (continueHotspot = FindActiveHotspot("INT_P_01_CONTINUE")) != null,
-            "The P-01 continue hotspot did not appear after Daniel's conversation.");
-        Assert.That(continueHotspot.Definition.TargetId, Is.EqualTo("LOC_GANGWAY"));
+            () => story.Current != null
+                && story.Current.Id == "P-01"
+                && state.State.currentStorySceneId == "P-01"
+                && state.State.currentLocationId == "LOC_PORT"
+                && state.State.pendingStorySceneId == "P-02"
+                && state.IsSceneCompleted("P-01")
+                && testSaves.Exists(Slot3)
+                && testSaves.Load(Slot3).pendingStorySceneId == "P-02",
+            "Daniel's conversation did not complete P-01 and create a pending P-02 map-travel checkpoint.");
+        yield return WaitFor(
+            IsTransitionInputUnblocked,
+            "P-01 completion did not release its transition input blocker.");
+
+        Assert.That(
+            FindActiveHotspot("INT_P_01_CONTINUE"),
+            Is.Null,
+            "The retired central continue hotspot must not appear after Daniel's conversation.");
+        Assert.That(screens.Current, Is.EqualTo(ScreenId.Exploration));
+        AssertP01CompletionState(state.State);
+        AssertPendingP02Travel(state.State);
+
+        GameState pendingSave = testSaves.Load(Slot3);
+        AssertP01CompletionState(pendingSave);
+        AssertPendingP02Travel(pendingSave);
+
+        yield return RestartApplication();
+        yield return SelectSlot3ThroughUi();
+
+        story = Object.FindFirstObjectByType<StorySceneDirector>();
+        state = Object.FindFirstObjectByType<GameStateStore>();
+        screens = Object.FindFirstObjectByType<ScreenRouter>();
+        narrative = Object.FindFirstObjectByType<NarrativeDirector>();
+        dialogue = Object.FindFirstObjectByType<DialogueScreen>(FindObjectsInactive.Include);
+
+        Assert.That(story, Is.Not.Null);
+        Assert.That(state, Is.Not.Null);
+        Assert.That(screens, Is.Not.Null);
+        Assert.That(narrative, Is.Not.Null);
+        Assert.That(dialogue, Is.Not.Null);
+
+        yield return WaitFor(
+            () => story.Current != null
+                && story.Current.Id == "P-01"
+                && screens.Current == ScreenId.Exploration
+                && state.State.pendingStorySceneId == "P-02",
+            "Selecting the pending checkpoint did not reconstruct completed P-01 at Port.");
+        AssertP01CompletionState(state.State);
+        AssertPendingP02Travel(state.State);
+        Assert.That(
+            narrative.History.Lines.Any(id => id.StartsWith("P-01", StringComparison.Ordinal)),
+            Is.False,
+            "Restoring pending travel must not replay P-01 entry presentation.");
+        Assert.That(FindActiveHotspot("INT_P_01_CONTINUE"), Is.Null);
+
+        PersistentHud hud = null;
+        yield return WaitFor(
+            () => (hud = Object.FindFirstObjectByType<PersistentHud>(
+                    FindObjectsInactive.Include)) != null
+                && hud.gameObject.activeInHierarchy,
+            "The persistent HUD did not appear for restored P-01 exploration.");
+        Button mapButton = FindButton(hud.transform, "MapButton");
+        yield return ClickThroughEventSystem(mapButton, "HUD Map button");
+
+        MapScreen map = null;
+        yield return WaitFor(
+            () => screens.Current == ScreenId.Map
+                && (map = Object.FindFirstObjectByType<MapScreen>(
+                    FindObjectsInactive.Include)) != null
+                && map.gameObject.activeInHierarchy
+                && map.SelectedMapId == "MAP_MVElysium"
+                && map.SelectedLocationId == "LOC_GANGWAY",
+            "The Map screen did not focus the pending Gangway destination on M.V. Elysium.");
+
+        Button gangwayNode = FindButton(map.transform, "LocationNode_LOC_GANGWAY");
+        string sceneBeforeNodeClick = state.State.currentStorySceneId;
+        string locationBeforeNodeClick = state.State.currentLocationId;
+        yield return ClickThroughEventSystem(gangwayNode, "Gangway Map node");
+        Assert.That(state.State.currentStorySceneId, Is.EqualTo(sceneBeforeNodeClick));
+        Assert.That(state.State.currentLocationId, Is.EqualTo(locationBeforeNodeClick));
+        Assert.That(state.State.pendingStorySceneId, Is.EqualTo("P-02"));
+        Assert.That(map.SelectedLocationId, Is.EqualTo("LOC_GANGWAY"));
+
+        Button confirmTravel = FindButton(map.transform, "Confirm Travel Button");
+        Assert.That(confirmTravel.interactable, Is.True);
         int historyBeforeP02 = narrative.History.Lines.Count;
-        yield return ClickThroughEventSystem(continueHotspot, "P-01 continue hotspot");
+        yield return ClickThroughEventSystem(confirmTravel, "Map Confirm Travel button");
 
         yield return WaitFor(
             () => story.Current != null
                 && story.Current.Id == "P-02"
                 && state.State.currentStorySceneId == "P-02"
-                && testSaves.Exists(Slot3)
+                && state.State.currentLocationId == "LOC_GANGWAY"
+                && string.IsNullOrEmpty(state.State.pendingStorySceneId)
+                && screens.Current == ScreenId.Exploration
                 && testSaves.Load(Slot3).currentStorySceneId == "P-02",
-            "P-01 did not complete and enter a saved P-02 checkpoint.");
-        yield return null;
+            "Confirming Gangway did not enter and checkpoint P-02.");
+        yield return WaitFor(
+            () => P02CharacterViewsMatch(story),
+            "P-02 character placement did not appear after Map travel.");
 
         AssertP01CompletionState(state.State);
         AssertP02Presentation(story, state);
-
-        GameState saved = testSaves.Load(Slot3);
-        AssertP01CompletionState(saved);
-        Assert.That(saved.currentStorySceneId, Is.EqualTo("P-02"));
-        Assert.That(saved.currentLocationId, Is.EqualTo("LOC_GANGWAY"));
-
-        // Settle P-02's entry dialogue before destroying the running application.
-        // Dialogue position is presentation state, so the saved checkpoint remains P-02 entry.
-        yield return CompleteCurrentDialogue(dialogue, screens, null, "P-02 entry");
-        string[] p02EntryLines = narrative.History.Lines
-            .Skip(historyBeforeP02)
-            .ToArray();
-        Assert.That(p02EntryLines, Does.Contain("P-02_021"));
         Assert.That(
-            p02EntryLines,
-            Does.Contain("P-02_022"),
-            "The serious P-01 choice must unlock Daniel's P-02 trust bonus exchange.");
-        yield return WaitFor(
-            IsTransitionInputUnblocked,
-            "P-02 entry presentation did not release its input blocker.");
-        yield return null;
+            narrative.History.Lines.Skip(historyBeforeP02)
+                .Any(id => id.StartsWith("P-02", StringComparison.Ordinal)),
+            Is.False,
+            "P-02 entry dialogue must wait for the player to click Daniel.");
+        CharacterView p02Daniel = FindActiveCharacter("CHR_DANIEL");
+        Assert.That(p02Daniel, Is.Not.Null);
+        Assert.That(p02Daniel.BodyInteractionAvailable, Is.True);
+
+        GameState p02Save = testSaves.Load(Slot3);
+        AssertP01CompletionState(p02Save);
+        AssertP02State(p02Save);
 
         yield return RestartApplication();
         yield return SelectSlot3ThroughUi();
@@ -312,6 +386,7 @@ public sealed class P01ProgressionTests
         yield return WaitFor(
             () => restoredStory.Current != null
                 && restoredStory.Current.Id == "P-02"
+                && restoredScreens.Current == ScreenId.Exploration
                 && restoredState.State.currentStorySceneId == "P-02"
                 && restoredState.State.currentLocationId == "LOC_GANGWAY",
             "Selecting the occupied slot did not restore P-02.");
@@ -320,29 +395,54 @@ public sealed class P01ProgressionTests
             "P-02 character placement was not reconstructed after restart.");
 
         AssertP01CompletionState(restoredState.State);
+        AssertP02State(restoredState.State);
         AssertP02Presentation(restoredStory, restoredState);
         Assert.That(
             FindActiveInteractionView("INT_P_01_MESSENGER"),
             Is.Null,
             "Restoring P-02 must not reconstruct P-01's messenger affordance.");
         Assert.That(
-            restoredNarrative.History.Lines.Any(id => id.StartsWith("P-01", StringComparison.Ordinal)),
+            restoredNarrative.History.Lines.Any(id =>
+                id.StartsWith("P-01", StringComparison.Ordinal)
+                || id.StartsWith("P-02", StringComparison.Ordinal)),
             Is.False,
-            "Restoring P-02 must not replay P-01.");
+            "Restoring P-02 must not replay either scene's presentation.");
+
+        CharacterView restoredDaniel = null;
+        yield return WaitFor(
+            () => (restoredDaniel = FindActiveCharacter("CHR_DANIEL")) != null
+                && restoredDaniel.BodyInteractionAvailable,
+            "Restored P-02 did not expose Daniel's authored Character interaction.");
+        int restoredP02HistoryStart = restoredNarrative.History.Lines.Count;
+        yield return ClickThroughEventSystem(restoredDaniel, "P-02 Daniel interaction");
+        yield return WaitFor(
+            () => restoredScreens.Current == ScreenId.Dialogue
+                && restoredNarrative.History.Lines.Count > restoredP02HistoryStart,
+            "Clicking Daniel did not start P-02 dialogue.");
+        Assert.That(
+            restoredNarrative.History.Lines[restoredP02HistoryStart],
+            Is.EqualTo("P-02_001"),
+            "Daniel's Character interaction must begin at the authored P-02 opening line.");
 
         yield return CompleteCurrentDialogue(
             restoredDialogue,
             restoredScreens,
             null,
-            "restored P-02 entry");
-        Assert.That(restoredNarrative.History.Lines, Does.Contain("P-02_021"));
+            "P-02 Daniel conversation");
+        yield return WaitFor(
+            () => restoredState.IsInteractionCompleted("INT_P_02_DIALOGUE"),
+            "Daniel's P-02 Character interaction was not completed.");
+        string[] p02DialogueLines = restoredNarrative.History.Lines
+            .Skip(restoredP02HistoryStart)
+            .ToArray();
+        Assert.That(p02DialogueLines, Does.Contain("P-02_021"));
         Assert.That(
-            restoredNarrative.History.Lines,
+            p02DialogueLines,
             Does.Contain("P-02_022"),
-            "Restoring the P-02 checkpoint must preserve the trust bonus eligibility.");
+            "The serious P-01 choice must unlock Daniel's P-02 trust bonus exchange.");
         yield return WaitFor(
             IsTransitionInputUnblocked,
-            "Restored P-02 presentation did not release its input blocker.");
+            "P-02 dialogue presentation did not release its input blocker.");
     }
 
     private IEnumerator LoadGameShell()
@@ -667,17 +767,29 @@ public sealed class P01ProgressionTests
     {
         Assert.That(state, Is.Not.Null);
         Assert.That(state.completedStoryScenes, Does.Contain("P-01"));
-        Assert.That(state.currentStorySceneId, Is.EqualTo("P-02"));
-        Assert.That(state.currentLocationId, Is.EqualTo("LOC_GANGWAY"));
         Assert.That(state.discoveredEvidence, Does.Contain("C-01"));
         Assert.That(state.flags, Does.Contain("anonymous_tip_preview"));
         Assert.That(state.flags, Does.Contain("DIALOGUE_CHOICE_P-01_C1"));
         Assert.That(state.flags, Does.Contain("daniel_warning_taken"));
         Assert.That(state.flags, Does.Not.Contain("DIALOGUE_CHOICE_P-01_C2"));
         Assert.That(state.completedInteractions, Is.EquivalentTo(P01InteractionIds));
-        Assert.That(state.completedInteractions.Count, Is.EqualTo(4));
+        Assert.That(state.completedInteractions.Count, Is.EqualTo(3));
         Assert.That(state.trust.TryGetValue("CHR_DANIEL", out int trust), Is.True);
         Assert.That(trust, Is.EqualTo(3));
+    }
+
+    private static void AssertPendingP02Travel(GameState state)
+    {
+        Assert.That(state.currentStorySceneId, Is.EqualTo("P-01"));
+        Assert.That(state.currentLocationId, Is.EqualTo("LOC_PORT"));
+        Assert.That(state.pendingStorySceneId, Is.EqualTo("P-02"));
+    }
+
+    private static void AssertP02State(GameState state)
+    {
+        Assert.That(state.currentStorySceneId, Is.EqualTo("P-02"));
+        Assert.That(state.currentLocationId, Is.EqualTo("LOC_GANGWAY"));
+        Assert.That(state.pendingStorySceneId, Is.Empty);
     }
 
     private static void AssertP02Presentation(
@@ -698,7 +810,7 @@ public sealed class P01ProgressionTests
         Assert.That(
             Object.FindFirstObjectByType<InteractionDirector>().Current,
             Is.SameAs(story.Current.InteractionSet));
-        Assert.That(state.State.currentLocationId, Is.EqualTo("LOC_GANGWAY"));
+        AssertP02State(state.State);
         Assert.That(P02CharacterViewsMatch(story), Is.True);
     }
 

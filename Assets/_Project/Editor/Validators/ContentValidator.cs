@@ -144,6 +144,12 @@ public static class ContentValidator
                 .Select(placement => placement.character.Id)
                 .Where(id => !string.IsNullOrWhiteSpace(id)),
             StringComparer.Ordinal);
+        var clickableCharacterIds = new HashSet<string>(
+            (scene.CharacterSet?.Placements ?? Array.Empty<CharacterPlacement>())
+                .Where(placement => placement.character != null && placement.clickable)
+                .Select(placement => placement.character.Id)
+                .Where(id => !string.IsNullOrWhiteSpace(id)),
+            StringComparer.Ordinal);
         var attachedContextDefinitions = new HashSet<InteractionDefinition>();
 
         foreach (InteractionDefinition interaction in interactions)
@@ -204,9 +210,20 @@ public static class ContentValidator
             }
         }
 
+        if (scene.DeferEntryDialogue
+            && !interactions.Any(interaction =>
+                CanExecuteDeferredEntryDialogue(
+                    scene,
+                    interaction,
+                    clickableCharacterIds)))
+        {
+            errors.Add(
+                $"{scene.Id} defers its entry Dialogue but has no executable "
+                + "interaction for that Dialogue on a present clickable target.");
+        }
+
         InteractionDefinition[] advanceInteractions = interactions
-            .Where(interaction =>
-                interaction?.Action is StorySceneAdvanceInteractionAction)
+            .Where(AdvancesStoryScene)
             .ToArray();
         if (advanceInteractions.Length > 1)
         {
@@ -233,7 +250,60 @@ public static class ContentValidator
             errors.Add(
                 $"{scene.Id} has a Story Scene advance interaction but no route.");
         }
+
+        bool hasMapTravelRoute = scene.Routes?.Any(route =>
+            route != null
+            && route.AdvanceMode == StorySceneAdvanceMode.MapTravel) == true;
+        if (!hasMapTravelRoute)
+            return;
+
+        foreach (InteractionDefinition exit in interactions.Where(interaction =>
+                     interaction != null
+                     && interaction.Type == InteractionType.Exit
+                     && interaction.HasWorldHotspot))
+        {
+            errors.Add(
+                $"{scene.Id}/{exit.Id} is a world Exit hotspot on a MapTravel "
+                + "source; map travel must be requested by an authored action "
+                + "and confirmed on the Map screen.");
+        }
+
+        if (advanceInteractions.Length == 0)
+        {
+            errors.Add(
+                $"{scene.Id} has a MapTravel route but no interaction requests "
+                + "Story Scene advancement.");
+        }
     }
+
+    private static bool CanExecuteDeferredEntryDialogue(
+        StorySceneDefinition scene,
+        InteractionDefinition interaction,
+        ISet<string> clickableCharacterIds)
+    {
+        if (interaction?.Action == null)
+            return false;
+
+        SerializedProperty dialogueProperty = new SerializedObject(interaction.Action)
+            .FindProperty("dialogue");
+        if (dialogueProperty?.objectReferenceValue != scene.EntryDialogue)
+            return false;
+
+        if (interaction.HasWorldHotspot)
+            return true;
+
+        return (interaction.Type == InteractionType.Character
+                || interaction.Type == InteractionType.Context)
+            && !string.IsNullOrWhiteSpace(interaction.TargetId)
+            && clickableCharacterIds.Contains(interaction.TargetId);
+    }
+
+    private static bool AdvancesStoryScene(InteractionDefinition interaction) =>
+        interaction?.Action is StorySceneAdvanceInteractionAction
+        || interaction?.Action is DialogueInteractionAction
+        {
+            AdvanceStorySceneOnComplete: true
+        };
 
     private static void ValidateAuthoringRequirements(
         StorySceneDefinition scene,

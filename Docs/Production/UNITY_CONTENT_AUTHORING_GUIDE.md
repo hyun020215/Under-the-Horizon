@@ -405,7 +405,10 @@ Story Scene의 `StorySceneRoute.Advance Mode`가 `MapTravel`이면 완료 후 �
 4. pending 이동 전/후로 RouteOnly 노드의 숨김·목표 상태를 확인한다.
 5. 노드 클릭만으로 Story Scene과 Location이 바뀌지 않는지 확인한다.
 6. 이동 확인 뒤 정확한 목적지 장면·Location으로 진입하는지 확인한다.
-7. `Build Preflight`, Map EditMode/PlayMode 테스트와 세 16:9 해상도 캡처를 실행한다.
+7. pending 체크포인트를 재시작해도 완료된 출발 장면·Location·목적지가 복원되고 진입 연출이
+   재생되지 않는지 확인한다.
+8. 목적지 진입 체크포인트를 재시작해도 목적지 Story Scene·Location이 복원되는지 확인한다.
+9. `Build Preflight`, Map EditMode/PlayMode 테스트와 세 16:9 해상도 캡처를 실행한다.
 
 ## 13. 기존 Story Scene 수정
 
@@ -436,7 +439,23 @@ Story Scene의 `StorySceneRoute.Advance Mode`가 `MapTravel`이면 완료 후 �
 
 수정 뒤 `Under The Horizon > Content > Story Graph`에서 진입/종료 경로를 확인하고 `Under The Horizon > Preview > Story Scene`에서 주요 참조와 배경을 확인한다.
 
-전체 entry Dialogue를 한 번에 자동 재생하지 않고 조사와 대화를 단계화하려면 `Defer Entry Dialogue`를 켠다. 필요한 도입부만 `DialogueCommand`의 start/end line ID로 entry Sequence에서 재생하고, 이후 Interaction은 `InteractionCompletedCondition`으로 순서화한다. 마지막 Exit Interaction은 `StorySceneAdvanceInteractionAction`으로 route 해석을 요청한다. P-01이 이 구성의 기준 예시다.
+전체 entry Dialogue를 한 번에 자동 재생하지 않고 조사와 대화를 단계화하려면 `Defer Entry Dialogue`를
+켠다. 필요한 도입부만 `DialogueCommand`의 start/end line ID로 entry Sequence에서 재생하고, 이후
+Interaction은 `InteractionCompletedCondition`으로 순서화한다. deferred Dialogue에는 같은
+`Entry Dialogue`를 실행하는 Interaction이 최소 하나 있어야 한다. 월드 핫스팟이 아니라 Character 또는
+캐릭터 부착 Context라면 해당 target Character가 현재 `CharacterPlacementSet`에 있고 `Clickable`이어야 한다.
+Validator는 이 실행 경로가 없으면 실패한다.
+
+마지막 대화가 장면 route를 요청해야 하면 `DialogueInteractionAction.Advance Story Scene On Complete`를
+사용한다. 이 옵션은 대화가 성공적으로 끝난 뒤 advance 요청만 반환하며, 장면 완료·route 해석·저장은
+`InteractionDirector`와 `GameFlowController`가 담당한다. `Advance Mode`가 `MapTravel`이면 출발 장면과
+Location을 유지한 pending 체크포인트가 만들어지고, HUD 지도에서 목적지 노드를 선택·확정해야 다음
+Story Scene에 진입한다. `MapTravel` 출발 장면에 별도의 월드 Exit 핫스팟을 두면 안 된다.
+
+P-01은 초대장 → Daniel 부착 메신저 → Daniel 대화 완료 뒤 P-02를 pending으로 만드는 기준 예시다.
+기존 `INT_P_01_CONTINUE`와 Action 자산은 GUID 호환성을 위해 남겨 두되 P-01 InteractionSet에는 포함하지
+않는다. P-02도 `Defer Entry Dialogue`를 사용하며, Gangway에 배치된 Daniel의 `Character` Interaction을
+실제로 클릭해야 대화를 시작한다.
 
 다음 Story Scene의 `Entry Conditions`에 앞 장면의 `SceneCompletedCondition`을 둘 수 있다. 이는 진입 gate일 뿐 다음 장면 자체의 Interaction·완주 흐름이 구현됐다는 의미는 아니다.
 
