@@ -16,6 +16,8 @@ public sealed class PersistentHud : MonoBehaviour
     [SerializeField]
     private GameStateStore state;
     [SerializeField]
+    private GameFlowController flow;
+    [SerializeField]
     private ContentDatabase content;
 
     [SerializeField]
@@ -99,7 +101,7 @@ public sealed class PersistentHud : MonoBehaviour
     private string ResolveLocation(string id) =>
         content != null && content.TryGetLocation(id, out LocationDefinition location)
             ? location.DisplayName
-            : id ?? string.Empty;
+            : "알 수 없는 위치";
 
     private void RefreshObjective(GameState current)
     {
@@ -107,7 +109,11 @@ public sealed class PersistentHud : MonoBehaviour
             return;
         StorySceneDefinition scene = null;
         content?.TryGetStoryScene(current.currentStorySceneId, out scene);
-        string next = ObjectiveGuidanceResolver.Resolve(scene, state).HudText;
+        ObjectiveGuidance guidance = flow != null
+            && flow.TryGetPendingTravel(out PendingStorySceneTravel pending)
+                ? ObjectiveGuidanceResolver.Resolve(pending)
+                : ObjectiveGuidanceResolver.Resolve(scene, state);
+        string next = guidance.HudText;
         if (next == renderedObjective)
             return;
         bool animate = !string.IsNullOrEmpty(renderedObjective)

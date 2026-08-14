@@ -1,4 +1,5 @@
 using System.Linq;
+using System.Reflection;
 using NUnit.Framework;
 using UnityEditor;
 using UnityEditor.SceneManagement;
@@ -71,5 +72,79 @@ public sealed class HudPresentationTests
         {
             Object.DestroyImmediate(root);
         }
+    }
+
+    [Test]
+    public void PendingTravelGuidanceUsesThePlayerFacingDestinationName()
+    {
+        LocationDefinition location = ScriptableObject.CreateInstance<LocationDefinition>();
+        StorySceneDefinition target = ScriptableObject.CreateInstance<StorySceneDefinition>();
+        try
+        {
+            SetPrivateField(location, "id", "LOC_GANGWAY");
+            SetPrivateField(location, "displayName", "승선 통로");
+            SetPrivateField(target, "id", "P-02");
+            SetPrivateField(target, "location", location);
+
+            ObjectiveGuidance guidance = ObjectiveGuidanceResolver.Resolve(
+                new PendingStorySceneTravel(null, target));
+
+            Assert.That(guidance.Objective, Is.EqualTo("승선 통로로 향하기"));
+            Assert.That(guidance.Guidance, Is.EqualTo("지도에서 목적지를 선택해 이동하기"));
+            Assert.That(guidance.HudText, Does.Not.Contain("LOC_"));
+        }
+        finally
+        {
+            Object.DestroyImmediate(target);
+            Object.DestroyImmediate(location);
+        }
+    }
+
+    [Test]
+    public void HudDoesNotExposeAnUnknownLocationId()
+    {
+        var root = new GameObject("HUD fallback test");
+        root.SetActive(false);
+        ContentDatabase content = ScriptableObject.CreateInstance<ContentDatabase>();
+        try
+        {
+            GameStateStore state = root.AddComponent<GameStateStore>();
+            PersistentHud hud = root.AddComponent<PersistentHud>();
+            var labelOwner = new GameObject("Location", typeof(RectTransform), typeof(Text));
+            labelOwner.transform.SetParent(root.transform, false);
+            Text locationLabel = labelOwner.GetComponent<Text>();
+            SetPrivateField(hud, "state", state);
+            SetPrivateField(hud, "content", content);
+            SetPrivateField(hud, "locationLabel", locationLabel);
+            state.SetCurrentLocation("LOC_INTERNAL_ONLY");
+
+            InvokePrivate(hud, "Refresh", state.State);
+
+            Assert.That(locationLabel.text, Is.EqualTo("알 수 없는 위치"));
+            Assert.That(locationLabel.text, Does.Not.Contain("LOC_"));
+        }
+        finally
+        {
+            Object.DestroyImmediate(content);
+            Object.DestroyImmediate(root);
+        }
+    }
+
+    private static void SetPrivateField<T>(object target, string name, T value)
+    {
+        FieldInfo field = target.GetType().GetField(
+            name,
+            BindingFlags.Instance | BindingFlags.NonPublic);
+        Assert.That(field, Is.Not.Null, name);
+        field.SetValue(target, value);
+    }
+
+    private static void InvokePrivate(object target, string name, params object[] arguments)
+    {
+        MethodInfo method = target.GetType().GetMethod(
+            name,
+            BindingFlags.Instance | BindingFlags.NonPublic);
+        Assert.That(method, Is.Not.Null, name);
+        method.Invoke(target, arguments);
     }
 }

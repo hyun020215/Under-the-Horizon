@@ -20,6 +20,19 @@ public readonly struct ObjectiveGuidance
 
 public static class ObjectiveGuidanceResolver
 {
+    public static ObjectiveGuidance Resolve(PendingStorySceneTravel travel)
+    {
+        string destinationName = travel.Destination == null
+            || string.IsNullOrWhiteSpace(travel.Destination.DisplayName)
+                ? "목적지"
+                : travel.Destination.DisplayName.Trim();
+        return new ObjectiveGuidance(
+            $"{destinationName}로 향하기",
+            "지도에서 목적지를 선택해 이동하기",
+            0,
+            0);
+    }
+
     public static ObjectiveGuidance Resolve(StorySceneDefinition scene, GameStateStore state)
     {
         string objective = string.IsNullOrWhiteSpace(scene?.DisplayName)

@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: MAP_Deck10
   m_EditorClassIdentifier: UTH.Runtime::MapDefinition
   id: MAP_Deck10
+  displayName: 10층 갑판
   baseLayer: {fileID: 21300000, guid: 8a7062ac8b096134cb323e5c7d0978ea, type: 3}
   restrictedLayer: {fileID: 21300000, guid: 20a6a0ce780514947be8e941c87845f9, type: 3}
   technicalLayer: {fileID: 21300000, guid: df5d34d2977bdff4b9b60a86da6ea10f, type: 3}

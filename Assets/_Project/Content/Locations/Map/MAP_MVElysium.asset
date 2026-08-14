@@ -13,7 +13,8 @@ MonoBehaviour:
   m_Name: MAP_MVElysium
   m_EditorClassIdentifier: UTH.Runtime::MapDefinition
   id: MAP_MVElysium
-  baseLayer: {fileID: 0}
+  displayName: M.V. 엘리시움
+  baseLayer: {fileID: 21300000, guid: 1e21a5fc4eb447cabd9259b966e34fd0, type: 3}
   restrictedLayer: {fileID: 0}
   technicalLayer: {fileID: 0}
   locations:

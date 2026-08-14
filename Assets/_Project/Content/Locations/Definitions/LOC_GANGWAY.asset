@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: LOC_GANGWAY
   m_EditorClassIdentifier: UTH.Runtime::LocationDefinition
   id: LOC_GANGWAY
-  displayName: Gangway
+  displayName: 승선 통로
   defaultBackground: {fileID: 21300000, guid: 4d6cab773a7d1a44196f5021a0009dc7, type: 3}
   states:
   - {fileID: 11400000, guid: 383ee029d52aafc4cbf6841ff533915f, type: 2}
@@ -21,4 +21,7 @@ MonoBehaviour:
   defaultAudio: {fileID: 11400000, guid: e41301e6eb6a1d54caabe157ef9bd61d, type: 2}
   mapNode:
     id: LOC_GANGWAY
-    normalizedPosition: {x: 0.125, y: 0.3}
+    normalizedPosition: {x: 0.58, y: 0.51}
+    displayName: 승선 통로
+    description: 항구와 선내를 잇는 승선 통로.
+    accessMode: 1

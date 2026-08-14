@@ -21,6 +21,7 @@ public static class ContentValidator
         DialogueSequence[] dialogues = LoadAll<DialogueSequence>();
         EvidenceDefinition[] evidence = LoadAll<EvidenceDefinition>();
         PuzzleDefinition[] puzzles = LoadAll<PuzzleDefinition>();
+        MapDefinition[] maps = LoadAll<MapDefinition>();
 
         ValidateUniqueIds(scenes, item => item.Id, "Story Scene", errors);
         ValidateUniqueIds(LoadAll<LocationDefinition>(), item => item.Id, "Location", errors);
@@ -33,6 +34,7 @@ public static class ContentValidator
             "Interaction",
             errors);
         ValidateUniqueIds(puzzles, item => item.Id, "Puzzle", errors);
+        ValidateUniqueIds(maps, item => item.Id, "Map", errors);
 
         ValidateCanonicalIds(
             scenes.Select(item => item.Id),
@@ -47,6 +49,7 @@ public static class ContentValidator
 
         ValidateStoryScenes(scenes, errors);
         ValidateLocations(errors);
+        ValidateMaps(maps, scenes, errors);
         ValidateAudioCueProfiles(errors);
         ValidateDialogues(dialogues, errors);
         ValidatePuzzles(puzzles, errors);
@@ -359,6 +362,132 @@ public static class ContentValidator
             {
                 if (state == null || state.Background == null)
                     errors.Add($"{location.Id} has a State without a background.");
+            }
+        }
+    }
+
+    private static void ValidateMaps(
+        MapDefinition[] maps,
+        StorySceneDefinition[] scenes,
+        ICollection<string> errors)
+    {
+        var mapCountByLocationId = new Dictionary<string, int>(StringComparer.Ordinal);
+
+        foreach (MapDefinition map in maps)
+        {
+            string authoredDisplayName = new SerializedObject(map)
+                .FindProperty("displayName")
+                .stringValue;
+            if (string.IsNullOrWhiteSpace(authoredDisplayName)
+                || authoredDisplayName.Contains("MAP_", StringComparison.Ordinal))
+            {
+                errors.Add($"{map.Id} has no player-facing map display name.");
+            }
+
+            if (map.BaseLayer == null)
+                errors.Add($"{map.Id} has no base map layer.");
+
+            if (map.Locations == null || map.Locations.Length == 0)
+            {
+                errors.Add($"{map.Id} has no authored Location nodes.");
+                continue;
+            }
+
+            var locationIds = new HashSet<string>(StringComparer.Ordinal);
+            foreach (LocationDefinition location in map.Locations)
+            {
+                if (location == null)
+                {
+                    errors.Add($"{map.Id} has an invalid Location reference.");
+                    continue;
+                }
+
+                if (!locationIds.Add(location.Id))
+                    errors.Add($"{map.Id} repeats Location {location.Id}.");
+
+                mapCountByLocationId.TryGetValue(location.Id, out int currentMapCount);
+                mapCountByLocationId[location.Id] = currentMapCount + 1;
+
+                MapNodeDefinition node = location.MapNode;
+                if (node == null)
+                {
+                    errors.Add($"{map.Id}/{location.Id} has no Map node.");
+                    continue;
+                }
+
+                if (!string.Equals(node.Id, location.Id, StringComparison.Ordinal))
+                {
+                    errors.Add(
+                        $"{map.Id}/{location.Id} has mismatched Map node ID "
+                        + $"'{node.Id}'.");
+                }
+
+                Vector2 position = node.NormalizedPosition;
+                if (position.x < 0f || position.x > 1f
+                    || position.y < 0f || position.y > 1f)
+                {
+                    errors.Add(
+                        $"{map.Id}/{location.Id} has a Map node outside "
+                        + "normalized bounds.");
+                }
+
+                string effectiveNodeName = !string.IsNullOrWhiteSpace(node.DisplayName)
+                    ? node.DisplayName
+                    : location.DisplayName;
+                if (string.IsNullOrWhiteSpace(effectiveNodeName)
+                    || effectiveNodeName.Contains("LOC_", StringComparison.Ordinal))
+                {
+                    errors.Add(
+                        $"{map.Id}/{location.Id} has no player-facing Map node name.");
+                }
+
+                if (node.AccessMode == MapNodeAccessMode.RouteOnly
+                    && string.IsNullOrWhiteSpace(node.DisplayName))
+                {
+                    errors.Add(
+                        $"{map.Id}/{location.Id} is RouteOnly but has no explicit "
+                        + "Map node name.");
+                }
+
+                if (node.AccessMode == MapNodeAccessMode.RouteOnly
+                    && string.IsNullOrWhiteSpace(node.Description))
+                {
+                    errors.Add(
+                        $"{map.Id}/{location.Id} is RouteOnly but has no player-facing "
+                        + "Map node description.");
+                }
+            }
+        }
+
+        foreach (StorySceneDefinition source in scenes)
+        {
+            foreach (StorySceneRoute route in source.Routes ?? Array.Empty<StorySceneRoute>())
+            {
+                if (route == null || route.AdvanceMode != StorySceneAdvanceMode.MapTravel)
+                    continue;
+
+                StorySceneDefinition target = scenes.FirstOrDefault(scene =>
+                    scene != null
+                    && string.Equals(
+                        scene.Id,
+                        route.TargetSceneId,
+                        StringComparison.Ordinal));
+                if (target?.Location == null)
+                    continue;
+
+                if (!mapCountByLocationId.TryGetValue(target.Location.Id, out int mapCount)
+                    || mapCount == 0)
+                {
+                    errors.Add(
+                        $"{source.Id} MapTravel destination {target.Location.Id} "
+                        + "is not represented on a MapDefinition.");
+                }
+                else if (mapCount > 1)
+                {
+                    errors.Add(
+                        $"{source.Id} MapTravel destination {target.Location.Id} "
+                        + "is represented on more than one MapDefinition.");
+                }
             }
         }
     }
