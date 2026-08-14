@@ -89,3 +89,4 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: UTH.Runtime::CharacterView
   image: {fileID: 8288310882090342808}
+  contextBadgePrefab: {fileID: 7194830429091310184, guid: 634227327b0f9174590edccdc3c17ec4, type: 3}

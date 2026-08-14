@@ -227,6 +227,17 @@ Location Preview는 현재 `defaultBackground` 한 장을 확인하는 간단한
 | `Action` | 실행할 재사용 Action |
 | `Repeatable` | 완료 뒤에도 다시 실행 가능한지 |
 
+캐릭터에 부착되는 `Context`는 배경 좌표를 임의로 만들지 않고 다음 계약을 따른다.
+
+- `Type`은 `Context`, `Has World Hotspot`은 꺼진 상태로 저작한다.
+- `Target Id`는 비워 두지 않으며 현재 Story Scene의 `CharacterPlacementSet`에 배치된
+  `CharacterDefinition.Id`와 정확히 일치해야 한다.
+- `Display Name`에는 HUD 목표와 배지 tooltip만으로 플레이어가 행동과 대상을 이해할 수 있는
+  문구를 넣는다.
+- 같은 Character에 조건이 서로 배타적인 여러 Context를 순차 배치할 수는 있지만,
+  동일한 `InteractionDefinition`을 한 `InteractionSet`에 중복 참조하지 않는다.
+- 캐릭터 본체 클릭을 Context의 대체 입력으로 숨기거나 Story Scene 전용 클릭 스크립트를 만들지 않는다.
+
 `Normalized Rect` 조정 절차:
 
 1. 1920×1080 기준 화면에서 대상의 좌상/우하 위치를 잰다.

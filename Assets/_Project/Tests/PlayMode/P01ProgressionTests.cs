@@ -111,6 +111,19 @@ public sealed class P01ProgressionTests
             "P-01 entry must play only the two opening lines before exploration.");
         Assert.That(screens.Current, Is.EqualTo(ScreenId.Exploration));
 
+        CharacterView daniel = null;
+        yield return WaitFor(
+            () => (daniel = FindActiveCharacter("CHR_DANIEL")) != null,
+            "Daniel's CharacterView did not appear in P-01.");
+        Assert.That(
+            FindActiveInteractionView("INT_P_01_MESSENGER"),
+            Is.Null,
+            "The messenger affordance must remain hidden before the invitation is inspected.");
+        Assert.That(
+            daniel.BodyInteractionAvailable,
+            Is.False,
+            "Daniel's body must not start a different interaction while the invitation is pending.");
+
         InteractionPointView invitation = null;
         yield return WaitFor(
             () => (invitation = FindActiveHotspot("INT_P_01_INVITATION")) != null,
@@ -130,26 +143,72 @@ public sealed class P01ProgressionTests
         Assert.That(FindActiveHotspot("INT_P_01_INVITATION"), Is.Null);
         Assert.That(FindActiveHotspot("INT_P_01_CONTINUE"), Is.Null);
 
-        CharacterView daniel = null;
+        InteractionPointView messengerBadge = null;
         yield return WaitFor(
-            () => (daniel = FindActiveCharacter("CHR_DANIEL")) != null,
-            "Daniel's CharacterView did not appear in P-01.");
+            () => (daniel = FindActiveCharacter("CHR_DANIEL")) != null
+                && (messengerBadge = daniel.ContextBadge) != null
+                && messengerBadge.gameObject.activeInHierarchy
+                && messengerBadge.Definition?.Id == "INT_P_01_MESSENGER",
+            "Daniel's anchored messenger affordance did not appear after the invitation.");
+
+        Assert.That(messengerBadge.Definition.Type, Is.EqualTo(InteractionType.Context));
+        Assert.That(messengerBadge.Definition.TargetId, Is.EqualTo("CHR_DANIEL"));
+        Assert.That(
+            messengerBadge.transform.IsChildOf(daniel.transform),
+            Is.True,
+            "The messenger affordance must stay anchored to Daniel's CharacterView.");
+        Assert.That(
+            daniel.BodyInteractionAvailable,
+            Is.False,
+            "Daniel's body must not fall back to the pending Context interaction.");
+        Assert.That(messengerBadge.Tooltip, Is.Not.Null);
+        Assert.That(messengerBadge.Tooltip.IsVisible, Is.False);
+
+        yield return HoverThroughEventSystem(
+            messengerBadge,
+            "Daniel messenger context affordance");
+        Assert.That(messengerBadge.Tooltip.IsVisible, Is.True);
+        Assert.That(
+            messengerBadge.Tooltip.Text,
+            Is.EqualTo(messengerBadge.Definition.DisplayName));
 
         int historyBeforeMessenger = narrative.History.Lines.Count;
-        yield return ClickThroughEventSystem(daniel, "Daniel messenger interaction");
+        yield return ClickThroughEventSystem(
+            messengerBadge,
+            "Daniel messenger context affordance");
+        Assert.That(
+            messengerBadge.Tooltip.IsVisible,
+            Is.False,
+            "The Context tooltip must close as soon as its action is selected.");
         yield return CompleteCurrentDialogue(dialogue, screens, null, "messenger inspection");
         yield return WaitFor(
-            () => state.IsInteractionCompleted("INT_P_01_MESSENGER"),
-            "The messenger interaction was not completed.");
+            () => state.IsInteractionCompleted("INT_P_01_MESSENGER")
+                && (messengerBadge == null || !messengerBadge.gameObject.activeInHierarchy)
+                && (daniel = FindActiveCharacter("CHR_DANIEL")) != null
+                && daniel.BodyInteractionAvailable,
+            "The messenger affordance did not hand off to Daniel's body interaction.");
 
         Assert.That(state.HasFlag("anonymous_tip_preview"), Is.True);
-        Assert.That(narrative.History.Lines.Count, Is.GreaterThan(historyBeforeMessenger));
-        Assert.That(narrative.History.Lines, Does.Contain("P-01_008"));
+        Assert.That(
+            narrative.History.Lines.Skip(historyBeforeMessenger),
+            Is.EqualTo(new[] { "P-01_006", "P-01_007", "P-01_008" }),
+            "The messenger affordance must play only its authored inspection range.");
+        Assert.That(narrative.History.Lines, Does.Not.Contain("P-01_009"));
         Assert.That(FindActiveHotspot("INT_P_01_CONTINUE"), Is.Null);
 
         daniel = FindActiveCharacter("CHR_DANIEL");
         Assert.That(daniel, Is.Not.Null);
+        Assert.That(daniel.ContextBadge.gameObject.activeInHierarchy, Is.False);
+        int historyBeforeDaniel = narrative.History.Lines.Count;
         yield return ClickThroughEventSystem(daniel, "Daniel conversation interaction");
+        yield return WaitFor(
+            () => screens.Current == ScreenId.Dialogue
+                && narrative.History.Lines.Count > historyBeforeDaniel,
+            "Clicking Daniel's body did not start his conversation.");
+        Assert.That(
+            narrative.History.Lines[historyBeforeDaniel],
+            Is.EqualTo("P-01_009"),
+            "Daniel's body interaction must begin at the authored meeting line.");
         yield return CompleteCurrentDialogue(
             dialogue,
             screens,
@@ -163,6 +222,17 @@ public sealed class P01ProgressionTests
         Assert.That(state.HasFlag("daniel_warning_taken"), Is.True);
         Assert.That(state.HasFlag("DIALOGUE_CHOICE_P-01_C2"), Is.False);
         Assert.That(state.GetTrust("CHR_DANIEL"), Is.EqualTo(3));
+        string[] danielConversationLines = narrative.History.Lines
+            .Skip(historyBeforeDaniel)
+            .ToArray();
+        Assert.That(
+            danielConversationLines,
+            Does.Not.Contain("P-01_006"));
+        Assert.That(danielConversationLines, Does.Not.Contain("P-01_007"));
+        Assert.That(
+            danielConversationLines,
+            Does.Not.Contain("P-01_008"),
+            "Daniel's conversation must not replay the messenger inspection.");
 
         InteractionPointView continueHotspot = null;
         yield return WaitFor(
@@ -224,6 +294,10 @@ public sealed class P01ProgressionTests
 
         AssertP01CompletionState(restoredState.State);
         AssertP02Presentation(restoredStory, restoredState);
+        Assert.That(
+            FindActiveInteractionView("INT_P_01_MESSENGER"),
+            Is.Null,
+            "Restoring P-02 must not reconstruct P-01's messenger affordance.");
         Assert.That(
             restoredNarrative.History.Lines.Any(id => id.StartsWith("P-01", StringComparison.Ordinal)),
             Is.False,
@@ -466,6 +540,56 @@ public sealed class P01ProgressionTests
             + $"App roots: {Object.FindObjectsByType<AppLifetime>(FindObjectsInactive.Include, FindObjectsSortMode.None).Length}.");
     }
 
+    private static IEnumerator HoverThroughEventSystem(Component target, string label)
+    {
+        Assert.That(target, Is.Not.Null, $"Missing hover target for {label}.");
+        Assert.That(EventSystem.current, Is.Not.Null, $"Missing EventSystem for {label}.");
+
+        float deadline = Time.realtimeSinceStartup + TimeoutSeconds;
+        List<RaycastResult> lastHits = null;
+        while (Time.realtimeSinceStartup < deadline)
+        {
+            if (target != null && target.gameObject.activeInHierarchy)
+            {
+                var pointer = new PointerEventData(EventSystem.current)
+                {
+                    position = ScreenPointAtCenter(target.transform as RectTransform),
+                };
+                var hits = new List<RaycastResult>();
+                EventSystem.current.RaycastAll(pointer, hits);
+                lastHits = hits;
+
+                if (hits.Count > 0 && IsTargetOrChild(hits[0].gameObject, target.gameObject))
+                {
+                    GameObject receiver = ExecuteEvents.ExecuteHierarchy(
+                        hits[0].gameObject,
+                        pointer,
+                        ExecuteEvents.pointerEnterHandler);
+                    Assert.That(
+                        receiver,
+                        Is.Not.Null,
+                        $"The top raycast hit for {label} had no pointer-enter receiver.");
+                    Assert.That(
+                        IsTargetOrChild(receiver, target.gameObject)
+                            || IsTargetOrChild(target.gameObject, receiver),
+                        Is.True,
+                        $"The {label} hover was handled by an unexpected object '{receiver.name}'.");
+                    yield return null;
+                    yield break;
+                }
+            }
+
+            yield return null;
+        }
+
+        string hitNames = lastHits == null || lastHits.Count == 0
+            ? "none"
+            : string.Join(", ", lastHits.Take(5).Select(hit => hit.gameObject.name));
+        Assert.Fail(
+            $"Could not raycast and hover {label} within {TimeoutSeconds} seconds. "
+            + $"Top hits: {hitNames}.");
+    }
+
     private static Vector2 ScreenPointAtCenter(RectTransform rect)
     {
         Assert.That(rect, Is.Not.Null, "Pointer targets must use RectTransform.");
@@ -482,6 +606,9 @@ public sealed class P01ProgressionTests
         candidate == target || candidate.transform.IsChildOf(target.transform);
 
     private static InteractionPointView FindActiveHotspot(string interactionId) =>
+        FindActiveInteractionView(interactionId);
+
+    private static InteractionPointView FindActiveInteractionView(string interactionId) =>
         Object.FindObjectsByType<InteractionPointView>(
                 FindObjectsInactive.Exclude,
                 FindObjectsSortMode.None)

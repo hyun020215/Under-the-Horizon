@@ -4,7 +4,7 @@ P-01_002,P-01,2,opening,narration,NARRATION,"다니엘 머서는 탑승 줄에�
 P-01_003,P-01,3,inspection,narration,NARRATION,[조사: 구겨진 초대장],observe,,,,PORT,N,,
 P-01_004,P-01,4,inspection,inspection,ADRIAN,종이는 두 번 접혔다가 급히 펴졌다. 리처드의 전자서명은 선명하지만 발송 코드가 초대장 본문과 다른 서체다.,focused,,,,PORT,Y,,
 P-01_005,P-01,5,evidence,system,SYSTEM,단서 획득: C-01 다니엘의 초대장,system,,,evidence:C-01,UI,N,,
-P-01_006,P-01,6,inspection,narration,NARRATION,[조사: 암호화 메신저 알림],observe,,,,PORT,N,,
+P-01_006,P-01,6,inspection,narration,NARRATION,"다니엘이 진동을 확인하려 기기를 꺼내는 순간, 기울어진 화면에 암호화 메신저 미리보기가 드러났다.",observe,,,,PORT,N,,
 P-01_007,P-01,7,inspection,inspection,ADRIAN,"발신자 표시는 없다. 미리보기에는 ‘선미, 21시 이후. 회장이 혼자일 때’라고 적혀 있다.",focused,,,,PORT,Y,,
 P-01_008,P-01,8,evidence,system,SYSTEM,단서 획득: 보조 단서: 익명 제보 알림,system,,,flag:anonymous_tip_preview,UI,N,,
 P-01_009,P-01,9,meeting,dialogue,DANIEL,아드리안 베일. 휴가 중인 탐정까지 불렀다면 호손도 불안하긴 한 모양이군요.,dry,,,,PORT,Y,,

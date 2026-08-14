@@ -7,10 +7,19 @@ public sealed class CharacterView : MonoBehaviour, IPointerClickHandler
 {
     [SerializeField]
     private Image image;
+
+    [SerializeField]
+    private InteractionPointView contextBadgePrefab;
+
     public CharacterDefinition Definition { get; private set; }
+    public InteractionPointView ContextBadge => contextBadge;
+    public bool BodyInteractionAvailable { get; private set; }
     public event Action<CharacterView> Clicked;
+    public event Action<CharacterView, InteractionDefinition> ContextClicked;
 
     private bool clickable;
+    private bool placementAllowsClick;
+    private InteractionPointView contextBadge;
     private CharacterIdleMotion idleMotion;
     private Outline silhouette;
     private CharacterPresentationProfile defaultPresentation;
@@ -20,6 +29,8 @@ public sealed class CharacterView : MonoBehaviour, IPointerClickHandler
 
     private void Awake()
     {
+        if (contextBadgePrefab != null)
+            contextBadge = Instantiate(contextBadgePrefab, transform);
         idleMotion = GetComponent<CharacterIdleMotion>()
             ?? gameObject.AddComponent<CharacterIdleMotion>();
         if (image != null)
@@ -28,6 +39,14 @@ public sealed class CharacterView : MonoBehaviour, IPointerClickHandler
                 ?? image.gameObject.AddComponent<Outline>();
             silhouette.useGraphicAlpha = true;
         }
+        if (contextBadge != null)
+            contextBadge.Clicked += OnContextBadgeClicked;
+    }
+
+    private void OnDestroy()
+    {
+        if (contextBadge != null)
+            contextBadge.Clicked -= OnContextBadgeClicked;
     }
 
     public void ConfigurePresentation(CharacterPresentationProfile profile) =>
@@ -38,19 +57,25 @@ public sealed class CharacterView : MonoBehaviour, IPointerClickHandler
         Definition = placement.character;
         pose = placement.pose;
         expression = placement.expression;
+        placementAllowsClick = placement.clickable;
         if (image != null)
         {
             image.sprite = Definition?.Resolve(pose, expression);
-            image.raycastTarget = placement.clickable;
+            image.raycastTarget = false;
         }
-        clickable = placement.clickable;
+        clickable = false;
+        BodyInteractionAvailable = false;
+        contextBadge?.ApplyAnchored(null);
         RectTransform rect = transform as RectTransform;
         if (rect != null)
             rect.anchorMin = rect.anchorMax = new Vector2(
                 placement.normalizedX,
                 placement.normalizedY
             );
-        transform.localScale = Vector3.one * (placement.scale <= 0 ? 1 : placement.scale);
+        float placementScale = placement.scale <= 0 ? 1 : placement.scale;
+        transform.localScale = Vector3.one * placementScale;
+        if (contextBadge != null)
+            contextBadge.transform.localScale = Vector3.one / placementScale;
         CharacterPresentationProfile presentation =
             Definition?.PresentationOverride ?? defaultPresentation;
         activePresentation = presentation;
@@ -62,6 +87,17 @@ public sealed class CharacterView : MonoBehaviour, IPointerClickHandler
         idleMotion?.Configure(StableHash(Definition?.Id), presentation);
         gameObject.SetActive(Definition != null);
     }
+
+    public void SetBodyInteractionAvailable(bool available)
+    {
+        BodyInteractionAvailable = placementAllowsClick && available;
+        clickable = BodyInteractionAvailable;
+        if (image != null)
+            image.raycastTarget = BodyInteractionAvailable;
+    }
+
+    public void SetContextInteraction(InteractionDefinition definition) =>
+        contextBadge?.ApplyAnchored(placementAllowsClick ? definition : null);
 
     public void ApplyExpression(CharacterExpression next)
     {
@@ -90,6 +126,12 @@ public sealed class CharacterView : MonoBehaviour, IPointerClickHandler
     {
         if (clickable)
             Clicked?.Invoke(this);
+    }
+
+    private void OnContextBadgeClicked(InteractionPointView view)
+    {
+        if (view?.Definition != null)
+            ContextClicked?.Invoke(this, view.Definition);
     }
 
     private static int StableHash(string value)
