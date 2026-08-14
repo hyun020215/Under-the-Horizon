@@ -35,7 +35,7 @@ MonoBehaviour:
   onCompleteEffects:
   - {fileID: 11400000, guid: 572cbb60ba8da1c4fa68d353179f8c9f, type: 2}
   authoringRequirements:
-    minimumInteractionCount: 4
+    minimumInteractionCount: 3
     requiresPuzzle: 0
     requiresEntrySequence: 1
     requiresExitSequence: 0
@@ -43,9 +43,9 @@ MonoBehaviour:
     - 0
     - 2
     - 3
-    - 4
     requiresEvidenceAcquisition: 1
     requiresSceneChoice: 1
   routes:
   - targetSceneId: P-02
     conditions: []
+    advanceMode: 1

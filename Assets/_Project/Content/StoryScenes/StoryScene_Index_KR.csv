@@ -1,6 +1,6 @@
 scene_id,chapter,title,time_label,location,objective,entry_condition,next_scene,characters,clues,choices,dialogue_line_count,voiced_line_count,choice_count,hint_count,status
 P-01,프롤로그,항구의 기자,15:10,PORT,관찰 튜토리얼 후 다니엘과 대화,없음,P-02,다니엘,구겨진 초대장; 암호화 메신저 알림,경고를 진지하게 듣기 / 농담으로 넘기기,26,17,2,0,COMPLETE
-P-02,프롤로그,승선 명단의 오류,15:35,GANGWAY,다니엘의 초대가 리처드 명의임을 확인,P-01,P-03,이블린; 리처드,수기 수정된 명단; 리처드의 당황,이블린에게 명단 수정자를 묻기,23,16,1,0,COMPLETE
+P-02,프롤로그,승선 명단의 오류,15:35,GANGWAY,다니엘의 초대가 리처드 명의임을 확인,P-01,P-03,이블린; 다니엘; 리처드,수기 수정된 명단; 리처드의 당황,이블린에게 명단 수정자를 묻기,23,16,1,0,COMPLETE
 P-03,프롤로그,회장의 부탁,16:20,DECK10_SUITE,익명 협박장과 오르페우스 호 사고의 공식 설명 청취,P-02,D1-01,리처드,협박장 문구; 아들 사진,보수를 묻기 / 아들에 관해 묻기,25,17,2,0,COMPLETE
 D1-01,1일 차,승객 소개,17:00,DECK8_ATRIUM,주요 용의자들과 자유 대화,P-03,D1-02,클레어; 마커스; 헬레나; 오언,각자의 알리바이 씨앗,대화 순서 자유,28,21,4,0,COMPLETE
 D1-02,1일 차,불편한 만찬,19:30,DECK9_DINING,다니엘과 클레어의 언쟁 목격,D1-01,D1-03,다니엘; 클레어; 이블린,비자금 기사; 익명 제보 언급,끼어들기 / 관찰하기,26,18,2,0,COMPLETE

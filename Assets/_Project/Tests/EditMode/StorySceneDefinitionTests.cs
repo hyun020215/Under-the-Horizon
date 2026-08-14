@@ -115,7 +115,7 @@ public sealed class StorySceneDefinitionTests
     }
 
     [Test]
-    public void P01UsesFourAuthoredStepsAndP02RequiresItsCompletion()
+    public void P01UsesThreeAuthoredStepsAndDefersP02DialogueToDaniel()
     {
         StorySceneDefinition p01 = AssetDatabase.LoadAssetAtPath<StorySceneDefinition>(
             "Assets/_Project/Content/StoryScenes/Prologue/P01_PortJournalist.asset");
@@ -148,7 +148,6 @@ public sealed class StorySceneDefinitionTests
                     "INT_P_01_INVITATION",
                     "INT_P_01_MESSENGER",
                     "INT_P_01_DIALOGUE",
-                    "INT_P_01_CONTINUE",
                 }));
             Assert.That(
                 interactions.Select(interaction => interaction.Type),
@@ -157,7 +156,6 @@ public sealed class StorySceneDefinitionTests
                     InteractionType.Investigation,
                     InteractionType.Context,
                     InteractionType.Character,
-                    InteractionType.Exit,
                 }));
             Assert.That(
                 interactions.Select(interaction => interaction.DisplayName),
@@ -166,7 +164,6 @@ public sealed class StorySceneDefinitionTests
                     "구겨진 초대장",
                     "다니엘이 확인 중인 메신저 알림 살펴보기",
                     "다니엘과 대화",
-                    "승선 계속하기",
                 }));
             Assert.That(interactions[0].Action.GrantsEvidence, Is.True);
             Assert.That(interactions[0].HasWorldHotspot, Is.True);
@@ -175,16 +172,19 @@ public sealed class StorySceneDefinitionTests
                 interactions[0].NormalizedRect,
                 Is.EqualTo(new Rect(0.012f, 0.182f, 0.066f, 0.086f)),
                 "The invitation hotspot must match the manually approved C-01 semantic region.");
-            Assert.That(
-                interactions[3].Action,
-                Is.TypeOf<StorySceneAdvanceInteractionAction>());
-            Assert.That(interactions[3].HasWorldHotspot, Is.True);
-            Assert.That(interactions[3].TargetId, Is.EqualTo("LOC_GANGWAY"));
-            Assert.That(
-                interactions[3].NormalizedRect,
-                Is.EqualTo(new Rect(0.38f, 0.36f, 0.24f, 0.25f)),
-                "The continue hotspot must match the manually approved gangway semantic region.");
             Assert.That(interactions.All(interaction => !interaction.Repeatable), Is.True);
+            Assert.That(
+                interactions.All(interaction => interaction.Type != InteractionType.Exit),
+                Is.True,
+                "A MapTravel route must not leave a world Exit hotspot in P-01.");
+            Assert.That(
+                interactions[2].Action,
+                Is.TypeOf<DialogueInteractionAction>());
+            Assert.That(
+                ((DialogueInteractionAction)interactions[2].Action)
+                    .AdvanceStorySceneOnComplete,
+                Is.True,
+                "Completing Daniel's authored dialogue must request the P-01 route.");
 
             AssertActionRange(interactions[0].Action, "P-01_003", "P-01_005");
             AssertActionRange(interactions[1].Action, "P-01_006", "P-01_008");
@@ -236,7 +236,6 @@ public sealed class StorySceneDefinitionTests
             Assert.That(state.IsInteractionCompleted(interactions[1].Id), Is.False);
             state.CompleteInteraction(interactions[1].Id);
             Assert.That(interactions[2].IsAvailable(state), Is.True);
-            Assert.That(interactions[3].IsAvailable(state), Is.False);
             Assert.That(
                 director.TryGetFirstAvailableAnchored(
                     InteractionType.Context,
@@ -252,12 +251,71 @@ public sealed class StorySceneDefinitionTests
                 Is.True);
             Assert.That(characterInteraction, Is.SameAs(interactions[2]));
             state.CompleteInteraction(interactions[2].Id);
-            Assert.That(interactions[3].IsAvailable(state), Is.True);
 
             Assert.That(p01.Routes.Single().TargetSceneId, Is.EqualTo("P-02"));
+            Assert.That(
+                p01.Routes.Single().AdvanceMode,
+                Is.EqualTo(StorySceneAdvanceMode.MapTravel));
             Assert.That(ConditionResolver.All(p02.EntryConditions, state), Is.False);
             state.CompleteScene("P-01");
             Assert.That(ConditionResolver.All(p02.EntryConditions, state), Is.True);
+
+            Assert.That(p02.DeferEntryDialogue, Is.True);
+            InteractionDefinition p02Dialogue = p02.InteractionSet.Interactions.Single();
+            Assert.That(p02Dialogue.Id, Is.EqualTo("INT_P_02_DIALOGUE"));
+            Assert.That(p02Dialogue.Type, Is.EqualTo(InteractionType.Character));
+            Assert.That(p02Dialogue.TargetId, Is.EqualTo("CHR_DANIEL"));
+            Assert.That(p02Dialogue.HasWorldHotspot, Is.False);
+            Assert.That(p02Dialogue.Repeatable, Is.False);
+            Assert.That(p02Dialogue.Action, Is.TypeOf<DialogueInteractionAction>());
+            Assert.That(
+                new SerializedObject(p02Dialogue.Action)
+                    .FindProperty("dialogue")
+                    .objectReferenceValue,
+                Is.SameAs(p02.EntryDialogue));
+
+            CharacterPlacement[] p02Placements = p02.CharacterSet.Placements;
+            Assert.That(
+                p02Placements
+                    .Where(placement => placement.character != null)
+                    .Select(placement => placement.character.Id),
+                Is.EquivalentTo(new[]
+                {
+                    "CHR_EVELYN",
+                    "CHR_DANIEL",
+                    "CHR_RICHARD",
+                }));
+            // These coordinates use semantic slots from the current Gangway background;
+            // the P-02 cast mapping is an authored layout that still needs visual approval.
+            AssertPlacementSlot(
+                p02Placements,
+                "CHR_EVELYN",
+                new Vector2(0.53f, 0.08f),
+                0.78f,
+                1);
+            AssertPlacementSlot(
+                p02Placements,
+                "CHR_DANIEL",
+                new Vector2(0.70f, 0.06f),
+                0.78f,
+                2);
+            AssertPlacementSlot(
+                p02Placements,
+                "CHR_RICHARD",
+                new Vector2(0.65f, 0.28f),
+                0.63f,
+                0);
+            Assert.That(
+                p02Placements.Single(
+                    placement => placement.character?.Id == "CHR_DANIEL").clickable,
+                Is.True,
+                "P-02's deferred dialogue must have a present clickable Daniel target.");
+
+            Assert.That(
+                AssetDatabase.LoadAssetAtPath<InteractionDefinition>(
+                    "Assets/_Project/Content/Locations/InteractionDefinitions/Generated/INT_P_01_CONTINUE.asset"),
+                Is.Not.Null,
+                "The retired P-01 exit asset must remain for GUID/save compatibility.");
         }
         finally
         {
@@ -376,6 +434,26 @@ public sealed class StorySceneDefinitionTests
         Assert.That(
             serialized.FindProperty("endLineId").stringValue,
             Is.EqualTo(expectedEnd));
+    }
+
+    private static void AssertPlacementSlot(
+        CharacterPlacement[] placements,
+        string characterId,
+        Vector2 expectedPosition,
+        float expectedScale,
+        int expectedSortingOrder)
+    {
+        CharacterPlacement placement = placements.Single(item =>
+            item.character?.Id == characterId);
+        Assert.That(
+            new Vector2(placement.normalizedX, placement.normalizedY),
+            Is.EqualTo(expectedPosition),
+            $"{characterId} must remain in the authored P-02 placement slot.");
+        Assert.That(placement.scale, Is.EqualTo(expectedScale), characterId);
+        Assert.That(
+            placement.sortingOrder,
+            Is.EqualTo(expectedSortingOrder),
+            characterId);
     }
 
     private static void AssertPrivateString(

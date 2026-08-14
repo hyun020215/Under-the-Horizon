@@ -13,11 +13,18 @@ public sealed class DialogueInteractionAction : InteractionAction
     [SerializeField]
     private string endLineId;
 
+    [SerializeField]
+    private bool advanceStorySceneOnComplete;
+
+    public bool AdvanceStorySceneOnComplete => advanceStorySceneOnComplete;
+
     public override async Task<InteractionResult> ExecuteAsync(InteractionContext context)
     {
         if (context.Narrative == null || dialogue == null)
             return new(false);
         await context.Narrative.PlayAsync(dialogue, startLineId, endLineId);
-        return InteractionResult.Completed;
+        return advanceStorySceneOnComplete
+            ? InteractionResult.CompletedWithStorySceneAdvance
+            : InteractionResult.Completed;
     }
 }

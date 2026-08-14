@@ -86,12 +86,19 @@
   - `Character`/`Context`/`Investigation` capability와 증거 획득 검증
   - 다섯 조사 완료 후 Richard 대화와 공식 선택지 개방
   - Input Lock, Audio, 4프레임 Image Montage, Dialogue로 구성한 entry Sequence
-- [x] P-01을 실제 상호작용으로 완주하고 기존 route를 통해 P-02 진입을 요청하는 첫 프롤로그 흐름을 연결했다.
-  - 진입 Sequence는 `P-01_001`~`002`만 재생하고, 초대장 조사 → 메신저 확인 → Daniel 대화 →
-    승선 계속하기를 `InteractionCompletedCondition`으로 순서화했다.
+- [x] P-01을 실제 상호작용으로 완주하고 지도에서 P-02로 이동하는 첫 프롤로그 흐름을 연결했다.
+  - 진입 Sequence는 `P-01_001`~`002`만 재생하고, 초대장 조사 → Daniel 부착 메신저 확인 →
+    Daniel 본체 대화·선택을 `InteractionCompletedCondition`으로 순서화했다.
   - C-01 획득과 `anonymous_tip_preview`는 기존 GameEffect 계약으로 적용한다.
-  - `StorySceneAdvanceInteractionAction`은 대상 장면을 소유하지 않고 advance 요청만 반환하며,
-    `InteractionDirector`가 `GameFlowController`에 위임해 현재 장면 완료와 route 해석을 수행한다.
+  - 마지막 `DialogueInteractionAction`의 재사용 가능한 advance 옵션이 대화 성공 뒤 route 해석을 요청한다.
+    P-01은 Port에서 완료·저장되고 P-02를 pending으로 유지하며, HUD 지도에서 M.V. 엘리시움의
+    Gangway 노드를 선택하고 별도 확인해야 P-02/`LOC_GANGWAY`에 진입한다.
+  - 중앙 `INT_P_01_CONTINUE` Exit는 활성 InteractionSet에서 제외했다. 기존 Definition/Action 자산은
+    직렬화 GUID와 개발 저장 호환성을 위해 삭제하지 않았다.
+  - P-02는 entry Dialogue 자동 재생을 미루고, 배치된 Daniel의 실제 `Character` Interaction을 클릭해야
+    `P-02_001`부터 대화가 시작된다. Evelyn·Daniel·Richard 배치는 같은 데이터 세트로 구성한다.
+  - Validator는 `MapTravel` 출발 장면의 월드 Exit 의존과, deferred entry Dialogue의 클릭 가능한 실행 대상
+    누락을 거부한다.
 - [x] Story Scene 완료와 지도 이동을 분리하는 공통 pending travel 플로우를 추가했다.
   - `StorySceneRoute`의 `Immediate` 기본값을 유지하면서 재사용 가능한 `MapTravel` 진입 방식을 추가해
     기존 41개 Story Scene route 동작을 바꾸지 않았다.
@@ -101,7 +108,8 @@
     재실행하지 않는다. 완료됐지만 pending 필드가 없는 v1 저장도 route 데이터로 일반 복구한다.
   - `SaveVersion`을 2로 올리고 v1→v2 내장 마이그레이션, pending 체크포인트, 상위 버전 거부 검증을 추가했다.
   - advance 요청 Interaction이 사전 검증에 실패하면 Action Effect와 완료 기록을 함께 되돌려 재시도 가능한 상태를 보존한다.
-  - 이 증분은 공통 Runtime·Save 계약만 제공한다. P-01 route 활성화와 지도 선택·확정 UI는 후속 증분에서 연결한다.
+  - 이 증분은 공통 Runtime·Save 계약을 제공했고, P-01 route 활성화와 지도 선택·확정 UI는 아래 후속
+    증분에서 연결을 완료했다.
   - Unity 6000.3.20f1 기준 EditMode 96/96, PlayMode 24/24와 Build Preflight를 통과했다.
 - [x] pending Story Scene 목적지를 지도에서 선택하고 확인해 이동하는 공통 UI를 연결했다.
   - `MapScreen`은 노드 클릭을 임시 선택으로만 처리하고, `GameFlowController`가 정확한 pending Location을
@@ -232,8 +240,8 @@
   Interaction으로 교체한다.
   - 완료 조건: 각 장면의 원본 행동과 `requiredInteractionTypes`, 최소 상호작용 수,
     Condition/GameEffect가 일치한다.
-  - P-02에는 P-01 완료를 요구하는 `SceneCompletedCondition`만 연결했다. P-02 자체의 장면 전용
-    Interaction, P-03으로 이어지는 완주 흐름과 직접 PlayMode 검증은 아직 남아 있다.
+  - P-02의 첫 Daniel `Character` 대화와 직접 PlayMode 진입 검증은 완료했다. P-02의 나머지 원본 행동,
+    장면 완료 조건과 P-03으로 이어지는 완주 흐름은 아직 남아 있다.
 - [ ] 41개 CharacterPlacementSet을 실제 플레이 화면에서 시각 검수하고 좌표·스케일·sorting order를
   최종 조정한다.
 - [ ] 모든 Story Scene을 원본의 전용 Location State와 배경·오디오에 연결한다.
@@ -268,6 +276,11 @@
 - [ ] Puzzle 직접 미리보기와 공통 Preview 계약을 구현한다.
 - [ ] 필요한 Addressables 등록·레이블과 깨진 직렬화 참조 검증을 추가한다.
 - [x] Unity Editor에서 현재 EditMode/PlayMode 전체 suite와 Bootstrap 자동 대표 흐름을 통과시킨다.
+  - 2026-08-14 `codex/p01-map-travel` 증분은 Unity `6000.3.20f1`에서 EditMode 103/103,
+    PlayMode 25/25와 Build Preflight를 실패·건너뜀 없이 통과했다.
+    대표 PlayMode는 실제 EventSystem 클릭으로 새 Slot 3 → 초대장 → Daniel 메신저 배지 → Daniel 대화·선택 →
+    Port/P-01 pending 체크포인트 재시작 → HUD 지도 → M.V. 엘리시움/Gangway 노드 → 이동 확인 →
+    P-02 체크포인트 재시작 → Daniel 본체 클릭 대화를 검증한다.
   - 2026-08-14 `codex/p01-playable-to-p02` 증분을 Unity `6000.3.20f1`에서 검증했다.
     EditMode 92/92, PlayMode 17/17과 Build Preflight가 실패·건너뜀 없이 통과했다. PlayMode는 실제
     EventSystem 클릭으로 새 Slot 3 → P-01 초대장 → Daniel 부착 메신저 배지 → Daniel 본체 대화·선택 →

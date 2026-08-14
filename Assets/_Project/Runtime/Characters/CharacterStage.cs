@@ -54,9 +54,26 @@ public sealed class CharacterStage : MonoBehaviour
         Clear();
         if (set?.Placements != null && prefab != null)
         {
-            foreach (CharacterPlacement placement in set.Placements)
+            var orderedPlacements = new List<(
+                CharacterPlacement Placement,
+                int AuthoredIndex)>(set.Placements.Length);
+            for (int index = 0; index < set.Placements.Length; index++)
+                orderedPlacements.Add((set.Placements[index], index));
+            orderedPlacements.Sort((left, right) =>
             {
-                shadows.Add(CreateGroundShadow(placement));
+                int authoredOrder = left.Placement.sortingOrder.CompareTo(
+                    right.Placement.sortingOrder);
+                return authoredOrder != 0
+                    ? authoredOrder
+                    : left.AuthoredIndex.CompareTo(right.AuthoredIndex);
+            });
+
+            foreach (var item in orderedPlacements)
+                shadows.Add(CreateGroundShadow(item.Placement));
+
+            foreach (var item in orderedPlacements)
+            {
+                CharacterPlacement placement = item.Placement;
                 CharacterView view = Instantiate(prefab, root);
                 view.ConfigurePresentation(defaultPresentation);
                 view.Apply(placement);
