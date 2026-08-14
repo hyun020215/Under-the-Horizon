@@ -120,10 +120,39 @@ public static class P0ProjectBuilder
         Sprite panel = AssetDatabase.LoadAssetAtPath<Sprite>(ThemePanelPath);
         SavePrefab(PrefabRoot + "/UI/PF_MapScreen.prefab",
             CreateScreen("PF_MapScreen", typeof(MapScreen), ScreenId.Map, panel));
-        BuildGameScene();
+        WireMapSceneReferences();
         AssetDatabase.SaveAssets();
         AssetDatabase.Refresh();
         EditorApplication.Exit(0);
+    }
+
+    private static void WireMapSceneReferences()
+    {
+        Scene scene = EditorSceneManager.OpenScene(
+            ProjectRoot + "/Scenes/Game.unity", OpenSceneMode.Single);
+        GameObject[] roots = scene.GetRootGameObjects();
+        GameStateStore state = roots
+            .SelectMany(root => root.GetComponentsInChildren<GameStateStore>(true))
+            .Single();
+        ScreenRouter screens = roots
+            .SelectMany(root => root.GetComponentsInChildren<ScreenRouter>(true))
+            .Single();
+        GameFlowController flow = roots
+            .SelectMany(root => root.GetComponentsInChildren<GameFlowController>(true))
+            .Single();
+        foreach (MapScreen map in roots
+                     .SelectMany(root => root.GetComponentsInChildren<MapScreen>(true)))
+        {
+            SetObject(map, "screens", screens);
+            SetObject(map, "state", state);
+            SetObject(map, "flow", flow);
+        }
+        foreach (PersistentHud hud in roots
+                     .SelectMany(root => root.GetComponentsInChildren<PersistentHud>(true)))
+        {
+            SetObject(hud, "flow", flow);
+        }
+        EditorSceneManager.SaveScene(scene);
     }
 
     public static void RefreshInvestigationRecordFromCommandLine()
@@ -360,6 +389,15 @@ public static class P0ProjectBuilder
         foreach (SceneRow scene in scenes)
         {
             CharacterPlacementSet placements = GetOrCreate<CharacterPlacementSet>(PlacementPath(scene.Id));
+            Dictionary<string, CharacterPlacement> existingPlacements =
+                (placements.Placements ?? Array.Empty<CharacterPlacement>())
+                .Where(placement => placement.character != null
+                    && !string.IsNullOrWhiteSpace(placement.character.Id))
+                .GroupBy(placement => placement.character.Id, StringComparer.Ordinal)
+                .ToDictionary(
+                    group => group.Key,
+                    group => group.First(),
+                    StringComparer.Ordinal);
             CharacterDefinition[] sceneCharacters = SplitCharacters(scene.Characters)
                 .Select(FindCharacter)
                 .Where(character => character != null)
@@ -371,12 +409,34 @@ public static class P0ProjectBuilder
             for (int index = 0; index < sceneCharacters.Length; index++)
             {
                 SerializedProperty item = items.GetArrayElementAtIndex(index);
-                item.FindPropertyRelative("character").objectReferenceValue = sceneCharacters[index];
+                CharacterDefinition character = sceneCharacters[index];
+                item.FindPropertyRelative("character").objectReferenceValue = character;
+                if (!string.IsNullOrWhiteSpace(character.Id)
+                    && existingPlacements.TryGetValue(
+                        character.Id,
+                        out CharacterPlacement existing))
+                {
+                    item.FindPropertyRelative("normalizedX").floatValue = existing.normalizedX;
+                    item.FindPropertyRelative("normalizedY").floatValue = existing.normalizedY;
+                    item.FindPropertyRelative("scale").floatValue = existing.scale;
+                    item.FindPropertyRelative("sortingOrder").intValue = existing.sortingOrder;
+                    item.FindPropertyRelative("pose").enumValueIndex = (int)existing.pose;
+                    item.FindPropertyRelative("expression").enumValueIndex =
+                        (int)existing.expression;
+                    item.FindPropertyRelative("clickable").boolValue = existing.clickable;
+                    continue;
+                }
+
                 item.FindPropertyRelative("normalizedX").floatValue =
-                    sceneCharacters.Length == 1 ? 0.78f : 0.58f + 0.34f * index / (sceneCharacters.Length - 1f);
+                    sceneCharacters.Length == 1
+                        ? 0.78f
+                        : 0.58f + 0.34f * index / (sceneCharacters.Length - 1f);
                 item.FindPropertyRelative("normalizedY").floatValue = 0.04f;
-                item.FindPropertyRelative("scale").floatValue = sceneCharacters.Length > 2 ? 0.78f : 0.94f;
+                item.FindPropertyRelative("scale").floatValue =
+                    sceneCharacters.Length > 2 ? 0.78f : 0.94f;
                 item.FindPropertyRelative("sortingOrder").intValue = index;
+                item.FindPropertyRelative("pose").enumValueIndex = 0;
+                item.FindPropertyRelative("expression").enumValueIndex = 0;
                 item.FindPropertyRelative("clickable").boolValue = true;
             }
             placementObject.ApplyModifiedPropertiesWithoutUndo();
@@ -494,10 +554,21 @@ public static class P0ProjectBuilder
         {
             string token = map.name.Replace("MAP_", string.Empty);
             SetString(map, "id", map.name);
-            SetObject(map, "baseLayer", FindSprite($"MAP_{token}_Base"));
-            SetObject(map, "restrictedLayer", FindSprite($"MAP_{token}_Restricted"));
-            SetObject(map, "technicalLayer", FindSprite($"MAP_{token}_Technical"));
+            SerializedObject serialized = new(map);
+            if (string.IsNullOrWhiteSpace(
+                    serialized.FindProperty("displayName")?.stringValue))
+                SetString(map, "displayName", MapScreen.FormatDeckLabel(map.name));
+            SetMapLayerIfFound(map, "baseLayer", $"MAP_{token}_Base");
+            SetMapLayerIfFound(map, "restrictedLayer", $"MAP_{token}_Restricted");
+            SetMapLayerIfFound(map, "technicalLayer", $"MAP_{token}_Technical");
         }
+    }
+
+    private static void SetMapLayerIfFound(MapDefinition map, string field, string spriteName)
+    {
+        Sprite sprite = FindSprite(spriteName);
+        if (sprite != null)
+            SetObject(map, field, sprite);
     }
 
     private static void PopulateDatabases()
@@ -853,25 +924,39 @@ public static class P0ProjectBuilder
         title.text = "M.V. ELYSIUM · DECK PLAN";
         title.color = new Color(0.965f, 0.827f, 0.529f, 1f);
         SetRect(title.rectTransform, new Vector2(0.055f, 0.88f), new Vector2(0.60f, 0.97f));
-        Text location = CreateText("Current Location", root, font, 22, TextAnchor.MiddleRight);
+        Text location = CreateText("Current Location", root, font, 28, TextAnchor.MiddleRight);
         location.color = new Color(0.80f, 0.76f, 0.67f, 1f);
         SetRect(location.rectTransform, new Vector2(0.60f, 0.89f), new Vector2(0.94f, 0.96f));
 
         Image viewport = CreateLayer("Map Viewport", root).gameObject.AddComponent<Image>();
         viewport.color = new Color(0.015f, 0.025f, 0.035f, 0.95f);
-        SetRect(viewport.rectTransform, new Vector2(0.19f, 0.15f), new Vector2(0.94f, 0.86f));
-        Image baseLayer = CreateMapLayer("Base Layer", viewport.transform);
-        Image restrictedLayer = CreateMapLayer("Restricted Layer", viewport.transform);
-        Image technicalLayer = CreateMapLayer("Technical Layer", viewport.transform);
+        SetRect(viewport.rectTransform, new Vector2(0.19f, 0.19f), new Vector2(0.75f, 0.86f));
+        RectTransform mapSurface = CreateLayer("Map Surface", viewport.transform);
+        SetRect(mapSurface, new Vector2(0.02f, 0.02f), new Vector2(0.98f, 0.98f));
+        AspectRatioFitter surfaceAspect = mapSurface.gameObject.AddComponent<AspectRatioFitter>();
+        surfaceAspect.aspectMode = AspectRatioFitter.AspectMode.FitInParent;
+        surfaceAspect.aspectRatio = 4f / 3f;
+        Image baseLayer = CreateMapLayer("Base Layer", mapSurface);
+        Image restrictedLayer = CreateMapLayer("Restricted Layer", mapSurface);
+        Image technicalLayer = CreateMapLayer("Technical Layer", mapSurface);
+        RectTransform nodeRoot = CreateLayer("Node Root", mapSurface);
+        Button nodeTemplate = CreateTitleButton(
+            "Location Node Template", nodeRoot, font, "장소", false);
+        RectTransform nodeTemplateRect = (RectTransform)nodeTemplate.transform;
+        nodeTemplateRect.anchorMin = nodeTemplateRect.anchorMax = new Vector2(.5f, .5f);
+        nodeTemplateRect.pivot = new Vector2(.5f, .5f);
+        nodeTemplateRect.anchoredPosition = Vector2.zero;
+        nodeTemplateRect.sizeDelta = new Vector2(190f, 56f);
+        nodeTemplate.gameObject.SetActive(false);
 
         MapDefinition[] maps = LoadAll<MapDefinition>()
             .OrderBy(map => map.Id, StringComparer.Ordinal).ToArray();
         var deckButtons = new Button[maps.Length];
         for (var index = 0; index < maps.Length; index++)
         {
-            string label = maps[index].Id.Replace("MAP_", string.Empty);
+            string token = maps[index].Id.Replace("MAP_", string.Empty);
             deckButtons[index] = CreateTitleButton(
-                $"{label}Button", root, font, label, index == 0);
+                $"{token}Button", root, font, maps[index].DisplayName, index == 0);
             float top = 0.83f - index * 0.105f;
             SetRect((RectTransform)deckButtons[index].transform,
                 new Vector2(0.055f, top - 0.075f), new Vector2(0.17f, top));
@@ -888,15 +973,56 @@ public static class P0ProjectBuilder
             new Vector2(0.055f, 0.055f), new Vector2(0.17f, 0.12f));
         Text deckLabel = CreateText("Deck Label", viewport.transform, font, 24, TextAnchor.UpperLeft);
         deckLabel.color = new Color(0.965f, 0.827f, 0.529f, 0.9f);
-        SetRect(deckLabel.rectTransform, new Vector2(0.03f, 0.88f), new Vector2(0.35f, 0.97f));
+        SetRect(deckLabel.rectTransform, new Vector2(0.04f, 0.88f), new Vector2(0.42f, 0.97f));
 
+        Image details = CreateLayer("Location Details", root).gameObject.AddComponent<Image>();
+        details.color = new Color(0.035f, 0.045f, 0.06f, 0.96f);
+        SetRect(details.rectTransform, new Vector2(0.77f, 0.19f), new Vector2(0.94f, 0.86f));
+        Text selectionName = CreateText(
+            "Selection Name", details.transform, font, 28, TextAnchor.UpperLeft);
+        selectionName.color = new Color(0.965f, 0.827f, 0.529f, 1f);
+        selectionName.text = "목적지를 선택하세요";
+        SetRect(selectionName.rectTransform, new Vector2(0.08f, 0.75f), new Vector2(0.92f, 0.92f));
+        Text selectionStatus = CreateText(
+            "Selection Status", details.transform, font, 18, TextAnchor.UpperLeft);
+        selectionStatus.color = new Color(0.74f, 0.68f, 0.57f, 1f);
+        selectionStatus.text = "선택 없음";
+        SetRect(selectionStatus.rectTransform, new Vector2(0.08f, 0.65f), new Vector2(0.92f, 0.76f));
+        Text selectionDescription = CreateText(
+            "Selection Description", details.transform, font, 19, TextAnchor.UpperLeft);
+        selectionDescription.color = new Color(0.86f, 0.83f, 0.77f, 1f);
+        selectionDescription.horizontalOverflow = HorizontalWrapMode.Wrap;
+        selectionDescription.verticalOverflow = VerticalWrapMode.Truncate;
+        selectionDescription.text = "지도에서 장소를 선택하면 이동 가능 여부를 확인할 수 있습니다.";
+        SetRect(selectionDescription.rectTransform, new Vector2(0.08f, 0.35f), new Vector2(0.92f, 0.64f));
+        Text feedback = CreateText(
+            "Travel Feedback", details.transform, font, 16, TextAnchor.UpperLeft);
+        feedback.color = new Color(0.94f, 0.63f, 0.45f, 1f);
+        feedback.horizontalOverflow = HorizontalWrapMode.Wrap;
+        SetRect(feedback.rectTransform, new Vector2(0.08f, 0.19f), new Vector2(0.92f, 0.34f));
+        Button travel = CreateTitleButton(
+            "Confirm Travel Button", details.transform, font, "이동 불가", true);
+        SetRect((RectTransform)travel.transform,
+            new Vector2(0.08f, 0.07f), new Vector2(0.92f, 0.18f));
+        travel.interactable = false;
+        Text travelLabel = travel.GetComponentInChildren<Text>(true);
+
+        SetObject(screen, "mapSurface", mapSurface);
         SetObject(screen, "baseLayer", baseLayer);
         SetObject(screen, "restrictedLayer", restrictedLayer);
         SetObject(screen, "technicalLayer", technicalLayer);
+        SetObject(screen, "nodeRoot", nodeRoot);
+        SetObject(screen, "nodeTemplate", nodeTemplate);
         SetObject(screen, "deckLabel", deckLabel);
         SetObject(screen, "locationLabel", location);
         SetObject(screen, "restrictedToggle", restricted);
         SetObject(screen, "technicalToggle", technical);
+        SetObject(screen, "selectionNameLabel", selectionName);
+        SetObject(screen, "selectionStatusLabel", selectionStatus);
+        SetObject(screen, "selectionDescriptionLabel", selectionDescription);
+        SetObject(screen, "feedbackLabel", feedback);
+        SetObject(screen, "travelButton", travel);
+        SetObject(screen, "travelButtonLabel", travelLabel);
         SetObject(screen, "backButton", back);
         SetArray(screen, "maps", maps.Cast<UnityEngine.Object>().ToArray());
         SetArray(screen, "deckButtons", deckButtons.Cast<UnityEngine.Object>().ToArray());
@@ -905,9 +1031,9 @@ public static class P0ProjectBuilder
     private static Image CreateMapLayer(string name, Transform parent)
     {
         Image image = CreateLayer(name, parent).gameObject.AddComponent<Image>();
-        image.preserveAspect = true;
+        image.preserveAspect = false;
         image.raycastTarget = false;
-        SetRect(image.rectTransform, new Vector2(0.03f, 0.05f), new Vector2(0.97f, 0.95f));
+        SetRect(image.rectTransform, Vector2.zero, Vector2.one);
         return image;
     }
 
@@ -1516,7 +1642,7 @@ public static class P0ProjectBuilder
             if (screen is PuzzleScreen puzzleScreenView)
                 SetObject(puzzleScreenView, "screens", router);
         }
-        BuildPersistentHud(uiFrame, router, state);
+        PersistentHud persistentHud = BuildPersistentHud(uiFrame, router, state);
         BuildEvidenceDiscoveryPresenter(uiFrame, evidenceDirector, evidenceBoardDirector);
         transitionRoot.SetAsLastSibling();
 
@@ -1626,6 +1752,9 @@ public static class P0ProjectBuilder
         SetObject(flow, "scenes", story);
         SetObject(flow, "state", state);
         SetObject(interactions, "flow", flow);
+        foreach (MapScreen mapScreen in screens.OfType<MapScreen>())
+            SetObject(mapScreen, "flow", flow);
+        SetObject(persistentHud, "flow", flow);
         GameObject hotspotPrefab = AssetDatabase.LoadAssetAtPath<GameObject>(
             ProjectRoot + "/Prefabs/Interaction/PF_Hotspot.prefab");
         SetObject(
@@ -1817,7 +1946,7 @@ public static class P0ProjectBuilder
         SetObject(presenter, "profile", FindTransition("TRANS_DISCOVERY"));
     }
 
-    private static void BuildPersistentHud(
+    private static PersistentHud BuildPersistentHud(
         Transform parent,
         ScreenRouter router,
         GameStateStore state)
@@ -1867,6 +1996,7 @@ public static class P0ProjectBuilder
         SetObject(hud, "timeLabel", time);
         SetObject(hud, "locationLabel", location);
         SetObject(hud, "objectiveLabel", objective);
+        return hud;
     }
 
     private static Text CreateHudLabel(

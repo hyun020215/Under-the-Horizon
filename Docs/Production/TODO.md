@@ -55,7 +55,7 @@
 - [ ] 각 기능 단위로 TODO, 관련 테스트/검증, Unity Play Mode 결과를 같은 커밋에 포함한다.
 
 > 이 문서는 프로젝트의 유일한 TODO 목록이다. 자산 폴더 안에 TODO 파일을 다시 만들지 않는다.  
-> 갱신일: 2026-08-14 (P-01 → P-02 첫 플레이 가능 증분)
+> 갱신일: 2026-08-14 (지도 선택·확정 이동 UI 증분)
 
 ## 완료
 
@@ -86,12 +86,19 @@
   - `Character`/`Context`/`Investigation` capability와 증거 획득 검증
   - 다섯 조사 완료 후 Richard 대화와 공식 선택지 개방
   - Input Lock, Audio, 4프레임 Image Montage, Dialogue로 구성한 entry Sequence
-- [x] P-01을 실제 상호작용으로 완주하고 기존 route를 통해 P-02 진입을 요청하는 첫 프롤로그 흐름을 연결했다.
-  - 진입 Sequence는 `P-01_001`~`002`만 재생하고, 초대장 조사 → 메신저 확인 → Daniel 대화 →
-    승선 계속하기를 `InteractionCompletedCondition`으로 순서화했다.
+- [x] P-01을 실제 상호작용으로 완주하고 지도에서 P-02로 이동하는 첫 프롤로그 흐름을 연결했다.
+  - 진입 Sequence는 `P-01_001`~`002`만 재생하고, 초대장 조사 → Daniel 부착 메신저 확인 →
+    Daniel 본체 대화·선택을 `InteractionCompletedCondition`으로 순서화했다.
   - C-01 획득과 `anonymous_tip_preview`는 기존 GameEffect 계약으로 적용한다.
-  - `StorySceneAdvanceInteractionAction`은 대상 장면을 소유하지 않고 advance 요청만 반환하며,
-    `InteractionDirector`가 `GameFlowController`에 위임해 현재 장면 완료와 route 해석을 수행한다.
+  - 마지막 `DialogueInteractionAction`의 재사용 가능한 advance 옵션이 대화 성공 뒤 route 해석을 요청한다.
+    P-01은 Port에서 완료·저장되고 P-02를 pending으로 유지하며, HUD 지도에서 M.V. 엘리시움의
+    Gangway 노드를 선택하고 별도 확인해야 P-02/`LOC_GANGWAY`에 진입한다.
+  - 중앙 `INT_P_01_CONTINUE` Exit는 활성 InteractionSet에서 제외했다. 기존 Definition/Action 자산은
+    직렬화 GUID와 개발 저장 호환성을 위해 삭제하지 않았다.
+  - P-02는 entry Dialogue 자동 재생을 미루고, 배치된 Daniel의 실제 `Character` Interaction을 클릭해야
+    `P-02_001`부터 대화가 시작된다. Evelyn·Daniel·Richard 배치는 같은 데이터 세트로 구성한다.
+  - Validator는 `MapTravel` 출발 장면의 월드 Exit 의존과, deferred entry Dialogue의 클릭 가능한 실행 대상
+    누락을 거부한다.
 - [x] Story Scene 완료와 지도 이동을 분리하는 공통 pending travel 플로우를 추가했다.
   - `StorySceneRoute`의 `Immediate` 기본값을 유지하면서 재사용 가능한 `MapTravel` 진입 방식을 추가해
     기존 41개 Story Scene route 동작을 바꾸지 않았다.
@@ -101,8 +108,22 @@
     재실행하지 않는다. 완료됐지만 pending 필드가 없는 v1 저장도 route 데이터로 일반 복구한다.
   - `SaveVersion`을 2로 올리고 v1→v2 내장 마이그레이션, pending 체크포인트, 상위 버전 거부 검증을 추가했다.
   - advance 요청 Interaction이 사전 검증에 실패하면 Action Effect와 완료 기록을 함께 되돌려 재시도 가능한 상태를 보존한다.
-  - 이 증분은 공통 Runtime·Save 계약만 제공한다. P-01 route 활성화와 지도 선택·확정 UI는 후속 증분에서 연결한다.
+  - 이 증분은 공통 Runtime·Save 계약을 제공했고, P-01 route 활성화와 지도 선택·확정 UI는 아래 후속
+    증분에서 연결을 완료했다.
   - Unity 6000.3.20f1 기준 EditMode 96/96, PlayMode 24/24와 Build Preflight를 통과했다.
+- [x] pending Story Scene 목적지를 지도에서 선택하고 확인해 이동하는 공통 UI를 연결했다.
+  - `MapScreen`은 노드 클릭을 임시 선택으로만 처리하고, `GameFlowController`가 정확한 pending Location을
+    승인한 경우에만 별도 `목표 경로로 이동` 버튼으로 Story Scene 진입을 요청한다.
+  - Base/Restricted/Technical/장소 노드를 하나의 4:3 `Map Surface` 좌표계로 통일하고, 전용 노드
+    템플릿과 선택 장소 이름·상태·설명·이동 피드백 영역을 추가했다.
+  - M.V. 엘리시움 지도에 기존 `MAP_Port_Base`를 연결하고, 없는 제한/기술 Overlay와 토글은 숨긴다.
+    Port와 Gangway에는 사용자 표시명·설명·검수 좌표를 저작했으며 Gangway는 `RouteOnly`로 분류했다.
+  - HUD는 pending 중 `승선 통로로 향하기 / 지도에서 목적지를 선택해 이동하기`를 우선 표시하고,
+    지도와 HUD 모두 `MAP_`·`LOC_` 내부 ID를 fallback 문구로 노출하지 않는다.
+  - 자동 검증 대상은 지도 Prefab 직렬화 계약, 5개 지도 표시명/Base, M.V. 엘리시움 레이어,
+    선택 시 상태 불변·pending 목적지 확인 이동, HUD 표시명 fallback 및 Build Preflight다.
+    Unity 6000.3.20f1 기준 EditMode 101/101, PlayMode 25/25, Build Preflight와
+    3개 해상도 × 14개 화면(42장) 반응형 캡처를 통과했다.
 - [x] P-01 메신저가 Daniel에게 부착된 Context임을 목표 문구와 비음성 조사 내레이션으로 명확히 했다.
   - 캐릭터 부착형 비월드 `Context`는 target Character ID, 현재 `CharacterPlacementSet`, HUD용 display name을 갖도록
     Validator와 저작 지침을 보강했다. target이 없는 기존 일반 Context는 이 부착 계약에 포함하지 않는다.
@@ -160,6 +181,9 @@
   - Deck별 Base/Restricted/Technical 레이어, 덱 탭, 현재 위치 표시와 뒤로가기는 이식 완료했다.
   - [x] `MapDefinition`이 덱별 `LocationDefinition`을 참조하고 기존 `MapNodeDefinition` 좌표로 이동 노드를 구성한다.
   - [x] `GameStateStore.unlockedLocations`를 잠금 조건으로 사용하고 현재 Story Scene의 Location을 목표 목적지로 강조한다.
+  - [x] pending Story Scene 목적지가 속한 지도를 자동 선택하고, 장소 노드 선택과 실제 이동 확인을 분리했다.
+  - [x] `RouteOnly` 노드는 현재 위치 또는 pending 목적지일 때만 표시하며 지도 View의 직접 상태 변경을 제거했다.
+  - [x] 공통 4:3 Map Surface와 전용 노드 템플릿·선택 상세 패널을 구성하고 없는 Overlay 토글을 숨겼다.
   - 각 장면의 위치 해금 Effect와 지도 이동 가능 범위 최종 조정은 콘텐츠 완성 단계에 남아 있다.
 - [ ] 조사 기록·증거 노트 UI를 완성한다.
   - 기존 EvidenceDefinition/Inventory/Director와 Investigation Record 화면을 사용한다.
@@ -216,8 +240,8 @@
   Interaction으로 교체한다.
   - 완료 조건: 각 장면의 원본 행동과 `requiredInteractionTypes`, 최소 상호작용 수,
     Condition/GameEffect가 일치한다.
-  - P-02에는 P-01 완료를 요구하는 `SceneCompletedCondition`만 연결했다. P-02 자체의 장면 전용
-    Interaction, P-03으로 이어지는 완주 흐름과 직접 PlayMode 검증은 아직 남아 있다.
+  - P-02의 첫 Daniel `Character` 대화와 직접 PlayMode 진입 검증은 완료했다. P-02의 나머지 원본 행동,
+    장면 완료 조건과 P-03으로 이어지는 완주 흐름은 아직 남아 있다.
 - [ ] 41개 CharacterPlacementSet을 실제 플레이 화면에서 시각 검수하고 좌표·스케일·sorting order를
   최종 조정한다.
 - [ ] 모든 Story Scene을 원본의 전용 Location State와 배경·오디오에 연결한다.
@@ -252,8 +276,13 @@
 - [ ] Puzzle 직접 미리보기와 공통 Preview 계약을 구현한다.
 - [ ] 필요한 Addressables 등록·레이블과 깨진 직렬화 참조 검증을 추가한다.
 - [x] Unity Editor에서 현재 EditMode/PlayMode 전체 suite와 Bootstrap 자동 대표 흐름을 통과시킨다.
+  - 2026-08-14 `codex/p01-map-travel` 증분은 Unity `6000.3.20f1`에서 EditMode 103/103,
+    PlayMode 25/25와 Build Preflight를 실패·건너뜀 없이 통과했다.
+    대표 PlayMode는 실제 EventSystem 클릭으로 새 Slot 3 → 초대장 → Daniel 메신저 배지 → Daniel 대화·선택 →
+    Port/P-01 pending 체크포인트 재시작 → HUD 지도 → M.V. 엘리시움/Gangway 노드 → 이동 확인 →
+    P-02 체크포인트 재시작 → Daniel 본체 클릭 대화를 검증한다.
   - 2026-08-14 `codex/p01-playable-to-p02` 증분을 Unity `6000.3.20f1`에서 검증했다.
-    EditMode 91/91, PlayMode 17/17과 Build Preflight가 실패·건너뜀 없이 통과했다. PlayMode는 실제
+    EditMode 92/92, PlayMode 17/17과 Build Preflight가 실패·건너뜀 없이 통과했다. PlayMode는 실제
     EventSystem 클릭으로 새 Slot 3 → P-01 초대장 → Daniel 부착 메신저 배지 → Daniel 본체 대화·선택 →
     Trust 2에서 예약 기사·태블릿 경고 확인 → 출구 → P-02 Trust 보너스 대사 → 앱 재시작 후
     같은 Slot 3의 P-02 복원을 확인하며, reduced-motion 전환의 입력 해제와 체크포인트 저장 실패 격리도 포함한다.
@@ -290,6 +319,8 @@
 - [ ] 프로젝트 전용 Input Actions 사용 범위와 정상화한 Rendering 설정을 타깃 플랫폼에서 검증한다.
 - [ ] Library가 없는 clean checkout에서 cold import 설정 오류 0건을 확인하고 타깃 Player build를 검증한다.
 - [ ] 앱 이름, 회사명, 아이콘, 해상도, 품질과 플랫폼별 Player Settings를 확정한다.
+  - [x] 이전 임시 제품명을 정식명 `Under the Horizon`으로 정정하고 UWP 패키지 식별자는 공백 없는 `UnderTheHorizon`으로 분리했으며, Build Preflight 회귀 검사를 추가했다. 출시 전 레거시 개발 저장·PlayerPrefs 경로는 자동 이전하지 않는다.
+  - [ ] 회사명, 애플리케이션 식별자, 아이콘, 해상도, 품질과 플랫폼별 나머지 설정을 확정한다.
 - [ ] CI에서 Unity Test Runner와 Build Preflight를 push/PR마다 실행한다.
 - [ ] `Docs/QA/ReleaseChecklist.md`를 모두 확인한다.
 

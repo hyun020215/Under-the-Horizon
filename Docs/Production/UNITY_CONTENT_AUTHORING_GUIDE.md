@@ -357,6 +357,59 @@ PuzzleDefinition은 다음을 소유한다.
 
 퍼즐 controller가 Story Scene ID로 분기하거나 다음 장면을 직접 열면 안 된다.
 
+## 12-1. 지도와 Story Scene 이동 경로 저작
+
+관련 경로:
+
+- 지도 정의: `Assets/_Project/Content/Locations/Map/`
+- 장소/노드 정의: `Assets/_Project/Content/Locations/Definitions/`
+- 지도 원본: `Assets/_Project/Art/Maps/DeckLayers/`
+- 지도 화면: `Assets/_Project/Prefabs/UI/PF_MapScreen.prefab`
+
+`MapDefinition`은 플레이어에게 보여 줄 지도 한 장을 정의한다. `Display Name`은 갑판 탭과
+지도 제목에 표시되므로 `MAP_Deck07` 같은 내부 ID를 넣지 않는다. `Base Layer`는 필수이고,
+`Restricted Layer`와 `Technical Layer`는 실제 도면이 있을 때만 연결한다. 선택 레이어가 null이면
+화면은 해당 이미지와 토글을 함께 숨긴다.
+
+Base/Restricted/Technical 이미지와 장소 노드는 모두 Prefab의 4:3 `Map Surface`를 좌표 기준으로
+사용한다. 이미지마다 `preserveAspect`나 별도 여백을 주면 노드가 도면에서 어긋나므로, 같은
+RectTransform을 채우게 유지한다. M.V. 엘리시움 지도는 현재 `MAP_Port_Base.png`를 Base로 사용하며
+Port `(0.20, 0.50)`, Gangway `(0.58, 0.51)` 좌표를 기준으로 검수한다.
+
+각 `LocationDefinition.MapNode`의 필드 의미:
+
+| 필드 | 계약 |
+|---|---|
+| `Id` | `LocationDefinition.Id`와 정확히 일치 |
+| `Normalized Position` | 4:3 Map Surface 기준 0~1 좌표 |
+| `Display Name` | 플레이어 표시명. 비우면 Location 표시명을 사용 |
+| `Description` | 선택 상세 패널의 장소 설명 |
+| `Access Mode` | `PersistentUnlock` 또는 `RouteOnly` |
+
+`PersistentUnlock`은 일반 지도 노드다. 현재는 해금 상태를 표시·선택할 수 있지만, 별도의 자유 이동
+정책이 완성되기 전에는 pending Story Scene 목적지가 아닌 장소로 실제 이동할 수 없다.
+`RouteOnly`는 이야기 경로가 해당 장소를 현재 목적지로 지정했거나 플레이어가 이미 그 장소에 있을
+때만 보인다. 일시적인 Gangway를 전역 해금 장소처럼 남기지 않는다.
+
+Story Scene의 `StorySceneRoute.Advance Mode`가 `MapTravel`이면 완료 후 곧바로 다음 장면에 들어가지
+않고 목적지 Story Scene을 pending으로 저장한다. 지도 노드 클릭은 선택 상세만 갱신하며
+`currentLocationId`를 바꾸지 않는다. 플레이어가 `목표 경로로 이동`을 눌렀을 때만
+`GameFlowController`가 pending 목적지와 정확히 일치하는지 확인하고 다음 Story Scene에 진입한다.
+`MapScreen`이나 노드 View에서 상태를 직접 변경하거나 장면을 완료하지 않는다.
+
+지도 작업 검수 순서:
+
+1. MapDefinition의 표시명, Base, 선택 Overlay, Locations 배열을 확인한다.
+2. 각 Location의 MapNode ID·표시명·설명·좌표·Access Mode를 확인한다.
+3. P0 builder를 실행했다면, 이름이 일치하는 새 Sprite가 없을 때 기존 저작 레이어가 보존되는지 확인한다.
+4. pending 이동 전/후로 RouteOnly 노드의 숨김·목표 상태를 확인한다.
+5. 노드 클릭만으로 Story Scene과 Location이 바뀌지 않는지 확인한다.
+6. 이동 확인 뒤 정확한 목적지 장면·Location으로 진입하는지 확인한다.
+7. pending 체크포인트를 재시작해도 완료된 출발 장면·Location·목적지가 복원되고 진입 연출이
+   재생되지 않는지 확인한다.
+8. 목적지 진입 체크포인트를 재시작해도 목적지 Story Scene·Location이 복원되는지 확인한다.
+9. `Build Preflight`, Map EditMode/PlayMode 테스트와 세 16:9 해상도 캡처를 실행한다.
+
 ## 13. 기존 Story Scene 수정
 
 편집 메뉴: `Under The Horizon > Content > Story Scenes`
@@ -386,7 +439,23 @@ PuzzleDefinition은 다음을 소유한다.
 
 수정 뒤 `Under The Horizon > Content > Story Graph`에서 진입/종료 경로를 확인하고 `Under The Horizon > Preview > Story Scene`에서 주요 참조와 배경을 확인한다.
 
-전체 entry Dialogue를 한 번에 자동 재생하지 않고 조사와 대화를 단계화하려면 `Defer Entry Dialogue`를 켠다. 필요한 도입부만 `DialogueCommand`의 start/end line ID로 entry Sequence에서 재생하고, 이후 Interaction은 `InteractionCompletedCondition`으로 순서화한다. 마지막 Exit Interaction은 `StorySceneAdvanceInteractionAction`으로 route 해석을 요청한다. P-01이 이 구성의 기준 예시다.
+전체 entry Dialogue를 한 번에 자동 재생하지 않고 조사와 대화를 단계화하려면 `Defer Entry Dialogue`를
+켠다. 필요한 도입부만 `DialogueCommand`의 start/end line ID로 entry Sequence에서 재생하고, 이후
+Interaction은 `InteractionCompletedCondition`으로 순서화한다. deferred Dialogue에는 같은
+`Entry Dialogue`를 실행하는 Interaction이 최소 하나 있어야 한다. 월드 핫스팟이 아니라 Character 또는
+캐릭터 부착 Context라면 해당 target Character가 현재 `CharacterPlacementSet`에 있고 `Clickable`이어야 한다.
+Validator는 이 실행 경로가 없으면 실패한다.
+
+마지막 대화가 장면 route를 요청해야 하면 `DialogueInteractionAction.Advance Story Scene On Complete`를
+사용한다. 이 옵션은 대화가 성공적으로 끝난 뒤 advance 요청만 반환하며, 장면 완료·route 해석·저장은
+`InteractionDirector`와 `GameFlowController`가 담당한다. `Advance Mode`가 `MapTravel`이면 출발 장면과
+Location을 유지한 pending 체크포인트가 만들어지고, HUD 지도에서 목적지 노드를 선택·확정해야 다음
+Story Scene에 진입한다. `MapTravel` 출발 장면에 별도의 월드 Exit 핫스팟을 두면 안 된다.
+
+P-01은 초대장 → Daniel 부착 메신저 → Daniel 대화 완료 뒤 P-02를 pending으로 만드는 기준 예시다.
+기존 `INT_P_01_CONTINUE`와 Action 자산은 GUID 호환성을 위해 남겨 두되 P-01 InteractionSet에는 포함하지
+않는다. P-02도 `Defer Entry Dialogue`를 사용하며, Gangway에 배치된 Daniel의 `Character` Interaction을
+실제로 클릭해야 대화를 시작한다.
 
 다음 Story Scene의 `Entry Conditions`에 앞 장면의 `SceneCompletedCondition`을 둘 수 있다. 이는 진입 gate일 뿐 다음 장면 자체의 Interaction·완주 흐름이 구현됐다는 의미는 아니다.
 

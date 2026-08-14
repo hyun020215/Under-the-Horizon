@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using NUnit.Framework;
 using UnityEngine;
 using UnityEngine.TestTools;
+using UnityEngine.UI;
 using Object = UnityEngine.Object;
 
 public sealed class MapTravelFlowTests
@@ -237,6 +238,187 @@ public sealed class MapTravelFlowTests
             Is.EquivalentTo(before.completedStoryScenes));
     }
 
+    [UnityTest]
+    public IEnumerator MapScreenSelectsWithoutMutatingStateAndConfirmsOnlyPendingTravel()
+    {
+        using var harness = new FlowHarness();
+        ConfigureMapNode(
+            harness.SourceLocation,
+            new Vector2(0.2f, 0.5f),
+            "출발지",
+            MapNodeAccessMode.PersistentUnlock);
+        ConfigureMapNode(
+            harness.TargetLocation,
+            new Vector2(0.58f, 0.51f),
+            "목적지",
+            MapNodeAccessMode.RouteOnly);
+        ConfigureMapNode(
+            harness.UnrelatedLocation,
+            new Vector2(0.8f, 0.3f),
+            "다른 장소",
+            MapNodeAccessMode.PersistentUnlock);
+
+        MapDefinition unrelatedMap = harness.Track(
+            ScriptableObject.CreateInstance<MapDefinition>());
+        SetPrivateField(unrelatedMap, "id", "MAP_OTHER");
+        SetPrivateField(unrelatedMap, "displayName", "다른 갑판");
+        SetPrivateField(unrelatedMap, "locations", Array.Empty<LocationDefinition>());
+        MapDefinition travelMap = harness.Track(
+            ScriptableObject.CreateInstance<MapDefinition>());
+        SetPrivateField(travelMap, "id", "MAP_TRAVEL");
+        SetPrivateField(travelMap, "displayName", "승선 지도");
+        SetPrivateField(
+            travelMap,
+            "locations",
+            new[]
+            {
+                harness.SourceLocation,
+                harness.TargetLocation,
+                harness.UnrelatedLocation,
+            });
+
+        var owner = new GameObject("Map screen under test");
+        owner.transform.SetParent(harness.Owner.transform, false);
+        owner.SetActive(false);
+        MapScreen screen = owner.AddComponent<MapScreen>();
+        RectTransform surface = CreateRect("Map Surface", owner.transform);
+        Image baseLayer = CreateImage("Base Layer", surface);
+        Image restrictedLayer = CreateImage("Restricted Layer", surface);
+        Image technicalLayer = CreateImage("Technical Layer", surface);
+        RectTransform nodeRoot = CreateRect("Node Root", surface);
+        Button nodeTemplate = CreateButton("Location Node Template", nodeRoot);
+        Text deckLabel = CreateText("Deck Label", owner.transform);
+        Text locationLabel = CreateText("Current Location", owner.transform);
+        Text selectionName = CreateText("Selection Name", owner.transform);
+        Text selectionStatus = CreateText("Selection Status", owner.transform);
+        Text selectionDescription = CreateText("Selection Description", owner.transform);
+        Text feedback = CreateText("Travel Feedback", owner.transform);
+        Button travelButton = CreateButton("Confirm Travel Button", owner.transform);
+        Text travelButtonLabel = travelButton.GetComponentInChildren<Text>(true);
+        Toggle restrictedToggle = CreateToggle("Restricted Toggle", owner.transform);
+        Toggle technicalToggle = CreateToggle("Technical Toggle", owner.transform);
+
+        SetPrivateField(screen, "state", harness.State);
+        SetPrivateField(screen, "flow", harness.Flow);
+        SetPrivateField(screen, "maps", new[] { unrelatedMap, travelMap });
+        SetPrivateField(screen, "mapSurface", surface);
+        SetPrivateField(screen, "baseLayer", baseLayer);
+        SetPrivateField(screen, "restrictedLayer", restrictedLayer);
+        SetPrivateField(screen, "technicalLayer", technicalLayer);
+        SetPrivateField(screen, "nodeRoot", nodeRoot);
+        SetPrivateField(screen, "nodeTemplate", nodeTemplate);
+        SetPrivateField(screen, "deckLabel", deckLabel);
+        SetPrivateField(screen, "locationLabel", locationLabel);
+        SetPrivateField(screen, "deckButtons", Array.Empty<Button>());
+        SetPrivateField(screen, "restrictedToggle", restrictedToggle);
+        SetPrivateField(screen, "technicalToggle", technicalToggle);
+        SetPrivateField(screen, "selectionNameLabel", selectionName);
+        SetPrivateField(screen, "selectionStatusLabel", selectionStatus);
+        SetPrivateField(screen, "selectionDescriptionLabel", selectionDescription);
+        SetPrivateField(screen, "feedbackLabel", feedback);
+        SetPrivateField(screen, "travelButton", travelButton);
+        SetPrivateField(screen, "travelButtonLabel", travelButtonLabel);
+
+        owner.SetActive(true);
+        yield return Await(harness.Flow.StartAsync(harness.Source.Id));
+        harness.State.UnlockLocation(harness.UnrelatedLocation.Id);
+        yield return Await(harness.Flow.AdvanceAsync());
+        string sourceSceneId = harness.State.State.currentStorySceneId;
+        string sourceLocationId = harness.State.State.currentLocationId;
+
+        yield return Await(screen.OpenAsync(default));
+
+        Assert.That(screen.SelectedMapId, Is.EqualTo(travelMap.Id));
+        Assert.That(screen.SelectedLocationId, Is.EqualTo(harness.TargetLocation.Id));
+        Assert.That(travelButton.interactable, Is.True);
+        Assert.That(restrictedLayer.gameObject.activeSelf, Is.False);
+        Assert.That(technicalLayer.gameObject.activeSelf, Is.False);
+        Assert.That(restrictedToggle.gameObject.activeSelf, Is.False);
+        Assert.That(technicalToggle.gameObject.activeSelf, Is.False);
+
+        Button unrelatedNode = nodeRoot.Find(
+            $"LocationNode_{harness.UnrelatedLocation.Id}").GetComponent<Button>();
+        unrelatedNode.onClick.Invoke();
+        Assert.That(screen.SelectedLocationId, Is.EqualTo(harness.UnrelatedLocation.Id));
+        Assert.That(harness.State.State.currentStorySceneId, Is.EqualTo(sourceSceneId));
+        Assert.That(harness.State.State.currentLocationId, Is.EqualTo(sourceLocationId));
+        Assert.That(travelButton.interactable, Is.False);
+
+        Button targetNode = nodeRoot.Find(
+            $"LocationNode_{harness.TargetLocation.Id}").GetComponent<Button>();
+        targetNode.onClick.Invoke();
+        Assert.That(harness.State.State.currentLocationId, Is.EqualTo(sourceLocationId));
+        Assert.That(travelButton.interactable, Is.True);
+
+        travelButton.onClick.Invoke();
+        for (var frame = 0;
+             frame < 60
+                 && !string.Equals(
+                     harness.State.State.currentStorySceneId,
+                     harness.Target.Id,
+                     StringComparison.Ordinal);
+             frame++)
+        {
+            yield return null;
+        }
+
+        Assert.That(harness.State.State.currentStorySceneId, Is.EqualTo(harness.Target.Id));
+        Assert.That(
+            harness.State.State.currentLocationId,
+            Is.EqualTo(harness.TargetLocation.Id));
+        Assert.That(harness.State.State.pendingStorySceneId, Is.Empty);
+    }
+
+    private static void ConfigureMapNode(
+        LocationDefinition location,
+        Vector2 position,
+        string displayName,
+        MapNodeAccessMode accessMode)
+    {
+        SetPrivateField(location, "displayName", displayName);
+        var node = new MapNodeDefinition();
+        SetPrivateField(node, "id", location.Id);
+        SetPrivateField(node, "normalizedPosition", position);
+        SetPrivateField(node, "displayName", displayName);
+        SetPrivateField(node, "description", $"{displayName} 설명");
+        SetPrivateField(node, "accessMode", accessMode);
+        SetPrivateField(location, "mapNode", node);
+    }
+
+    private static RectTransform CreateRect(string name, Transform parent)
+    {
+        var owner = new GameObject(name, typeof(RectTransform));
+        owner.transform.SetParent(parent, false);
+        return owner.GetComponent<RectTransform>();
+    }
+
+    private static Image CreateImage(string name, Transform parent)
+    {
+        RectTransform rect = CreateRect(name, parent);
+        return rect.gameObject.AddComponent<Image>();
+    }
+
+    private static Text CreateText(string name, Transform parent)
+    {
+        RectTransform rect = CreateRect(name, parent);
+        return rect.gameObject.AddComponent<Text>();
+    }
+
+    private static Button CreateButton(string name, Transform parent)
+    {
+        Image image = CreateImage(name, parent);
+        Button button = image.gameObject.AddComponent<Button>();
+        Text label = CreateText("Label", image.transform);
+        label.text = name;
+        return button;
+    }
+
+    private static Toggle CreateToggle(string name, Transform parent)
+    {
+        Image image = CreateImage(name, parent);
+        return image.gameObject.AddComponent<Toggle>();
+    }
+
     private static IEnumerator Await(Task task)
     {
         while (!task.IsCompleted)
@@ -381,7 +563,7 @@ public sealed class MapTravelFlowTests
             return scene;
         }
 
-        private T Track<T>(T asset) where T : ScriptableObject
+        public T Track<T>(T asset) where T : ScriptableObject
         {
             assets.Add(asset);
             return asset;
