@@ -98,8 +98,12 @@
   - 공통 Character Context 배지와 tooltip을 추가하고, 배지는 정확한 `Context` 정의만 실행하며
     Daniel 본체는 정확한 `Character` 정의가 열렸을 때만 클릭되도록 입력을 분리했다.
   - Unity Game View의 16:9 Aspect, Full HD, QHD에서 배지와 tooltip이 화면 안에 유지되는지 확인했다.
-- [ ] `P-01_018`의 초기 Trust 2 대비 `trust_daniel>=3` 도달 불가와 후속 보너스 분기 정책은
-  별도의 스토리 콘텐츠 증분에서 확정한다.
+- [x] `P-01_018`의 예약 기사·태블릿 경고를 선택 전 필수 복선으로 복구했다.
+  - 활성 CSV의 beat를 `warning`으로 바로잡고 초기 `trust_daniel>=3` 조건만 제거했으며,
+    line ID·순서·본문·화자·음성 필수 계약은 유지했다.
+  - 새 저장의 Trust 2에서도 경고를 들은 뒤 C1은 Trust 3으로 올라 P-02/D1-03 보너스를 열고,
+    C2는 Trust 1로 내려 보너스를 숨긴다. 후속 Trust Condition과 선택 GameEffect는 변경하지 않았다.
+  - SaveData·SaveVersion 변경은 없다. 이미 P-01 대화를 완료한 개발 저장에는 해당 줄을 소급 재생하지 않는다.
 - [x] 필수 Sequence가 `WaitCommand`만 포함하면 실패하도록 Validator를 강화했다.
 - [x] `AudioDirector` 아래 Music A/B, Voice Bark, Story Voice, crossfade와 대화 더킹을 연결했다.
 - [x] Audio 원본을 Music·Ambience·SFX·VoiceBarks·StoryRecordings 역할로 정리하고,
@@ -238,9 +242,9 @@
 - [ ] 필요한 Addressables 등록·레이블과 깨진 직렬화 참조 검증을 추가한다.
 - [x] Unity Editor에서 현재 EditMode/PlayMode 전체 suite와 Bootstrap 자동 대표 흐름을 통과시킨다.
   - 2026-08-14 `codex/p01-playable-to-p02` 증분을 Unity `6000.3.20f1`에서 검증했다.
-    EditMode 90/90, PlayMode 17/17과 Build Preflight가 실패·건너뜀 없이 통과했다. PlayMode는 실제
+    EditMode 91/91, PlayMode 17/17과 Build Preflight가 실패·건너뜀 없이 통과했다. PlayMode는 실제
     EventSystem 클릭으로 새 Slot 3 → P-01 초대장 → Daniel 부착 메신저 배지 → Daniel 본체 대화·선택 →
-    출구 → P-02 진입 → 앱 재시작 후
+    Trust 2에서 예약 기사·태블릿 경고 확인 → 출구 → P-02 Trust 보너스 대사 → 앱 재시작 후
     같은 Slot 3의 P-02 복원을 확인하며, reduced-motion 전환의 입력 해제와 체크포인트 저장 실패 격리도 포함한다.
   - 2026-08-12 기준 커밋 `b53a09f1416cb2a3ad838d0d4ac9d7eef4d810c6`, Unity `6000.3.20f1`
     (`c9ba695d4f07`)에서 Build Preflight, EditMode 64/64, PlayMode 11/11을 통과했다. 실패·건너뜀은 0건이다.

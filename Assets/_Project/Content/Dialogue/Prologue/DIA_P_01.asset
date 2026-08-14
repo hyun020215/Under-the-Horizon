@@ -236,8 +236,7 @@ MonoBehaviour:
     expression: 0
     voiceRequired: 1
     voiceClip: {fileID: 0}
-    conditions:
-    - {fileID: 11400000, guid: c3e720736d5a14341900bff5ff757347, type: 2}
+    conditions: []
     effects: []
     choices: []
   - id: P-01_019

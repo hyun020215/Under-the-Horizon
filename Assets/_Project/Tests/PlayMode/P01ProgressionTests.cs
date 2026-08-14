@@ -200,6 +200,13 @@ public sealed class P01ProgressionTests
         Assert.That(daniel, Is.Not.Null);
         Assert.That(daniel.ContextBadge.gameObject.activeInHierarchy, Is.False);
         int historyBeforeDaniel = narrative.History.Lines.Count;
+        int trustAtTabletWarning = int.MinValue;
+        Action<DialogueLine> captureTabletWarningTrust = line =>
+        {
+            if (line.id == "P-01_018")
+                trustAtTabletWarning = state.GetTrust("CHR_DANIEL");
+        };
+        narrative.LineChanged += captureTabletWarningTrust;
         yield return ClickThroughEventSystem(daniel, "Daniel conversation interaction");
         yield return WaitFor(
             () => screens.Current == ScreenId.Dialogue
@@ -214,6 +221,7 @@ public sealed class P01ProgressionTests
             screens,
             "P-01_C1",
             "Daniel conversation and choice");
+        narrative.LineChanged -= captureTabletWarningTrust;
         yield return WaitFor(
             () => state.IsInteractionCompleted("INT_P_01_DIALOGUE"),
             "Daniel's P-01 conversation was not completed.");
@@ -225,6 +233,16 @@ public sealed class P01ProgressionTests
         string[] danielConversationLines = narrative.History.Lines
             .Skip(historyBeforeDaniel)
             .ToArray();
+        Assert.That(
+            trustAtTabletWarning,
+            Is.EqualTo(2),
+            "A fresh save must hear the tablet warning before the choice changes Daniel's trust.");
+        Assert.That(danielConversationLines, Does.Contain("P-01_018"));
+        Assert.That(danielConversationLines, Does.Contain("P-01_019"));
+        Assert.That(
+            Array.IndexOf(danielConversationLines, "P-01_018"),
+            Is.LessThan(Array.IndexOf(danielConversationLines, "P-01_019")),
+            "The tablet warning must precede Daniel's choice prompt.");
         Assert.That(
             danielConversationLines,
             Does.Not.Contain("P-01_006"));
@@ -239,6 +257,7 @@ public sealed class P01ProgressionTests
             () => (continueHotspot = FindActiveHotspot("INT_P_01_CONTINUE")) != null,
             "The P-01 continue hotspot did not appear after Daniel's conversation.");
         Assert.That(continueHotspot.Definition.TargetId, Is.EqualTo("LOC_GANGWAY"));
+        int historyBeforeP02 = narrative.History.Lines.Count;
         yield return ClickThroughEventSystem(continueHotspot, "P-01 continue hotspot");
 
         yield return WaitFor(
@@ -261,6 +280,14 @@ public sealed class P01ProgressionTests
         // Settle P-02's entry dialogue before destroying the running application.
         // Dialogue position is presentation state, so the saved checkpoint remains P-02 entry.
         yield return CompleteCurrentDialogue(dialogue, screens, null, "P-02 entry");
+        string[] p02EntryLines = narrative.History.Lines
+            .Skip(historyBeforeP02)
+            .ToArray();
+        Assert.That(p02EntryLines, Does.Contain("P-02_021"));
+        Assert.That(
+            p02EntryLines,
+            Does.Contain("P-02_022"),
+            "The serious P-01 choice must unlock Daniel's P-02 trust bonus exchange.");
         yield return WaitFor(
             IsTransitionInputUnblocked,
             "P-02 entry presentation did not release its input blocker.");
@@ -308,6 +335,11 @@ public sealed class P01ProgressionTests
             restoredScreens,
             null,
             "restored P-02 entry");
+        Assert.That(restoredNarrative.History.Lines, Does.Contain("P-02_021"));
+        Assert.That(
+            restoredNarrative.History.Lines,
+            Does.Contain("P-02_022"),
+            "Restoring the P-02 checkpoint must preserve the trust bonus eligibility.");
         yield return WaitFor(
             IsTransitionInputUnblocked,
             "Restored P-02 presentation did not release its input blocker.");
