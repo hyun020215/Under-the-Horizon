@@ -16,7 +16,7 @@ P-01_014,P-01,14,warning,dialogue,ADRIAN,그 확신은 어디서 왔습니까?,f
 P-01_015,P-01,15,warning,dialogue,DANIEL,"15년 전 오르페우스 호. 보험금, 매수된 조사관, 사라진 항해 데이터. 누군가 제게 원본이 아직 배 안에 있다고 알려왔습니다.",intense,,,,PORT,Y,,
 P-01_016,P-01,16,warning,dialogue,ADRIAN,익명 제보자를 믿습니까?,skeptical,,,,PORT,Y,,
 P-01_017,P-01,17,warning,dialogue,DANIEL,사람은 안 믿습니다. 문서와 겁먹은 반응을 믿죠. 리처드는 제 이름을 듣자마자 승선 명단을 다시 보게 될 겁니다.,confident,,,,PORT,Y,,
-P-01_018,P-01,18,trust_bonus,dialogue,DANIEL,"혹시 제가 약속 시간에 나타나지 않으면, 제 객실의 예약 기사를 먼저 보세요. 태블릿은 제가 가진 것 중 가장 위험한 물건입니다.",low,trust_daniel>=3,,,PORT,Y,,
+P-01_018,P-01,18,warning,dialogue,DANIEL,"혹시 제가 약속 시간에 나타나지 않으면, 제 객실의 예약 기사를 먼저 보세요. 태블릿은 제가 가진 것 중 가장 위험한 물건입니다.",low,,,,PORT,Y,,
 P-01_019,P-01,19,choice_setup,dialogue,DANIEL,"한 가지만 기억하세요. 이 배에서 누가 무엇을 숨기는지보다, 누가 무엇을 너무 친절하게 설명하는지가 중요합니다.",warning,,,,PORT,Y,,
 P-01_020,P-01,20,choice,choice,PLAYER_CHOICE,그의 경고를 진지하게 듣기,choice,,P-01_C1,trust_daniel:+1; flag:daniel_warning_taken,UI choice,N,P-01_WARN,
 P-01_021,P-01,21,choice,choice,PLAYER_CHOICE,농담으로 넘기기,choice,,P-01_C2,trust_daniel:-1; flag:daniel_warning_dismissed,UI choice,N,P-01_WARN,

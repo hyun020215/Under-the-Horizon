@@ -265,6 +265,105 @@ public sealed class StorySceneDefinitionTests
         }
     }
 
+    [Test]
+    public void P01TabletWarningPrecedesTheChoiceWhileLaterTrustBonusStillBranches()
+    {
+        DialogueSequence p01 = AssetDatabase.LoadAssetAtPath<DialogueSequence>(
+            "Assets/_Project/Content/Dialogue/Prologue/DIA_P_01.asset");
+        DialogueSequence p02 = AssetDatabase.LoadAssetAtPath<DialogueSequence>(
+            "Assets/_Project/Content/Dialogue/Prologue/DIA_P_02.asset");
+        DialogueLine tabletWarning = p01.Lines.Single(line => line.id == "P-01_018");
+        DialogueLine choiceLine = p01.Lines.Single(line => line.id == "P-01_019");
+        DialogueChoice seriousChoice = choiceLine.choices.Single(
+            choice => choice.Id == "P-01_C1");
+        DialogueChoice dismissiveChoice = choiceLine.choices.Single(
+            choice => choice.Id == "P-01_C2");
+        DialogueLine[] p02TrustBonus = p02.Lines
+            .Where(line => line.id is "P-02_021" or "P-02_022")
+            .ToArray();
+
+        Assert.That(tabletWarning.voiceRequired, Is.True);
+        Assert.That(tabletWarning.text, Does.Contain("예약 기사"));
+        Assert.That(tabletWarning.text, Does.Contain("태블릿"));
+        Assert.That(tabletWarning.conditions, Is.Null.Or.Empty);
+        Assert.That(
+            System.Array.FindIndex(p01.Lines, line => line.id == tabletWarning.id),
+            Is.LessThan(System.Array.FindIndex(p01.Lines, line => line.id == choiceLine.id)),
+            "The tablet warning must be heard before the player chooses how to answer Daniel.");
+        Assert.That(p02TrustBonus, Has.Length.EqualTo(2));
+        Assert.That(
+            p02TrustBonus.All(line => line.conditions is { Length: > 0 }),
+            Is.True,
+            "Only the later P-02 exchange should remain gated by Daniel's trust.");
+
+        var seriousOwner = new GameObject("P01SeriousTrustBranchTest");
+        var dismissiveOwner = new GameObject("P01DismissiveTrustBranchTest");
+        try
+        {
+            GameStateStore seriousState = seriousOwner.AddComponent<GameStateStore>();
+            GameStateStore dismissiveState = dismissiveOwner.AddComponent<GameStateStore>();
+            NarrativeDirector dismissiveNarrative =
+                dismissiveOwner.AddComponent<NarrativeDirector>();
+            var narrativeData = new SerializedObject(dismissiveNarrative);
+            narrativeData.FindProperty("state").objectReferenceValue = dismissiveState;
+            narrativeData.ApplyModifiedPropertiesWithoutUndo();
+            dismissiveNarrative.LinePresented += line =>
+                System.Threading.Tasks.Task.FromResult(
+                    line.choices?.SingleOrDefault(
+                        choice => choice.Id == dismissiveChoice.Id));
+
+            Assert.That(seriousState.GetTrust("CHR_DANIEL"), Is.EqualTo(2));
+            Assert.That(ConditionResolver.All(tabletWarning.conditions, seriousState), Is.True);
+            Assert.That(
+                p02TrustBonus.All(line => !ConditionResolver.All(line.conditions, seriousState)),
+                Is.True);
+
+            seriousChoice.Apply(seriousState);
+
+            Assert.That(seriousState.GetTrust("CHR_DANIEL"), Is.EqualTo(3));
+            Assert.That(seriousState.HasFlag("daniel_warning_taken"), Is.True);
+            Assert.That(
+                p02TrustBonus.All(line => ConditionResolver.All(line.conditions, seriousState)),
+                Is.True,
+                "Taking Daniel seriously should unlock the later trust bonus.");
+
+            dismissiveNarrative.PlayAsync(
+                    p01,
+                    "P-01_009",
+                    "P-01_026")
+                .GetAwaiter()
+                .GetResult();
+
+            Assert.That(dismissiveState.GetTrust("CHR_DANIEL"), Is.EqualTo(1));
+            Assert.That(dismissiveState.HasFlag("daniel_warning_dismissed"), Is.True);
+            Assert.That(
+                dismissiveNarrative.History.Lines,
+                Does.Contain("P-01_018"),
+                "The dismissive branch must still hear the core tablet warning.");
+
+            int p02HistoryStart = dismissiveNarrative.History.Lines.Count;
+            dismissiveState.CompleteScene("P-01");
+            dismissiveNarrative.PlayAsync(p02).GetAwaiter().GetResult();
+            string[] dismissiveP02History = dismissiveNarrative.History.Lines
+                .Skip(p02HistoryStart)
+                .ToArray();
+
+            Assert.That(dismissiveP02History, Does.Contain("P-02_020"));
+            Assert.That(dismissiveP02History, Does.Contain("P-02_023"));
+            Assert.That(dismissiveP02History, Does.Not.Contain("P-02_021"));
+            Assert.That(dismissiveP02History, Does.Not.Contain("P-02_022"));
+            Assert.That(
+                p02TrustBonus.All(line => !ConditionResolver.All(line.conditions, dismissiveState)),
+                Is.True,
+                "Dismissing Daniel should keep the later trust bonus hidden.");
+        }
+        finally
+        {
+            Object.DestroyImmediate(seriousOwner);
+            Object.DestroyImmediate(dismissiveOwner);
+        }
+    }
+
     private static void AssertActionRange(
         InteractionAction action,
         string expectedStart,
