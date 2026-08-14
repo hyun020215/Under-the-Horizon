@@ -1468,7 +1468,7 @@ public static class P0ProjectBuilder
         backgroundAspect.aspectMode = AspectRatioFitter.AspectMode.EnvelopeParent;
         background.raycastTarget = false;
         RectTransform characterLayer = CreateLayer("CharacterLayer", worldFrame);
-        CreateLayer("HotspotLayer", worldFrame);
+        RectTransform hotspotLayer = CreateLayer("HotspotLayer", worldFrame);
 
         Canvas ui = CreateCanvas("UICanvas", root.transform);
         ui.sortingOrder = 100;
@@ -1625,6 +1625,19 @@ public static class P0ProjectBuilder
         SetObject(flow, "content", AssetDatabase.LoadAssetAtPath<ContentDatabase>(ContentRoot + "/Game/DATABASE_Content.asset"));
         SetObject(flow, "scenes", story);
         SetObject(flow, "state", state);
+        SetObject(interactions, "flow", flow);
+        GameObject hotspotPrefab = AssetDatabase.LoadAssetAtPath<GameObject>(
+            ProjectRoot + "/Prefabs/Interaction/PF_Hotspot.prefab");
+        SetObject(
+            interactions,
+            "hotspotPrefab",
+            hotspotPrefab != null ? hotspotPrefab.GetComponent<InteractionPointView>() : null);
+        SetObject(interactions, "hotspotRoot", hotspotLayer);
+
+        SaveCheckpoint saveCheckpoint = root.AddComponent<SaveCheckpoint>();
+        SetObject(saveCheckpoint, "stateStore", state);
+        SetObject(saveCheckpoint, "storyScenes", story);
+        SetObject(saveCheckpoint, "flow", flow);
 
         GameStartup startup = root.AddComponent<GameStartup>();
         SetObject(startup, "flow", flow);
@@ -1632,6 +1645,7 @@ public static class P0ProjectBuilder
         SetObject(startup, "titleScreen", screens.OfType<TitleScreen>().FirstOrDefault());
         SetObject(startup, "saveSlotScreen", screens.OfType<SaveSlotScreen>().FirstOrDefault());
         SetObject(startup, "state", state);
+        SetObject(startup, "saveCheckpoint", saveCheckpoint);
         SetObject(startup, "audioDirector", audio);
         SetObject(
             startup,

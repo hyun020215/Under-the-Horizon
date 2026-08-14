@@ -74,6 +74,9 @@ public sealed class BootstrapReferenceTests
             SaveCheckpoint checkpoint = scene.GetRootGameObjects()
                 .SelectMany(root => root.GetComponentsInChildren<SaveCheckpoint>(true))
                 .Single();
+            GameFlowController flow = scene.GetRootGameObjects()
+                .SelectMany(root => root.GetComponentsInChildren<GameFlowController>(true))
+                .Single();
             SerializedObject startupData = new(startup);
             SerializedObject checkpointData = new(checkpoint);
 
@@ -86,6 +89,14 @@ public sealed class BootstrapReferenceTests
             Assert.That(
                 checkpointData.FindProperty("storyScenes").objectReferenceValue,
                 Is.Not.Null);
+            Assert.That(
+                checkpointData.FindProperty("flow").objectReferenceValue,
+                Is.EqualTo(flow),
+                "Pending map travel must be checkpointed through the canonical flow owner.");
+            Assert.That(
+                startupData.FindProperty("flow").objectReferenceValue,
+                Is.EqualTo(flow),
+                "Loaded saves must resume through the same GameFlowController instance.");
 
             GameObject transitionOverlay = scene.GetRootGameObjects()
                 .SelectMany(root => root.GetComponentsInChildren<Transform>(true))

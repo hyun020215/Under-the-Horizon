@@ -137,6 +137,8 @@ public sealed class InteractionDirector : MonoBehaviour
             return new InteractionResult(false, "Busy");
 
         isExecuting = true;
+        GameState snapshot = state?.State.Clone();
+        bool committed = false;
         try
         {
             if (definition == null
@@ -149,24 +151,46 @@ public sealed class InteractionDirector : MonoBehaviour
             InteractionResult result = await definition.Action.ExecuteAsync(
                 new InteractionContext(state, narrative, puzzles)
             );
-            if (result.Success && !definition.Repeatable)
-                state?.CompleteInteraction(definition.Id);
 
-            RefreshAvailability();
+            if (!result.Success)
+            {
+                Restore(snapshot);
+                return result;
+            }
 
-            if (result.Success && result.AdvanceStorySceneRequested)
+            if (result.AdvanceStorySceneRequested)
             {
                 if (flow == null)
                 {
-                    throw new InvalidOperationException(
+                    Restore(snapshot);
+                    return new InteractionResult(
+                        false,
                         "InteractionDirector requires a GameFlowController "
-                        + "to advance the current Story Scene.");
+                            + "to advance the current Story Scene.");
+                }
+                if (!definition.Repeatable)
+                    state?.CompleteInteraction(definition.Id);
+                if (!flow.TryValidateAdvance(out string reason))
+                {
+                    Restore(snapshot);
+                    return new InteractionResult(false, reason);
                 }
 
                 await flow.AdvanceAsync();
+                committed = true;
+                return result;
             }
 
+            if (!definition.Repeatable)
+                state?.CompleteInteraction(definition.Id);
+            committed = true;
             return result;
+        }
+        catch
+        {
+            if (!committed)
+                Restore(snapshot);
+            throw;
         }
         finally
         {
@@ -215,4 +239,10 @@ public sealed class InteractionDirector : MonoBehaviour
     }
 
     private void OnStateChanged(GameState _) => RefreshAvailability();
+
+    private void Restore(GameState snapshot)
+    {
+        if (snapshot != null)
+            state?.Replace(snapshot);
+    }
 }

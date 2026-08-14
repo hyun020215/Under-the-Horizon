@@ -5,6 +5,7 @@ using System.Collections.Generic;
 public sealed class GameState
 {
     public string currentStorySceneId = string.Empty;
+    public string pendingStorySceneId = string.Empty;
     public string currentLocationId = string.Empty;
     public int day;
     public TimeBlock timeBlock;
@@ -26,6 +27,7 @@ public sealed class GameState
         return new GameState
         {
             currentStorySceneId = currentStorySceneId,
+            pendingStorySceneId = pendingStorySceneId,
             currentLocationId = currentLocationId,
             day = day,
             timeBlock = timeBlock,

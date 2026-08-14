@@ -3,7 +3,10 @@ using System.Collections.Generic;
 
 public static class SaveMigrationRegistry
 {
-    private static readonly List<SaveMigration> Migrations = new();
+    private static readonly List<SaveMigration> Migrations = new()
+    {
+        new SaveMigrationV1ToV2(),
+    };
 
     public static void Register(SaveMigration migration)
     {
@@ -13,6 +16,8 @@ public static class SaveMigrationRegistry
 
     public static SaveData Migrate(SaveData data)
     {
+        if (data == null)
+            throw new ArgumentNullException(nameof(data));
         if (data.version > SaveVersion.Current)
             throw new InvalidOperationException(
                 $"Save version {data.version} is newer than supported version {SaveVersion.Current}."

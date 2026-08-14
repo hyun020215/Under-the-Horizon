@@ -10,6 +10,9 @@ public sealed class SaveCheckpoint : MonoBehaviour
     private StorySceneDirector storyScenes;
 
     [SerializeField]
+    private GameFlowController flow;
+
+    [SerializeField]
     private int slot;
 
     private bool isBound;
@@ -18,12 +21,16 @@ public sealed class SaveCheckpoint : MonoBehaviour
     {
         if (storyScenes != null)
             storyScenes.Entered += HandleStorySceneEntered;
+        if (flow != null)
+            flow.ProgressCheckpointReached += HandleProgressCheckpointReached;
     }
 
     private void OnDisable()
     {
         if (storyScenes != null)
             storyScenes.Entered -= HandleStorySceneEntered;
+        if (flow != null)
+            flow.ProgressCheckpointReached -= HandleProgressCheckpointReached;
     }
 
     public void Bind(SaveSlot selectedSlot)
@@ -48,6 +55,8 @@ public sealed class SaveCheckpoint : MonoBehaviour
     }
 
     private void HandleStorySceneEntered(StorySceneDefinition _) => Capture();
+
+    private void HandleProgressCheckpointReached() => Capture();
 
     private static bool TryResolveSaveService(out SaveService saves)
     {
