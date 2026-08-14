@@ -242,7 +242,7 @@
 - [ ] 필요한 Addressables 등록·레이블과 깨진 직렬화 참조 검증을 추가한다.
 - [x] Unity Editor에서 현재 EditMode/PlayMode 전체 suite와 Bootstrap 자동 대표 흐름을 통과시킨다.
   - 2026-08-14 `codex/p01-playable-to-p02` 증분을 Unity `6000.3.20f1`에서 검증했다.
-    EditMode 91/91, PlayMode 17/17과 Build Preflight가 실패·건너뜀 없이 통과했다. PlayMode는 실제
+    EditMode 92/92, PlayMode 17/17과 Build Preflight가 실패·건너뜀 없이 통과했다. PlayMode는 실제
     EventSystem 클릭으로 새 Slot 3 → P-01 초대장 → Daniel 부착 메신저 배지 → Daniel 본체 대화·선택 →
     Trust 2에서 예약 기사·태블릿 경고 확인 → 출구 → P-02 Trust 보너스 대사 → 앱 재시작 후
     같은 Slot 3의 P-02 복원을 확인하며, reduced-motion 전환의 입력 해제와 체크포인트 저장 실패 격리도 포함한다.
@@ -279,6 +279,8 @@
 - [ ] 프로젝트 전용 Input Actions 사용 범위와 정상화한 Rendering 설정을 타깃 플랫폼에서 검증한다.
 - [ ] Library가 없는 clean checkout에서 cold import 설정 오류 0건을 확인하고 타깃 Player build를 검증한다.
 - [ ] 앱 이름, 회사명, 아이콘, 해상도, 품질과 플랫폼별 Player Settings를 확정한다.
+  - [x] 이전 임시 제품명을 정식명 `Under the Horizon`으로 정정하고 UWP 패키지 식별자는 공백 없는 `UnderTheHorizon`으로 분리했으며, Build Preflight 회귀 검사를 추가했다. 출시 전 레거시 개발 저장·PlayerPrefs 경로는 자동 이전하지 않는다.
+  - [ ] 회사명, 애플리케이션 식별자, 아이콘, 해상도, 품질과 플랫폼별 나머지 설정을 확정한다.
 - [ ] CI에서 Unity Test Runner와 Build Preflight를 push/PR마다 실행한다.
 - [ ] `Docs/QA/ReleaseChecklist.md`를 모두 확인한다.
 
