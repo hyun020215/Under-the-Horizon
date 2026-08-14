@@ -87,7 +87,31 @@ Unity 메뉴에서 다음을 실행합니다.
 Under The Horizon > Validate > Build Preflight
 ```
 
-검증기는 중복 Story Scene ID, 누락 Location, 깨진 다음 장면 경로를 실패로 처리합니다. 검증을 통과시키기 위해 규칙을 약화하지 말고 콘텐츠나 참조를 수정하세요.
+검증기는 중복 Story Scene ID, 누락 Location, 깨진 다음 장면 경로뿐 아니라 프로젝트 이름과 canonical URP 렌더링 자산 연결을 실패로 처리합니다. 검증을 통과시키기 위해 규칙을 약화하지 말고 콘텐츠나 참조를 수정하세요.
+
+## Windows 64-bit Player 빌드 스모크
+
+출시 Scene과 렌더링 설정을 실제 Player 빌드 경로에서 확인하려면 Unity 메뉴에서 다음을 실행합니다.
+
+```text
+Under The Horizon > Build > Windows 64-bit Player Smoke
+```
+
+이 도구는 Build Preflight를 먼저 실행하고, 활성화된 Build Settings Scene이 정확히 `Bootstrap.unity` → `Game.unity` 두 개뿐이며 해당 순서인지 확인한 뒤 Windows 64-bit Development Player를 빌드합니다. 출력은 Git에서 제외되는 `Build/Smoke/Windows64/UnderTheHorizon.exe`에 생성됩니다.
+
+Editor를 닫은 뒤 명령줄에서도 같은 진입점을 사용할 수 있습니다.
+
+```powershell
+& $unity `
+  -batchmode `
+  -nographics `
+  -projectPath $PWD `
+  -executeMethod PlayerBuildSmokeRunner.Run `
+  -logFile 'Logs\Windows64-smoke.log' `
+  -quit
+```
+
+종료 코드가 `0`인지 확인하고 빌드 직후 작업 트리에 의도하지 않은 렌더링 fallback 자산이나 ProjectSettings 변경이 생기지 않았는지도 확인하세요.
 
 ## 주요 문서
 
