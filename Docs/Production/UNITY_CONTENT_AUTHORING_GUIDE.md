@@ -222,7 +222,7 @@ Location Preview는 현재 `defaultBackground` 한 장을 확인하는 간단한
 | `Display Name` | HUD/목표 안내용 이름 |
 | `Target Id` | 캐릭터 등 대상 필터. 비어 있으면 모든 대상 허용 |
 | `Has World Hotspot` | 배경 위 클릭 영역 생성 여부 |
-| `Normalized Rect` | 0~1 배경 좌표의 x/y/width/height |
+| `Normalized Rect` | 0~1 실행 `WorldFrame` 기준의 실제 클릭 x/y/width/height |
 | `Conditions` | 노출·실행 조건 |
 | `Action` | 실행할 재사용 Action |
 | `Repeatable` | 완료 뒤에도 다시 실행 가능한지 |
@@ -238,15 +238,48 @@ Location Preview는 현재 `defaultBackground` 한 장을 확인하는 간단한
   동일한 `InteractionDefinition`을 한 `InteractionSet`에 중복 참조하지 않는다.
 - 캐릭터 본체 클릭을 Context의 대체 입력으로 숨기거나 Story Scene 전용 클릭 스크립트를 만들지 않는다.
 
+월드 핫스팟은 실제 클릭 형상과 플레이어에게 보이는 표시를 다음처럼 분리한다.
+
+- 공통 `PF_Hotspot` root는 투명하며 `Normalized Rect` 전체의 raycast를 받는다.
+- root 안의 marker는 고정 크기를 유지한다. 기본은 중앙이며 화면 가장자리의 Rect에서는 화면 밖
+  overflow를 줄이도록 root 안쪽으로 배치된다. 넓은 클릭 Rect에 맞춰 marker를 늘리거나 배경 피사체를
+  가리는 패널로 사용하지 않는다.
+- marker와 tooltip은 별도 raycast 대상을 만들지 않는다. 클릭은 항상 root의 같은
+  `InteractionPointView`를 통해 `InteractionDirector`로 전달한다.
+- tooltip은 `Display Name`을 사용하며 pointer hover와 명시적 UI selection/focus가 전달된 경우 같은
+  행동을 설명한다. marker의 색만으로 Interaction 의미를 전달하지 않는다. 키보드·게임패드의 최초
+  focus와 전역 navigation은 Input 시스템의 후속 계약이며 개별 hotspot이 임의로 선택 대상을 정하지 않는다.
+- `Normalized Rect`가 권위 있는 실제 클릭 영역이고 marker는 그 위치를 알려 주는 표시다. 둘을 서로
+  다른 Interaction이나 진행 상태로 저장하지 않는다.
+
+배경 semantic catalog의 zone/region은 배경 피사체, 보호 영역, 캐릭터 배치 여유를 설명하기 위한
+저작 참고 자료다. semantic 검수 완료는 gameplay hitbox 승인과 같지 않으며, 해당 Rect를
+`InteractionDefinition.NormalizedRect`에 그대로 복사하지 않는다. 배경의 cover crop, 현재
+`LocationState`, 캐릭터 배치, HUD를 합성한 실제 화면에서 Interaction별 클릭 영역을 다시 측정하고
+서로 겹치지 않는지 별도로 승인한다.
+
+P-02의 `gangway_boarding_register`도 승선 명단이 있는 의미 영역을 찾기 위한 참고 자료일 뿐이다.
+승선 명단과 전자서명은 서로 다른 gameplay Interaction으로 시각 검수해야 하며, 공통 `PF_Hotspot`
+표시를 수정하는 증분에서는 두 Interaction이나 좌표를 함께 저작하지 않는다.
+
 `Normalized Rect` 조정 절차:
 
-1. 1920×1080 기준 화면에서 대상의 좌상/우하 위치를 잰다.
-2. x와 width는 픽셀 값을 1920으로, y와 height는 1080으로 나눈다.
-3. Inspector에서 Rect를 입력한다.
-4. 1280×720과 2560×1440에서도 클릭 영역이 대상을 따라가는지 확인한다.
-5. UI가 위에 겹치는 영역은 의도치 않은 클릭이 발생하지 않는지 확인한다.
+1. 대상 Story Scene의 실제 `LocationState`, 배경 crop, 캐릭터, HUD를 모두 적용한다.
+2. 1920×1080 `WorldFrame`에서 대상의 좌상/우하 위치를 잰다. 원본 이미지나 semantic Rect의
+   좌표를 실행 화면 확인 없이 대신 사용하지 않는다. Unity Rect의 원점은 왼쪽 아래다.
+3. 왼쪽 위가 원점인 화면 캡처에서 `left`, `top`, `right`, `bottom`을 쟀다면
+   `x = left / 1920`, `y = (1080 - bottom) / 1080`, `width = (right - left) / 1920`,
+   `height = (bottom - top) / 1080`으로 변환해 Inspector에 입력한다.
+4. marker가 클릭 Rect 안에서 고정 크기를 유지하고, marker 바깥의 투명 Rect도 의도대로 클릭되는지
+   확인한다. 화면 가장자리에서는 marker가 Rect 안쪽으로 이동한 뒤 HUD·캐릭터를 가리지 않는지 별도로
+   확인한다.
+5. 1280×720과 2560×1440에서도 클릭 영역이 대상을 따라가며 tooltip이 화면 안에 있는지 확인한다.
+6. UI·캐릭터·다른 핫스팟이 겹치는 영역에서 의도치 않은 클릭 우선순위가 생기지 않는지 확인한다.
 
-이미지 alpha/polygon hit shape는 아직 공통 최종 계약이 완성되지 않았다. 현 단계에서는 Rect가 권위 있는 영역이며, 장면 전용 Raycast 스크립트를 만들지 않는다.
+이미지 alpha/polygon hit shape는 아직 공통 최종 계약이 완성되지 않았다. 투명 root는 Rect 내부를
+모두 클릭할 수 있다는 뜻이며 marker Sprite의 alpha로 정밀 판정하지 않는다. 현 단계에서는 Rect가
+권위 있는 영역이고, 최종 hotspot 아트와 공통 Raycast 계약이 승인되기 전에는 장면 전용 alpha threshold나
+polygon Raycast 스크립트를 만들지 않는다.
 
 기존 Action 유형:
 
@@ -504,7 +537,7 @@ Sequence:    SEQ_D3_05_ENTRY.asset
 - Bootstrap/Game Unity Scene
 - Content database catalog
 
-생성 대상 자산을 Inspector에서만 수정하면 덮어쓸 수 있다. 영구 변경은 원본 CSV 또는 `P0ProjectBuilder.cs`의 생성 규칙에도 반영해야 한다.
+생성 대상 자산을 Inspector에서만 수정하면 덮어쓸 수 있다. 영구 변경은 원본 CSV 또는 `P0ProjectBuilder.cs`의 생성 규칙에도 반영해야 한다. 공통 `PF_Hotspot`도 생성 대상이므로 투명 hit rect·고정 marker·tooltip 계층을 Prefab에서만 수정하지 않는다.
 
 일반적인 에셋 한 장 교체나 Placement 수정을 위해 P0 builder를 실행하지 않는다.
 

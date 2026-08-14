@@ -196,6 +196,13 @@ public static class ContentValidator
             if (!interaction.HasWorldHotspot)
                 continue;
 
+            if (string.IsNullOrWhiteSpace(interaction.DisplayName))
+            {
+                errors.Add(
+                    $"{scene.Id}/{interaction.Id} is a world hotspot without "
+                    + "a display name for its tooltip.");
+            }
+
             Rect rect = interaction.NormalizedRect;
             if (rect.width <= 0f
                 || rect.height <= 0f

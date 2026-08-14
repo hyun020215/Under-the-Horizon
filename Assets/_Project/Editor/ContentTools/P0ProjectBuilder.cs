@@ -20,6 +20,11 @@ public static class P0ProjectBuilder
     private const string DialoguePath = ContentRoot + "/Dialogue/Source/Dialogue_Master_KR.csv";
     private const string EvidencePath = ContentRoot + "/Evidence/Evidence_Master_KR.csv";
     private const string ThemePanelPath = ProjectRoot + "/Art/UI/Panels/UI_panel_narrative_frame.png";
+    private const string PopupPanelPath = ProjectRoot + "/Art/UI/Panels/UI_panel_popup.png";
+    private const string RoundBadgePath = ProjectRoot + "/Art/UI/Badges/UI_badge_round.png";
+    private const string WorldHotspotPrefabPath = PrefabRoot + "/Interaction/PF_Hotspot.prefab";
+    private const string CharacterHotspotPrefabPath = PrefabRoot + "/Interaction/PF_CharacterHotspot.prefab";
+    private const string CharacterViewPrefabPath = PrefabRoot + "/Characters/PF_CharacterView.prefab";
 
     private sealed class SceneRow
     {
@@ -102,6 +107,21 @@ public static class P0ProjectBuilder
         BuildGameScene();
         AssetDatabase.SaveAssets();
         AssetDatabase.Refresh();
+        EditorApplication.Exit(0);
+    }
+
+    [MenuItem("Under The Horizon/Build/Interaction Prefabs")]
+    public static void RefreshInteractionPrefabs()
+    {
+        BuildInteractionPrefabs();
+        AssetDatabase.SaveAssets();
+        AssetDatabase.Refresh();
+        Debug.Log("Under the Horizon interaction prefabs refreshed.");
+    }
+
+    public static void RefreshInteractionPrefabsFromCommandLine()
+    {
+        RefreshInteractionPrefabs();
         EditorApplication.Exit(0);
     }
 
@@ -604,25 +624,49 @@ public static class P0ProjectBuilder
     private static void BuildPrefabs()
     {
         Sprite panel = AssetDatabase.LoadAssetAtPath<Sprite>(ThemePanelPath);
+        BuildInteractionPrefabs();
         EnsureScreenPrefab("PF_SettingsScreen", typeof(SettingsScreen), ScreenId.Settings, panel);
         EnsureScreenPrefab("PF_CreditsScreen", typeof(CreditsScreen), ScreenId.Credits, panel);
         foreach (string absolutePath in Directory.GetFiles(Path.GetFullPath(PrefabRoot), "*.prefab", SearchOption.AllDirectories))
         {
             string path = ToAssetPath(absolutePath);
             string name = Path.GetFileNameWithoutExtension(path);
+            if (path == WorldHotspotPrefabPath
+                || path == CharacterHotspotPrefabPath
+                || path == CharacterViewPrefabPath)
+                continue;
             if (name == "PF_AppBootstrap")
                 SavePrefab(path, CreateAppBootstrap(name));
             else if (name == "PF_GameRoot")
                 SavePrefab(path, CreateGameRootShell(name));
             else if (name == "PF_EventSystem")
                 SavePrefab(path, new GameObject(name, typeof(EventSystem)));
-            else if (name == "PF_CharacterView" || name == "PF_AmbientCharacterView")
-                SavePrefab(path, CreateCharacterView(name));
+            else if (name == "PF_AmbientCharacterView")
+                SavePrefab(path, CreateCharacterView(name, null));
             else if (TryGetScreenType(name, out Type screenType, out ScreenId id))
                 SavePrefab(path, CreateScreen(name, screenType, id, panel));
             else
                 SavePrefab(path, CreateVisualPrefab(name, panel));
         }
+    }
+
+    private static void BuildInteractionPrefabs()
+    {
+        SavePrefab(
+            WorldHotspotPrefabPath,
+            CreateWorldHotspotPrefab("PF_Hotspot"));
+        SavePrefab(
+            CharacterHotspotPrefabPath,
+            CreateCharacterHotspotPrefab("PF_CharacterHotspot"));
+
+        GameObject contextBadgeObject = AssetDatabase.LoadAssetAtPath<GameObject>(
+            CharacterHotspotPrefabPath);
+        InteractionPointView contextBadge = contextBadgeObject != null
+            ? contextBadgeObject.GetComponent<InteractionPointView>()
+            : null;
+        SavePrefab(
+            CharacterViewPrefabPath,
+            CreateCharacterView("PF_CharacterView", contextBadge));
     }
 
     private static void BuildPresentationPrefabs()
@@ -675,7 +719,9 @@ public static class P0ProjectBuilder
         return root;
     }
 
-    private static GameObject CreateCharacterView(string name)
+    private static GameObject CreateCharacterView(
+        string name,
+        InteractionPointView contextBadgePrefab)
     {
         GameObject root = new(name, typeof(RectTransform), typeof(CanvasRenderer), typeof(Image), typeof(CharacterView));
         Image image = root.GetComponent<Image>();
@@ -684,8 +730,181 @@ public static class P0ProjectBuilder
         RectTransform rect = root.GetComponent<RectTransform>();
         rect.pivot = new Vector2(0.5f, 0f);
         rect.sizeDelta = new Vector2(680f, 980f);
-        SetObject(root.GetComponent<CharacterView>(), "image", image);
+        CharacterView view = root.GetComponent<CharacterView>();
+        SetObject(view, "image", image);
+        SetObject(view, "contextBadgePrefab", contextBadgePrefab);
         return root;
+    }
+
+    private static GameObject CreateWorldHotspotPrefab(string name)
+    {
+        GameObject root = CreateInteractionPointRoot(
+            name,
+            visibleRoot: false,
+            anchoredRoot: false);
+        InteractionPointView view = root.GetComponent<InteractionPointView>();
+        Font iconFont = LoadUiFont("Pretendard/FONT_Pretendard-SemiBold.ttf");
+        Font labelFont = LoadUiFont("Pretendard/FONT_Pretendard-Medium.ttf");
+
+        GameObject marker = CreateHotspotMarker(
+            root.transform,
+            "Marker",
+            iconFont,
+            pointAnchor: new Vector2(0.5f, 0.5f),
+            size: new Vector2(72f, 72f));
+        marker.GetComponent<Image>().raycastTarget = false;
+
+        TooltipView tooltip = CreateHotspotTooltip(
+            root.transform,
+            labelFont,
+            anchoredPosition: new Vector2(0f, 84f));
+        SetObject(view, "tooltip", tooltip);
+        return root;
+    }
+
+    private static GameObject CreateCharacterHotspotPrefab(string name)
+    {
+        GameObject root = CreateInteractionPointRoot(
+            name,
+            visibleRoot: true,
+            anchoredRoot: true);
+        InteractionPointView view = root.GetComponent<InteractionPointView>();
+        Font iconFont = LoadUiFont("Pretendard/FONT_Pretendard-SemiBold.ttf");
+        Font labelFont = LoadUiFont("Pretendard/FONT_Pretendard-Medium.ttf");
+
+        Text glyph = CreateText(
+            "ContextIcon",
+            root.transform,
+            iconFont,
+            34,
+            TextAnchor.MiddleCenter);
+        glyph.text = "!";
+        glyph.color = new Color(0.05f, 0.075f, 0.11f);
+        glyph.raycastTarget = false;
+        SetRect(glyph.rectTransform, Vector2.zero, Vector2.one);
+        glyph.rectTransform.sizeDelta = new Vector2(-12f, -12f);
+
+        TooltipView tooltip = CreateHotspotTooltip(
+            root.transform,
+            labelFont,
+            anchoredPosition: new Vector2(-216f, -72f));
+        SetObject(view, "tooltip", tooltip);
+        return root;
+    }
+
+    private static GameObject CreateInteractionPointRoot(
+        string name,
+        bool visibleRoot,
+        bool anchoredRoot)
+    {
+        GameObject root = new(
+            name,
+            typeof(RectTransform),
+            typeof(CanvasRenderer),
+            typeof(Image),
+            typeof(InteractionPointView));
+        RectTransform rect = root.GetComponent<RectTransform>();
+        if (anchoredRoot)
+        {
+            rect.anchorMin = rect.anchorMax = new Vector2(0.82f, 0.82f);
+            rect.anchoredPosition = Vector2.zero;
+            rect.sizeDelta = new Vector2(72f, 72f);
+        }
+        else
+        {
+            rect.anchorMin = Vector2.zero;
+            rect.anchorMax = Vector2.one;
+            rect.offsetMin = Vector2.zero;
+            rect.offsetMax = Vector2.zero;
+        }
+
+        Image hitSurface = root.GetComponent<Image>();
+        hitSurface.sprite = visibleRoot
+            ? AssetDatabase.LoadAssetAtPath<Sprite>(RoundBadgePath)
+            : null;
+        hitSurface.color = visibleRoot ? Color.white : Color.clear;
+        hitSurface.type = Image.Type.Simple;
+        hitSurface.preserveAspect = visibleRoot;
+        hitSurface.raycastTarget = true;
+        return root;
+    }
+
+    private static GameObject CreateHotspotMarker(
+        Transform parent,
+        string name,
+        Font font,
+        Vector2 pointAnchor,
+        Vector2 size)
+    {
+        GameObject marker = new(
+            name,
+            typeof(RectTransform),
+            typeof(CanvasRenderer),
+            typeof(Image));
+        marker.transform.SetParent(parent, false);
+        RectTransform markerRect = marker.GetComponent<RectTransform>();
+        markerRect.anchorMin = markerRect.anchorMax = pointAnchor;
+        markerRect.anchoredPosition = Vector2.zero;
+        markerRect.sizeDelta = size;
+
+        Image markerImage = marker.GetComponent<Image>();
+        markerImage.sprite = AssetDatabase.LoadAssetAtPath<Sprite>(RoundBadgePath);
+        markerImage.color = Color.white;
+        markerImage.preserveAspect = true;
+        markerImage.raycastTarget = false;
+
+        Text glyph = CreateText(
+            "Glyph",
+            marker.transform,
+            font,
+            34,
+            TextAnchor.MiddleCenter);
+        glyph.text = "!";
+        glyph.color = new Color(0.05f, 0.075f, 0.11f);
+        glyph.raycastTarget = false;
+        SetRect(glyph.rectTransform, Vector2.zero, Vector2.one);
+        glyph.rectTransform.sizeDelta = new Vector2(-12f, -12f);
+        return marker;
+    }
+
+    private static TooltipView CreateHotspotTooltip(
+        Transform parent,
+        Font font,
+        Vector2 anchoredPosition)
+    {
+        GameObject tooltipObject = new(
+            "Tooltip",
+            typeof(RectTransform),
+            typeof(CanvasRenderer),
+            typeof(Image),
+            typeof(TooltipView));
+        tooltipObject.transform.SetParent(parent, false);
+        RectTransform tooltipRect = tooltipObject.GetComponent<RectTransform>();
+        tooltipRect.anchorMin = tooltipRect.anchorMax = new Vector2(0.5f, 0.5f);
+        tooltipRect.anchoredPosition = anchoredPosition;
+        tooltipRect.sizeDelta = new Vector2(420f, 72f);
+
+        Image background = tooltipObject.GetComponent<Image>();
+        background.sprite = AssetDatabase.LoadAssetAtPath<Sprite>(PopupPanelPath);
+        background.color = new Color(0.025f, 0.043f, 0.071f, 0.96f);
+        background.type = Image.Type.Sliced;
+        background.raycastTarget = false;
+
+        Text label = CreateText(
+            "Label",
+            tooltipObject.transform,
+            font,
+            18,
+            TextAnchor.MiddleCenter);
+        label.color = new Color(0.965f, 0.941f, 0.867f);
+        label.raycastTarget = false;
+        SetRect(label.rectTransform, Vector2.zero, Vector2.one);
+        label.rectTransform.sizeDelta = new Vector2(-32f, -18f);
+
+        TooltipView tooltip = tooltipObject.GetComponent<TooltipView>();
+        SetObject(tooltip, "label", label);
+        tooltipObject.SetActive(false);
+        return tooltip;
     }
 
     private static GameObject CreateScreen(string name, Type type, ScreenId id, Sprite panel)
