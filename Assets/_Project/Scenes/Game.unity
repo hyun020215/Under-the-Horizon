@@ -3454,6 +3454,10 @@ PrefabInstance:
       value: PF_MapScreen
       objectReference: {fileID: 0}
     - target: {fileID: 4999421208891143909, guid: 0b9a4e62ed7b3db46bb19439fb6ca600, type: 3}
+      propertyPath: flow
+      value:
+      objectReference: {fileID: 1229261065}
+    - target: {fileID: 4999421208891143909, guid: 0b9a4e62ed7b3db46bb19439fb6ca600, type: 3}
       propertyPath: state
       value: 
       objectReference: {fileID: 360852667}
@@ -6594,6 +6598,7 @@ MonoBehaviour:
   mapButton: {fileID: 1138185915}
   recordButton: {fileID: 632792560}
   state: {fileID: 360852667}
+  flow: {fileID: 1229261065}
   content: {fileID: 11400000, guid: e4f4273106d39a949b08e9673627d414, type: 2}
   timeLabel: {fileID: 103807189}
   locationLabel: {fileID: 986482859}

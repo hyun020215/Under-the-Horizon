@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: LOC_PORT
   m_EditorClassIdentifier: UTH.Runtime::LocationDefinition
   id: LOC_PORT
-  displayName: Port
+  displayName: 항구
   defaultBackground: {fileID: 21300000, guid: d0ed3ac38a4dca646a3d0831c7f0cf6d, type: 3}
   states:
   - {fileID: 11400000, guid: 7699431661924f84099f636e3074eb79, type: 2}
@@ -21,4 +21,7 @@ MonoBehaviour:
   defaultAudio: {fileID: 11400000, guid: 749189f0fb863304c97a8be3f61cc946, type: 2}
   mapNode:
     id: LOC_PORT
-    normalizedPosition: {x: 0.045, y: 0.15}
+    normalizedPosition: {x: 0.2, y: 0.5}
+    displayName: 항구
+    description: 엘리시움호가 정박한 출발 항구.
+    accessMode: 0

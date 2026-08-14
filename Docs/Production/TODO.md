@@ -55,7 +55,7 @@
 - [ ] 각 기능 단위로 TODO, 관련 테스트/검증, Unity Play Mode 결과를 같은 커밋에 포함한다.
 
 > 이 문서는 프로젝트의 유일한 TODO 목록이다. 자산 폴더 안에 TODO 파일을 다시 만들지 않는다.  
-> 갱신일: 2026-08-14 (P-01 → P-02 첫 플레이 가능 증분)
+> 갱신일: 2026-08-14 (지도 선택·확정 이동 UI 증분)
 
 ## 완료
 
@@ -103,6 +103,19 @@
   - advance 요청 Interaction이 사전 검증에 실패하면 Action Effect와 완료 기록을 함께 되돌려 재시도 가능한 상태를 보존한다.
   - 이 증분은 공통 Runtime·Save 계약만 제공한다. P-01 route 활성화와 지도 선택·확정 UI는 후속 증분에서 연결한다.
   - Unity 6000.3.20f1 기준 EditMode 96/96, PlayMode 24/24와 Build Preflight를 통과했다.
+- [x] pending Story Scene 목적지를 지도에서 선택하고 확인해 이동하는 공통 UI를 연결했다.
+  - `MapScreen`은 노드 클릭을 임시 선택으로만 처리하고, `GameFlowController`가 정확한 pending Location을
+    승인한 경우에만 별도 `목표 경로로 이동` 버튼으로 Story Scene 진입을 요청한다.
+  - Base/Restricted/Technical/장소 노드를 하나의 4:3 `Map Surface` 좌표계로 통일하고, 전용 노드
+    템플릿과 선택 장소 이름·상태·설명·이동 피드백 영역을 추가했다.
+  - M.V. 엘리시움 지도에 기존 `MAP_Port_Base`를 연결하고, 없는 제한/기술 Overlay와 토글은 숨긴다.
+    Port와 Gangway에는 사용자 표시명·설명·검수 좌표를 저작했으며 Gangway는 `RouteOnly`로 분류했다.
+  - HUD는 pending 중 `승선 통로로 향하기 / 지도에서 목적지를 선택해 이동하기`를 우선 표시하고,
+    지도와 HUD 모두 `MAP_`·`LOC_` 내부 ID를 fallback 문구로 노출하지 않는다.
+  - 자동 검증 대상은 지도 Prefab 직렬화 계약, 5개 지도 표시명/Base, M.V. 엘리시움 레이어,
+    선택 시 상태 불변·pending 목적지 확인 이동, HUD 표시명 fallback 및 Build Preflight다.
+    Unity 6000.3.20f1 기준 EditMode 101/101, PlayMode 25/25, Build Preflight와
+    3개 해상도 × 14개 화면(42장) 반응형 캡처를 통과했다.
 - [x] P-01 메신저가 Daniel에게 부착된 Context임을 목표 문구와 비음성 조사 내레이션으로 명확히 했다.
   - 캐릭터 부착형 비월드 `Context`는 target Character ID, 현재 `CharacterPlacementSet`, HUD용 display name을 갖도록
     Validator와 저작 지침을 보강했다. target이 없는 기존 일반 Context는 이 부착 계약에 포함하지 않는다.
@@ -160,6 +173,9 @@
   - Deck별 Base/Restricted/Technical 레이어, 덱 탭, 현재 위치 표시와 뒤로가기는 이식 완료했다.
   - [x] `MapDefinition`이 덱별 `LocationDefinition`을 참조하고 기존 `MapNodeDefinition` 좌표로 이동 노드를 구성한다.
   - [x] `GameStateStore.unlockedLocations`를 잠금 조건으로 사용하고 현재 Story Scene의 Location을 목표 목적지로 강조한다.
+  - [x] pending Story Scene 목적지가 속한 지도를 자동 선택하고, 장소 노드 선택과 실제 이동 확인을 분리했다.
+  - [x] `RouteOnly` 노드는 현재 위치 또는 pending 목적지일 때만 표시하며 지도 View의 직접 상태 변경을 제거했다.
+  - [x] 공통 4:3 Map Surface와 전용 노드 템플릿·선택 상세 패널을 구성하고 없는 Overlay 토글을 숨겼다.
   - 각 장면의 위치 해금 Effect와 지도 이동 가능 범위 최종 조정은 콘텐츠 완성 단계에 남아 있다.
 - [ ] 조사 기록·증거 노트 UI를 완성한다.
   - 기존 EvidenceDefinition/Inventory/Director와 Investigation Record 화면을 사용한다.
