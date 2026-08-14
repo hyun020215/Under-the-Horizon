@@ -267,23 +267,26 @@ public sealed class BootstrapTests
             yield return null;
 
         int historyBeforeClick = narrative.History.Lines.Count;
-        CharacterView character = Object.FindFirstObjectByType<CharacterView>();
-        Assert.That(character, Is.Not.Null);
+        InteractionPointView invitation = Object
+            .FindObjectsByType<InteractionPointView>(
+                FindObjectsInactive.Exclude,
+                FindObjectsSortMode.None)
+            .Single(view => view.Definition?.Id == "INT_P_01_INVITATION");
         var pointer = new PointerEventData(EventSystem.current)
         {
             position = RectTransformUtility.WorldToScreenPoint(
                 null,
-                ((RectTransform)character.transform).TransformPoint(
-                    ((RectTransform)character.transform).rect.center
+                ((RectTransform)invitation.transform).TransformPoint(
+                    ((RectTransform)invitation.transform).rect.center
                 )
             ),
         };
         var hits = new List<RaycastResult>();
         EventSystem.current.RaycastAll(pointer, hits);
         Assert.That(hits.Count, Is.GreaterThan(0));
-        Assert.That(hits[0].gameObject, Is.EqualTo(character.gameObject));
+        Assert.That(hits[0].gameObject, Is.EqualTo(invitation.gameObject));
         ExecuteEvents.Execute(
-            character.gameObject,
+            invitation.gameObject,
             pointer,
             ExecuteEvents.pointerClickHandler
         );

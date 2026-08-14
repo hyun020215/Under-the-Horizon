@@ -50,6 +50,7 @@ public sealed class StorySceneDirector : MonoBehaviour
         await screens.OpenAsync(scene.InitialScreen);
         Apply(scene.OnEnterEffects);
         await transitions.EndAsync(scene.EntryTransition);
+        Entered?.Invoke(scene);
         if (scene.EntrySequence != null)
             await sequences.PlayAsync(scene.EntrySequence);
         if (scene.EntryDialogue != null && !scene.DeferEntryDialogue)

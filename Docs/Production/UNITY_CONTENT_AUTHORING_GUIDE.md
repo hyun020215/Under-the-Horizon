@@ -82,6 +82,12 @@ StorySceneDefinition
 
 기존 저장 슬롯을 선택하면 저장된 `currentStorySceneId`가 우선하므로, 새 게임용 빈 슬롯을 사용해야 시작 ID 변경을 확인할 수 있다.
 
+### 활성 저장 슬롯과 자동 체크포인트
+
+Save Slot 화면에서 선택한 슬롯이 현재 플레이 세션의 활성 슬롯이다. `GameStartup`이 선택값을 `SaveCheckpoint`에 바인딩하므로 콘텐츠나 Unity Scene에서 임의의 슬롯 번호를 진행 상태로 사용하지 않는다. 바인딩 전에는 체크포인트 저장이 발생하지 않는다.
+
+`StorySceneDirector.Entered`가 발생하면 현재 논리 상태가 활성 슬롯에 저장된다. 이 시점은 Location·Interaction·On Enter Effect와 진입 Transition 적용 뒤이면서 entry Sequence/Dialogue 전이다. Sequence 진행률, 열린 UI, 대사 재생 위치 같은 프레젠테이션 상태는 저장 대상으로 추가하지 않는다. 이 동작은 `SaveData`와 `SaveVersion`을 변경하지 않는다.
+
 ## 4. 아트 에셋을 갈아끼우는 방법
 
 ### 참조를 유지하는 가장 안전한 교체
@@ -239,6 +245,9 @@ Location Preview는 현재 `defaultBackground` 한 장을 확인하는 간단한
 - `EvidenceInteractionAction`: 증거 획득
 - `LocationExitAction`: Location 이동
 - `PuzzleInteractionAction`: PuzzleDirector를 통한 퍼즐 실행
+- `StorySceneAdvanceInteractionAction`: 현재 장면 완료와 다음 route 해석을 요청
+
+`StorySceneAdvanceInteractionAction`에는 대상 Story Scene ID나 완료 Effect를 넣지 않는다. Action은 advance 요청만 반환하고, `InteractionDirector`가 `GameFlowController`에 위임한다. 실제 완료 Effect와 다음 장면 선택은 현재 `StorySceneDefinition.onCompleteEffects`와 `routes`가 소유한다. 이 Action을 쓰는 Interaction은 non-repeatable이어야 하며 장면에 유효한 route가 있어야 한다.
 
 상태 변화는 가능하면 Condition/GameEffect 자산으로 표현한다. View나 버튼이 `GameStateStore` 내부 컬렉션을 직접 수정하면 안 된다.
 
@@ -262,6 +271,7 @@ Location Preview는 현재 `defaultBackground` 한 장을 확인하는 간단한
 - 상태 변화가 GameEffect로 연결됐는가
 - 화자 CharacterDefinition과 expression visual이 존재하는가
 - 음성이 필수인 줄에 승인된 clip이 연결됐는가
+- Trust 조건과 증감을 저작할 때 미등록 값은 2에서 시작하고, 저장에 명시된 0을 포함한 값은 그대로 유지되는가
 
 ## 10. 오디오 에셋 교체
 
@@ -364,6 +374,10 @@ PuzzleDefinition은 다음을 소유한다.
 | Validation | Authoring Requirements |
 
 수정 뒤 `Under The Horizon > Content > Story Graph`에서 진입/종료 경로를 확인하고 `Under The Horizon > Preview > Story Scene`에서 주요 참조와 배경을 확인한다.
+
+전체 entry Dialogue를 한 번에 자동 재생하지 않고 조사와 대화를 단계화하려면 `Defer Entry Dialogue`를 켠다. 필요한 도입부만 `DialogueCommand`의 start/end line ID로 entry Sequence에서 재생하고, 이후 Interaction은 `InteractionCompletedCondition`으로 순서화한다. 마지막 Exit Interaction은 `StorySceneAdvanceInteractionAction`으로 route 해석을 요청한다. P-01이 이 구성의 기준 예시다.
+
+다음 Story Scene의 `Entry Conditions`에 앞 장면의 `SceneCompletedCondition`을 둘 수 있다. 이는 진입 gate일 뿐 다음 장면 자체의 Interaction·완주 흐름이 구현됐다는 의미는 아니다.
 
 ## 14. 새 Story Scene 추가 절차
 

@@ -55,7 +55,7 @@
 - [ ] 각 기능 단위로 TODO, 관련 테스트/검증, Unity Play Mode 결과를 같은 커밋에 포함한다.
 
 > 이 문서는 프로젝트의 유일한 TODO 목록이다. 자산 폴더 안에 TODO 파일을 다시 만들지 않는다.  
-> 갱신일: 2026-08-12 (검증 기준 `b53a09f`)
+> 갱신일: 2026-08-14 (P-01 → P-02 첫 플레이 가능 증분)
 
 ## 완료
 
@@ -69,6 +69,13 @@
   복구하고 빈 중복 콘텐츠 자산을 제거했다.
 - [x] `Bootstrap.unity`를 composition root로, `Game.unity`를 지속 런타임 셸로 연결했다.
 - [x] Title → Save Slot → Game 흐름과 화면 라우팅을 연결했다.
+- [x] 선택한 Save Slot을 활성 체크포인트에 바인딩하고 Story Scene 진입 시 같은 슬롯에 자동 저장한다.
+  - `GameStartup`이 선택 슬롯을 Load/New 분기 전에 `SaveCheckpoint`에 바인딩하며, 바인딩 전이거나
+    등록된 `SaveService`가 없으면 체크포인트는 저장하지 않는다.
+  - `StorySceneDirector.Entered` 시점의 논리 상태를 저장한다. `SaveData` 필드와
+    `SaveVersion.Current`는 변경하지 않아 저장 마이그레이션은 추가하지 않았다.
+- [x] 등록되지 않은 Trust는 런타임 기본값 2로 해석하고, 최초 증감도 2에서 시작하도록 했다.
+  - 저장에 명시된 0을 포함한 기존 Trust 값은 그대로 보존한다.
 - [x] 한국어 마스터 CSV의 전체 대화와 100개 선택지를 실행 가능한 그래프로 가져왔다.
 - [x] 41개 CharacterPlacementSet의 구조와 정규화 좌표 검증을 구성했다.
 - [x] Story Scene·Location·Character Placement·Interaction·Audio Cue·Evidence·Sequence 편집 도구를 구성했다.
@@ -79,6 +86,12 @@
   - `Character`/`Context`/`Investigation` capability와 증거 획득 검증
   - 다섯 조사 완료 후 Richard 대화와 공식 선택지 개방
   - Input Lock, Audio, 4프레임 Image Montage, Dialogue로 구성한 entry Sequence
+- [x] P-01을 실제 상호작용으로 완주하고 기존 route를 통해 P-02 진입을 요청하는 첫 프롤로그 흐름을 연결했다.
+  - 진입 Sequence는 `P-01_001`~`002`만 재생하고, 초대장 조사 → 메신저 확인 → Daniel 대화 →
+    승선 계속하기를 `InteractionCompletedCondition`으로 순서화했다.
+  - C-01 획득과 `anonymous_tip_preview`는 기존 GameEffect 계약으로 적용한다.
+  - `StorySceneAdvanceInteractionAction`은 대상 장면을 소유하지 않고 advance 요청만 반환하며,
+    `InteractionDirector`가 `GameFlowController`에 위임해 현재 장면 완료와 route 해석을 수행한다.
 - [x] 필수 Sequence가 `WaitCommand`만 포함하면 실패하도록 Validator를 강화했다.
 - [x] `AudioDirector` 아래 Music A/B, Voice Bark, Story Voice, crossfade와 대화 더킹을 연결했다.
 - [x] Audio 원본을 Music·Ambience·SFX·VoiceBarks·StoryRecordings 역할로 정리하고,
@@ -176,10 +189,12 @@
 
 ## P1 — 플레이 가능한 콘텐츠 완성
 
-- [ ] 나머지 40개 Story Scene의 일반 대화 Interaction을 실제 NPC·맥거핀·조사·증거·출구·퍼즐
+- [ ] P-01과 D1-06을 제외한 39개 Story Scene의 일반 대화 Interaction을 실제 NPC·맥거핀·조사·증거·출구·퍼즐
   Interaction으로 교체한다.
   - 완료 조건: 각 장면의 원본 행동과 `requiredInteractionTypes`, 최소 상호작용 수,
     Condition/GameEffect가 일치한다.
+  - P-02에는 P-01 완료를 요구하는 `SceneCompletedCondition`만 연결했다. P-02 자체의 장면 전용
+    Interaction, P-03으로 이어지는 완주 흐름과 직접 PlayMode 검증은 아직 남아 있다.
 - [ ] 41개 CharacterPlacementSet을 실제 플레이 화면에서 시각 검수하고 좌표·스케일·sorting order를
   최종 조정한다.
 - [ ] 모든 Story Scene을 원본의 전용 Location State와 배경·오디오에 연결한다.
@@ -214,6 +229,10 @@
 - [ ] Puzzle 직접 미리보기와 공통 Preview 계약을 구현한다.
 - [ ] 필요한 Addressables 등록·레이블과 깨진 직렬화 참조 검증을 추가한다.
 - [x] Unity Editor에서 현재 EditMode/PlayMode 전체 suite와 Bootstrap 자동 대표 흐름을 통과시킨다.
+  - 2026-08-14 `codex/p01-playable-to-p02` 증분을 Unity `6000.3.20f1`에서 검증했다.
+    EditMode 89/89, PlayMode 17/17과 Build Preflight가 실패·건너뜀 없이 통과했다. PlayMode는 실제
+    EventSystem 클릭으로 새 Slot 3 → P-01 초대장·메신저·Daniel 선택·출구 → P-02 진입 → 앱 재시작 후
+    같은 Slot 3의 P-02 복원을 확인하며, reduced-motion 전환의 입력 해제와 체크포인트 저장 실패 격리도 포함한다.
   - 2026-08-12 기준 커밋 `b53a09f1416cb2a3ad838d0d4ac9d7eef4d810c6`, Unity `6000.3.20f1`
     (`c9ba695d4f07`)에서 Build Preflight, EditMode 64/64, PlayMode 11/11을 통과했다. 실패·건너뜀은 0건이다.
   - `BootstrapTests.BootstrapLoadsPersistentGameShell`이 런타임 UI 버튼 이벤트와 `ScreenRouter` 경로로

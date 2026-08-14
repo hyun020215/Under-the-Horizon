@@ -22,6 +22,9 @@ public sealed class GameStartup : MonoBehaviour
     private GameStateStore state;
 
     [SerializeField]
+    private SaveCheckpoint saveCheckpoint;
+
+    [SerializeField]
     private AudioDirector audioDirector;
 
     [SerializeField]
@@ -46,6 +49,7 @@ public sealed class GameStartup : MonoBehaviour
             {
                 await screens.OpenAsync(ScreenId.SaveSlot);
                 SaveSlot slot = await saveSlotScreen.WaitForSelectionAsync();
+                saveCheckpoint?.Bind(slot);
                 SaveService saves = ResolveSaveService();
                 if (saves.Exists(slot))
                 {
