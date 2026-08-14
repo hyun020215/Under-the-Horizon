@@ -17,7 +17,8 @@ MonoBehaviour:
   chapter: 0
   day: 0
   timeBlock: 2
-  entryConditions: []
+  entryConditions:
+  - {fileID: 11400000, guid: d48a5f8e884e4961a22a1ebc261fe856, type: 2}
   location: {fileID: 11400000, guid: 8927a02e93e690242b1a957ebee934e8, type: 2}
   locationState: {fileID: 11400000, guid: 383ee029d52aafc4cbf6841ff533915f, type: 2}
   initialScreen: 2

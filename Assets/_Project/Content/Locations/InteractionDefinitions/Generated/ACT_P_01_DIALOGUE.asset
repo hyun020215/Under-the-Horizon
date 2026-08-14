@@ -13,3 +13,5 @@ MonoBehaviour:
   m_Name: ACT_P_01_DIALOGUE
   m_EditorClassIdentifier: UTH.Runtime::DialogueInteractionAction
   dialogue: {fileID: 11400000, guid: 8a7377334b8965d47bb6826a35bcb4e7, type: 2}
+  startLineId: P-01_009
+  endLineId: P-01_026

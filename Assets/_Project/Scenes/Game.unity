@@ -3811,6 +3811,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1265287069}
   - component: {fileID: 1265287068}
+  - component: {fileID: 1265287070}
   m_Layer: 0
   m_Name: GameRoot
   m_TagString: Untagged
@@ -3836,8 +3837,24 @@ MonoBehaviour:
   titleScreen: {fileID: 1978787423}
   saveSlotScreen: {fileID: 1166464355}
   state: {fileID: 360852667}
+  saveCheckpoint: {fileID: 1265287070}
   audioDirector: {fileID: 1682964838}
   titleAudio: {fileID: 11400000, guid: 08319e193966fa04380132595519380f, type: 2}
+--- !u!114 &1265287070
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1265287067}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: afbacb9ab90a5aa45983974dc280ed92, type: 3}
+  m_Name:
+  m_EditorClassIdentifier: UTH.Runtime::SaveCheckpoint
+  stateStore: {fileID: 360852667}
+  storyScenes: {fileID: 1528931846}
+  slot: 0
 --- !u!4 &1265287069
 Transform:
   m_ObjectHideFlags: 0
@@ -3965,7 +3982,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
   m_Material: {fileID: 0}
   m_Color: {r: 0, g: 0, b: 0, a: 0}
-  m_RaycastTarget: 1
+  m_RaycastTarget: 0
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
   m_OnCullStateChanged:
@@ -6063,8 +6080,9 @@ MonoBehaviour:
   state: {fileID: 360852667}
   narrative: {fileID: 416082523}
   puzzles: {fileID: 1451419863}
-  hotspotPrefab: {fileID: 0}
-  hotspotRoot: {fileID: 0}
+  flow: {fileID: 1229261065}
+  hotspotPrefab: {fileID: 8174279445771892240, guid: 42be2e85c6243fa4e8177066cb1e93f1, type: 3}
+  hotspotRoot: {fileID: 1460658611}
 --- !u!4 &1885110463
 Transform:
   m_ObjectHideFlags: 0

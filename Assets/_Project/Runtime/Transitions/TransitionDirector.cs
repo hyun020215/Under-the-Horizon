@@ -25,15 +25,17 @@ public sealed class TransitionDirector : MonoBehaviour
             return;
         if (accessibility == null)
             AppContext.Services?.TryGet(out accessibility);
-        if (accessibility?.ReducedMotion == true)
-        {
-            await PlaySupported(profile, entering, true);
-            return;
-        }
-        if (blocker != null && profile.blockInput)
+        if (entering && blocker != null && profile.blockInput)
             blocker.SetBlocked(true);
         if (entering && profile.stinger != null)
             sfx?.Play(profile.stinger);
+        if (accessibility?.ReducedMotion == true)
+        {
+            await PlaySupported(profile, entering, true);
+            if (!entering && blocker != null)
+                blocker.SetBlocked(false);
+            return;
+        }
         if (entering)
             await WaitAsync(profile.uiExitDuration);
         await PlaySupported(profile, entering, false);

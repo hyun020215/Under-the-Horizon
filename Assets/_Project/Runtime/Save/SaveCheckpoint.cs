@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 public sealed class SaveCheckpoint : MonoBehaviour
@@ -6,22 +7,57 @@ public sealed class SaveCheckpoint : MonoBehaviour
     private GameStateStore stateStore;
 
     [SerializeField]
+    private StorySceneDirector storyScenes;
+
+    [SerializeField]
     private int slot;
+
+    private bool isBound;
+
+    private void OnEnable()
+    {
+        if (storyScenes != null)
+            storyScenes.Entered += HandleStorySceneEntered;
+    }
+
+    private void OnDisable()
+    {
+        if (storyScenes != null)
+            storyScenes.Entered -= HandleStorySceneEntered;
+    }
+
+    public void Bind(SaveSlot selectedSlot)
+    {
+        slot = selectedSlot.Index;
+        isBound = true;
+    }
 
     public void Capture()
     {
-        if (stateStore != null)
-            ResolveSaveService().Save(new SaveSlot(slot), stateStore.State);
+        if (!isBound || stateStore == null || !TryResolveSaveService(out SaveService saves))
+            return;
+
+        try
+        {
+            saves.Save(new SaveSlot(slot), stateStore.State);
+        }
+        catch (Exception exception)
+        {
+            Debug.LogException(exception, this);
+        }
     }
 
-    private static SaveService ResolveSaveService()
+    private void HandleStorySceneEntered(StorySceneDefinition _) => Capture();
+
+    private static bool TryResolveSaveService(out SaveService saves)
     {
         if (AppContext.Services != null
-            && AppContext.Services.TryGet(out SaveService saves))
+            && AppContext.Services.TryGet(out saves))
         {
-            return saves;
+            return true;
         }
 
-        return new SaveService();
+        saves = null;
+        return false;
     }
 }

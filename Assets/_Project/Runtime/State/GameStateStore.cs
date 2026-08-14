@@ -3,6 +3,8 @@ using UnityEngine;
 
 public sealed class GameStateStore : MonoBehaviour
 {
+    public const int DefaultTrust = 2;
+
     [SerializeField]
     private GameState state = new();
     public GameState State => state;
@@ -86,7 +88,9 @@ public sealed class GameStateStore : MonoBehaviour
     public bool UnlockLocation(string id) => Add(state.unlockedLocations, id);
 
     public int GetTrust(string characterId) =>
-        state.trust.TryGetValue(Normalize(characterId), out int value) ? value : 0;
+        state.trust.TryGetValue(Normalize(characterId), out int value)
+            ? value
+            : DefaultTrust;
 
     public void ModifyTrust(string characterId, int delta)
     {

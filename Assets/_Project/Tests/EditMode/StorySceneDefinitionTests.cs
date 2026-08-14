@@ -1,6 +1,8 @@
 using System.Linq;
+using System.Reflection;
 using NUnit.Framework;
 using UnityEditor;
+using UnityEngine;
 
 public sealed class StorySceneDefinitionTests
 {
@@ -110,5 +112,115 @@ public sealed class StorySceneDefinitionTests
         Assert.That(
             montage.SeenFlag,
             Is.EqualTo("cinematic.d1_06_body_discovery_seen"));
+    }
+
+    [Test]
+    public void P01UsesFourAuthoredStepsAndP02RequiresItsCompletion()
+    {
+        StorySceneDefinition p01 = AssetDatabase.LoadAssetAtPath<StorySceneDefinition>(
+            "Assets/_Project/Content/StoryScenes/Prologue/P01_PortJournalist.asset");
+        StorySceneDefinition p02 = AssetDatabase.LoadAssetAtPath<StorySceneDefinition>(
+            "Assets/_Project/Content/StoryScenes/Prologue/P02_GangwayManifest.asset");
+        var owner = new GameObject("P01ContentProgressionTest");
+
+        try
+        {
+            GameStateStore state = owner.AddComponent<GameStateStore>();
+            InteractionDefinition[] interactions = p01.InteractionSet.Interactions;
+
+            Assert.That(p01.DeferEntryDialogue, Is.True);
+            Assert.That(p01.EntrySequence, Is.Not.Null);
+            DialogueCommand opening = p01.EntrySequence.Commands
+                .OfType<DialogueCommand>()
+                .Single();
+            AssertPrivateString(opening, "startLineId", "P-01_001");
+            AssertPrivateString(opening, "endLineId", "P-01_002");
+
+            Assert.That(
+                interactions.Select(interaction => interaction.Id),
+                Is.EqualTo(new[]
+                {
+                    "INT_P_01_INVITATION",
+                    "INT_P_01_MESSENGER",
+                    "INT_P_01_DIALOGUE",
+                    "INT_P_01_CONTINUE",
+                }));
+            Assert.That(
+                interactions.Select(interaction => interaction.Type),
+                Is.EqualTo(new[]
+                {
+                    InteractionType.Investigation,
+                    InteractionType.Context,
+                    InteractionType.Character,
+                    InteractionType.Exit,
+                }));
+            Assert.That(interactions[0].Action.GrantsEvidence, Is.True);
+            Assert.That(interactions[0].HasWorldHotspot, Is.True);
+            Assert.That(interactions[0].TargetId, Is.EqualTo("C-01"));
+            Assert.That(
+                interactions[0].NormalizedRect,
+                Is.EqualTo(new Rect(0.012f, 0.182f, 0.066f, 0.086f)),
+                "The invitation hotspot must match the manually approved C-01 semantic region.");
+            Assert.That(
+                interactions[3].Action,
+                Is.TypeOf<StorySceneAdvanceInteractionAction>());
+            Assert.That(interactions[3].HasWorldHotspot, Is.True);
+            Assert.That(interactions[3].TargetId, Is.EqualTo("LOC_GANGWAY"));
+            Assert.That(
+                interactions[3].NormalizedRect,
+                Is.EqualTo(new Rect(0.38f, 0.36f, 0.24f, 0.25f)),
+                "The continue hotspot must match the manually approved gangway semantic region.");
+            Assert.That(interactions.All(interaction => !interaction.Repeatable), Is.True);
+
+            AssertActionRange(interactions[0].Action, "P-01_003", "P-01_005");
+            AssertActionRange(interactions[1].Action, "P-01_006", "P-01_008");
+            AssertActionRange(interactions[2].Action, "P-01_009", "P-01_026");
+
+            Assert.That(interactions[0].IsAvailable(state), Is.True);
+            Assert.That(interactions.Skip(1).All(item => !item.IsAvailable(state)), Is.True);
+            state.CompleteInteraction(interactions[0].Id);
+            Assert.That(interactions[1].IsAvailable(state), Is.True);
+            Assert.That(interactions.Skip(2).All(item => !item.IsAvailable(state)), Is.True);
+            state.CompleteInteraction(interactions[1].Id);
+            Assert.That(interactions[2].IsAvailable(state), Is.True);
+            Assert.That(interactions[3].IsAvailable(state), Is.False);
+            state.CompleteInteraction(interactions[2].Id);
+            Assert.That(interactions[3].IsAvailable(state), Is.True);
+
+            Assert.That(p01.Routes.Single().TargetSceneId, Is.EqualTo("P-02"));
+            Assert.That(ConditionResolver.All(p02.EntryConditions, state), Is.False);
+            state.CompleteScene("P-01");
+            Assert.That(ConditionResolver.All(p02.EntryConditions, state), Is.True);
+        }
+        finally
+        {
+            Object.DestroyImmediate(owner);
+        }
+    }
+
+    private static void AssertActionRange(
+        InteractionAction action,
+        string expectedStart,
+        string expectedEnd)
+    {
+        SerializedObject serialized = new(action);
+        Assert.That(
+            serialized.FindProperty("startLineId").stringValue,
+            Is.EqualTo(expectedStart));
+        Assert.That(
+            serialized.FindProperty("endLineId").stringValue,
+            Is.EqualTo(expectedEnd));
+    }
+
+    private static void AssertPrivateString(
+        object target,
+        string fieldName,
+        string expected)
+    {
+        FieldInfo field = target.GetType().GetField(
+            fieldName,
+            BindingFlags.Instance | BindingFlags.NonPublic);
+        Assert.That(field, Is.Not.Null, $"Missing field '{fieldName}'.");
+        Assert.That(field.GetValue(target), Is.EqualTo(expected));
     }
 }

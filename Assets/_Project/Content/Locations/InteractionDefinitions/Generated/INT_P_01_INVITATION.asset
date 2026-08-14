@@ -10,15 +10,19 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 0eb5a31aeabd45947bf8c5b6c03af2ab, type: 3}
-  m_Name: INT_P_01_DIALOGUE
+  m_Name: INT_P_01_INVITATION
   m_EditorClassIdentifier: UTH.Runtime::InteractionDefinition
-  id: INT_P_01_DIALOGUE
-  type: 0
-  displayName: "\uB2E4\uB2C8\uC5D8\uACFC \uB300\uD654"
-  targetId: CHR_DANIEL
-  hasWorldHotspot: 0
-  normalizedRect: {x: 0, y: 0, width: 0, height: 0}
-  conditions:
-  - {fileID: 11400000, guid: 1ff8e3060dbf4b8a8def6c046953a921, type: 2}
-  action: {fileID: 11400000, guid: e960efd87a393514e93fb79836f5bb94, type: 2}
+  id: INT_P_01_INVITATION
+  type: 3
+  displayName: "\uAD6C\uACA8\uC9C4 \uCD08\uB300\uC7A5"
+  targetId: C-01
+  hasWorldHotspot: 1
+  normalizedRect:
+    serializedVersion: 2
+    x: 0.012
+    y: 0.182
+    width: 0.066
+    height: 0.086
+  conditions: []
+  action: {fileID: 11400000, guid: 42a65086a23045b7b56a75c8b9f7fab6, type: 2}
   repeatable: 0

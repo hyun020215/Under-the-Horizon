@@ -15,12 +15,16 @@ public sealed class InteractionDirector : MonoBehaviour
     private PuzzleDirector puzzles;
 
     [SerializeField]
+    private GameFlowController flow;
+
+    [SerializeField]
     private InteractionPointView hotspotPrefab;
 
     [SerializeField]
     private RectTransform hotspotRoot;
 
     private readonly List<InteractionPointView> hotspotViews = new();
+    private bool isExecuting;
     public InteractionSet Current { get; private set; }
 
     public void Apply(InteractionSet set)
@@ -70,14 +74,46 @@ public sealed class InteractionDirector : MonoBehaviour
 
     public async Task<InteractionResult> ExecuteAsync(InteractionDefinition definition)
     {
-        if (definition == null || !definition.IsAvailable(state) || definition.Action == null)
-            return new InteractionResult(false, "Unavailable");
-        InteractionResult result = await definition.Action.ExecuteAsync(
-            new InteractionContext(state, narrative, puzzles)
-        );
-        if (result.Success && !definition.Repeatable)
-            state?.CompleteInteraction(definition.Id);
-        return result;
+        if (isExecuting)
+            return new InteractionResult(false, "Busy");
+
+        isExecuting = true;
+        try
+        {
+            if (definition == null
+                || !definition.IsAvailable(state)
+                || definition.Action == null)
+            {
+                return new InteractionResult(false, "Unavailable");
+            }
+
+            InteractionResult result = await definition.Action.ExecuteAsync(
+                new InteractionContext(state, narrative, puzzles)
+            );
+            if (result.Success && !definition.Repeatable)
+                state?.CompleteInteraction(definition.Id);
+
+            RefreshHotspots();
+
+            if (result.Success && result.AdvanceStorySceneRequested)
+            {
+                if (flow == null)
+                {
+                    throw new InvalidOperationException(
+                        "InteractionDirector requires a GameFlowController "
+                        + "to advance the current Story Scene.");
+                }
+
+                await flow.AdvanceAsync();
+            }
+
+            return result;
+        }
+        finally
+        {
+            isExecuting = false;
+            RefreshHotspots();
+        }
     }
 
     private void ClearHotspots()
@@ -97,7 +133,6 @@ public sealed class InteractionDirector : MonoBehaviour
         try
         {
             await ExecuteAsync(view.Definition);
-            RefreshHotspots();
         }
         catch (Exception exception)
         {

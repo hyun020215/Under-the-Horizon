@@ -159,6 +159,36 @@ public static class ContentValidator
                     + $"{rect}.");
             }
         }
+
+        InteractionDefinition[] advanceInteractions = interactions
+            .Where(interaction =>
+                interaction?.Action is StorySceneAdvanceInteractionAction)
+            .ToArray();
+        if (advanceInteractions.Length > 1)
+        {
+            errors.Add(
+                $"{scene.Id} has more than one Story Scene advance interaction.");
+        }
+
+        foreach (InteractionDefinition interaction in advanceInteractions)
+        {
+            if (interaction.Repeatable)
+            {
+                errors.Add(
+                    $"{scene.Id}/{interaction.Id} advances the Story Scene "
+                    + "but is repeatable.");
+            }
+        }
+
+        if (advanceInteractions.Length > 0
+            && (scene.Routes == null
+                || !scene.Routes.Any(route =>
+                    route != null
+                    && !string.IsNullOrWhiteSpace(route.TargetSceneId))))
+        {
+            errors.Add(
+                $"{scene.Id} has a Story Scene advance interaction but no route.");
+        }
     }
 
     private static void ValidateAuthoringRequirements(
