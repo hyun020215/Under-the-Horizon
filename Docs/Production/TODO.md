@@ -298,9 +298,9 @@
     실패·건너뜀·불확정 결과와 남은 테스트별 고유 임시 Save 디렉터리는 0건이다.
   - 대화형 Editor에서는 Bootstrap → Title → Save Slot 3 → Dialogue까지 화면 표시를 직접 확인했다.
     Map과 Record의 자동 PlayMode 경로는 통과했지만 별도 수동 시각 확인은 완료하지 않았다.
-  - 새 아키텍처 scaffold 단계에서 생성되어 P2로 유보된 설정용 0바이트 placeholder 8개가 아직
-    유효한 Unity 자산으로 저작·연결되지 않아 cold import 오류가 발생한다. 최신 기능 변경의 회귀는
-    아니지만 현재 Build Preflight와 테스트 범위 밖이므로 아래 P2 작업에서 별도로 해결한다.
+  - 새 아키텍처 scaffold 단계에서 생성되어 P2로 유보된 설정용 0바이트 placeholder 가운데 Rendering 3개는
+    canonical URP 기준선으로 교체·연결하고 Build Preflight 검증 범위에 포함하는 중이다. Input 1개, Audio 3개,
+    Addressables settings 1개는 아래 P2 작업에 남아 있다.
 - [ ] P-01부터 모든 엔딩까지 실제 대표 플레이스루를 완료한다.
   - Story graph 도달 가능성 자동 검사와 별도로 장면별 Interaction·Puzzle·연출·저장·엔딩 흐름을 확인한다.
 
@@ -308,16 +308,27 @@
 
 - [ ] P2로 유보한 설정용 0바이트 placeholder 8개를 현재 아키텍처에 맞는 유효한 Unity
   `6000.3.20f1` 자산으로 저작·교체·연결한다.
-  - Input 1개, Rendering 3개, Audio 3개, Addressables settings 1개를 대상으로 한다.
+  - [ ] Input 1개, Audio 3개, Addressables settings 1개를 유효한 자산으로 저작·연결한다.
+  - [x] Rendering 0바이트 placeholder 3개를 해소하면서 2D Renderer, URP Pipeline, URP Global Settings,
+    기본 Volume Profile의 canonical 자산 4개를 구성하고 `GraphicsSettings`와 모든 Quality 단계가 같은
+    Pipeline을 사용하도록 연결했다.
+  - [x] `RenderingSettingsValidator`를 Build Preflight에 연결해 누락·0바이트·잘못된 타입·깨진 Pipeline/Renderer/
+    Global Settings/Volume 참조와 root fallback 자산을 검출하도록 했다.
   - 과거의 유효한 본체는 Git 이력에 없으므로 원본을 단순 복원하지 않고 현재 owner와 참조 계약을 따른다.
   - 사용하지 않는 orphan placeholder는 serialized reference와 GUID 영향을 확인한 뒤 제거한다.
-  - Rendering은 `GraphicsSettings`·`QualitySettings`의 누락된 active URP 참조와 URP Global Settings를
-    Renderer Data·URP Pipeline·Global Volume과 함께 정상화한다.
 - [ ] Audio Mixer 그룹·스냅샷과 더킹 attack/release 및 버스별 최종 볼륨을 실제 음원으로 튜닝한다.
 - [ ] Addressables 패키지와 settings를 구성하고 대형 배경·캐릭터·증거·BGM·환경음·녹음을
   그룹과 레이블로 구성한다.
 - [ ] 프로젝트 전용 Input Actions 사용 범위와 정상화한 Rendering 설정을 타깃 플랫폼에서 검증한다.
-- [ ] Library가 없는 clean checkout에서 cold import 설정 오류 0건을 확인하고 타깃 Player build를 검증한다.
+  - [x] Windows 64-bit Player smoke runner는 Build Preflight → 활성 Build Settings Scene이 정확히
+    `Bootstrap` → `Game` 순서인지 확인 → Development Player 빌드를 반복 가능한 단일 진입점으로 제공한다.
+  - [x] Unity `6000.3.20f1`에서 EditMode `105/105`, PlayMode `25/25`, Build Preflight와 Windows 64-bit
+    Development Player smoke build를 통과했고, GPU responsive capture `42/42`를 생성해 대표 화면의
+    누락 Renderer·마젠타 Shader가 없음을 확인했다.
+- [x] Library가 없는 clean checkout에서 cold import 설정 오류 0건과 Build Preflight 통과를 확인하고
+  EditMode `105/105`, PlayMode `25/25`, Windows 64-bit Development Player smoke build를 검증했다.
+  - Player build를 2회 실행한 뒤에도 Git 내용 diff `0`, root fallback 자산 `0`개였으며 두 번째 빌드는
+    약 `9.5초`에 완료됐다.
 - [ ] 앱 이름, 회사명, 아이콘, 해상도, 품질과 플랫폼별 Player Settings를 확정한다.
   - [x] 이전 임시 제품명을 정식명 `Under the Horizon`으로 정정하고 UWP 패키지 식별자는 공백 없는 `UnderTheHorizon`으로 분리했으며, Build Preflight 회귀 검사를 추가했다. 출시 전 레거시 개발 저장·PlayerPrefs 경로는 자동 이전하지 않는다.
   - [ ] 회사명, 애플리케이션 식별자, 아이콘, 해상도, 품질과 플랫폼별 나머지 설정을 확정한다.

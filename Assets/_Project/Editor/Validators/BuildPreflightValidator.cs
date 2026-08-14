@@ -9,6 +9,7 @@ public static class BuildPreflightValidator
     {
         var errors = ContentValidator.ValidateAll();
         errors.AddRange(ProjectIdentityValidator.ValidateAll());
+        errors.AddRange(RenderingSettingsValidator.ValidateAll());
         if (errors.Count > 0)
             throw new BuildFailedException(string.Join("\n", errors));
         Debug.Log("Under the Horizon build preflight passed.");

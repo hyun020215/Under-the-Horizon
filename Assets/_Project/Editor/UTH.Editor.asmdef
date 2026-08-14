@@ -1,7 +1,14 @@
 {
   "name": "UTH.Editor",
   "rootNamespace": "UnderTheHorizon.Editor",
-  "references": ["UTH.Runtime", "Unity.TextMeshPro", "Unity.InputSystem"],
+  "references": [
+    "UTH.Runtime",
+    "Unity.TextMeshPro",
+    "Unity.InputSystem",
+    "Unity.RenderPipelines.Core.Runtime",
+    "Unity.RenderPipelines.Universal.Runtime",
+    "Unity.RenderPipelines.Universal.2D.Runtime"
+  ],
   "includePlatforms": ["Editor"],
   "autoReferenced": true
 }
