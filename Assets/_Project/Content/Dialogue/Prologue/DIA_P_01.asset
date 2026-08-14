@@ -81,7 +81,7 @@ MonoBehaviour:
     speaker:
       character: {fileID: 0}
       overrideName: NARRATION
-    text: "[\uC870\uC0AC: \uC554\uD638\uD654 \uBA54\uC2E0\uC800 \uC54C\uB9BC]"
+    text: "\uB2E4\uB2C8\uC5D8\uC774 \uC9C4\uB3D9\uC744 \uD655\uC778\uD558\uB824 \uAE30\uAE30\uB97C \uAEBC\uB0B4\uB294 \uC21C\uAC04, \uAE30\uC6B8\uC5B4\uC9C4 \uD654\uBA74\uC5D0 \uC554\uD638\uD654 \uBA54\uC2E0\uC800 \uBBF8\uB9AC\uBCF4\uAE30\uAC00 \uB4DC\uB7EC\uB0AC\uB2E4."
     expression: 0
     voiceRequired: 0
     voiceClip: {fileID: 0}

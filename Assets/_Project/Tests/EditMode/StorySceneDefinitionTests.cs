@@ -126,6 +126,11 @@ public sealed class StorySceneDefinitionTests
         try
         {
             GameStateStore state = owner.AddComponent<GameStateStore>();
+            InteractionDirector director = owner.AddComponent<InteractionDirector>();
+            var directorData = new SerializedObject(director);
+            directorData.FindProperty("state").objectReferenceValue = state;
+            directorData.ApplyModifiedPropertiesWithoutUndo();
+            director.Apply(p01.InteractionSet);
             InteractionDefinition[] interactions = p01.InteractionSet.Interactions;
 
             Assert.That(p01.DeferEntryDialogue, Is.True);
@@ -154,6 +159,15 @@ public sealed class StorySceneDefinitionTests
                     InteractionType.Character,
                     InteractionType.Exit,
                 }));
+            Assert.That(
+                interactions.Select(interaction => interaction.DisplayName),
+                Is.EqualTo(new[]
+                {
+                    "구겨진 초대장",
+                    "다니엘이 확인 중인 메신저 알림 살펴보기",
+                    "다니엘과 대화",
+                    "승선 계속하기",
+                }));
             Assert.That(interactions[0].Action.GrantsEvidence, Is.True);
             Assert.That(interactions[0].HasWorldHotspot, Is.True);
             Assert.That(interactions[0].TargetId, Is.EqualTo("C-01"));
@@ -176,14 +190,67 @@ public sealed class StorySceneDefinitionTests
             AssertActionRange(interactions[1].Action, "P-01_006", "P-01_008");
             AssertActionRange(interactions[2].Action, "P-01_009", "P-01_026");
 
+            DialogueLine[] messengerLines = p01.EntryDialogue.Lines
+                .Where(line => line.id is "P-01_006" or "P-01_007" or "P-01_008")
+                .ToArray();
+            Assert.That(
+                messengerLines.Select(line => line.id),
+                Is.EqualTo(new[] { "P-01_006", "P-01_007", "P-01_008" }));
+            Assert.That(
+                messengerLines.Select(line => line.voiceRequired),
+                Is.EqualTo(new[] { false, true, false }),
+                "The messenger range must preserve its narration/voiced/system contract.");
+            Assert.That(messengerLines[0].text, Does.Contain("다니엘"));
+            Assert.That(messengerLines[0].text, Does.Contain("기기"));
+
             Assert.That(interactions[0].IsAvailable(state), Is.True);
             Assert.That(interactions.Skip(1).All(item => !item.IsAvailable(state)), Is.True);
+            Assert.That(
+                director.TryGetFirstAvailableAnchored(
+                    InteractionType.Context,
+                    "CHR_DANIEL",
+                    out _),
+                Is.False);
             state.CompleteInteraction(interactions[0].Id);
             Assert.That(interactions[1].IsAvailable(state), Is.True);
             Assert.That(interactions.Skip(2).All(item => !item.IsAvailable(state)), Is.True);
+            Assert.That(
+                director.TryGetFirstAvailableAnchored(
+                    InteractionType.Context,
+                    "CHR_DANIEL",
+                    out InteractionDefinition anchoredContext),
+                Is.True);
+            Assert.That(anchoredContext, Is.SameAs(interactions[1]));
+            Assert.That(
+                director.TryGetFirstAvailable(
+                    InteractionType.Character,
+                    "CHR_DANIEL",
+                    out _),
+                Is.False,
+                "A Character request must not fall back to Daniel's pending Context interaction.");
+            InteractionResult unavailableCharacter = director
+                .ExecuteFirstAvailableAsync(InteractionType.Character, "CHR_DANIEL")
+                .GetAwaiter()
+                .GetResult();
+            Assert.That(unavailableCharacter.Success, Is.False);
+            Assert.That(state.IsInteractionCompleted(interactions[1].Id), Is.False);
             state.CompleteInteraction(interactions[1].Id);
             Assert.That(interactions[2].IsAvailable(state), Is.True);
             Assert.That(interactions[3].IsAvailable(state), Is.False);
+            Assert.That(
+                director.TryGetFirstAvailableAnchored(
+                    InteractionType.Context,
+                    "CHR_DANIEL",
+                    out _),
+                Is.False,
+                "The anchored Context affordance must disappear once completed.");
+            Assert.That(
+                director.TryGetFirstAvailable(
+                    InteractionType.Character,
+                    "CHR_DANIEL",
+                    out InteractionDefinition characterInteraction),
+                Is.True);
+            Assert.That(characterInteraction, Is.SameAs(interactions[2]));
             state.CompleteInteraction(interactions[2].Id);
             Assert.That(interactions[3].IsAvailable(state), Is.True);
 

@@ -26,49 +26,108 @@ public sealed class InteractionDirector : MonoBehaviour
     private readonly List<InteractionPointView> hotspotViews = new();
     private bool isExecuting;
     public InteractionSet Current { get; private set; }
+    public event Action AvailabilityChanged;
+
+    private void OnEnable()
+    {
+        if (state != null)
+            state.Changed += OnStateChanged;
+        RefreshAvailability();
+    }
+
+    private void OnDisable()
+    {
+        if (state != null)
+            state.Changed -= OnStateChanged;
+    }
 
     public void Apply(InteractionSet set)
     {
         ClearHotspots();
         Current = set;
 
-        if (set?.Interactions == null || hotspotPrefab == null || hotspotRoot == null)
-            return;
-
-        foreach (InteractionDefinition definition in set.Interactions)
+        if (set?.Interactions != null && hotspotPrefab != null && hotspotRoot != null)
         {
-            if (definition == null || !definition.HasWorldHotspot)
-                continue;
+            foreach (InteractionDefinition definition in set.Interactions)
+            {
+                if (definition == null || !definition.HasWorldHotspot)
+                    continue;
 
-            InteractionPointView view = Instantiate(hotspotPrefab, hotspotRoot);
-            view.Apply(definition);
-            view.Clicked += OnHotspotClicked;
-            hotspotViews.Add(view);
+                InteractionPointView view = Instantiate(hotspotPrefab, hotspotRoot);
+                view.Apply(definition);
+                view.Clicked += OnHotspotClicked;
+                hotspotViews.Add(view);
+            }
         }
 
-        RefreshHotspots();
+        RefreshAvailability();
+    }
+
+    public bool TryGetFirstAvailable(
+        InteractionType type,
+        string targetId,
+        out InteractionDefinition definition)
+    {
+        definition = null;
+        if (Current?.Interactions == null)
+            return false;
+
+        foreach (InteractionDefinition candidate in Current.Interactions)
+        {
+            if (candidate == null
+                || candidate.Type != type
+                || !string.Equals(
+                    candidate.TargetId,
+                    targetId,
+                    StringComparison.Ordinal)
+                || !candidate.IsAvailable(state))
+            {
+                continue;
+            }
+
+            definition = candidate;
+            return true;
+        }
+
+        return false;
+    }
+
+    public bool TryGetFirstAvailableAnchored(
+        InteractionType type,
+        string exactTargetId,
+        out InteractionDefinition definition)
+    {
+        definition = null;
+        if (Current?.Interactions == null || string.IsNullOrWhiteSpace(exactTargetId))
+            return false;
+
+        foreach (InteractionDefinition candidate in Current.Interactions)
+        {
+            if (candidate == null
+                || candidate.Type != type
+                || candidate.HasWorldHotspot
+                || !string.Equals(
+                    candidate.TargetId,
+                    exactTargetId,
+                    StringComparison.Ordinal)
+                || !candidate.IsAvailable(state))
+            {
+                continue;
+            }
+
+            definition = candidate;
+            return true;
+        }
+
+        return false;
     }
 
     public async Task<InteractionResult> ExecuteFirstAvailableAsync(
-        InteractionType preferredType,
+        InteractionType type,
         string targetId = null)
     {
-        InteractionDefinition fallback = null;
-        if (Current?.Interactions != null)
-        {
-            foreach (InteractionDefinition definition in Current.Interactions)
-            {
-                if (definition == null
-                    || !definition.IsAvailable(state)
-                    || !definition.MatchesTarget(targetId))
-                    continue;
-                if (definition.Type == preferredType)
-                    return await ExecuteAsync(definition);
-                fallback ??= definition;
-            }
-        }
-        return fallback != null
-            ? await ExecuteAsync(fallback)
+        return TryGetFirstAvailable(type, targetId, out InteractionDefinition definition)
+            ? await ExecuteAsync(definition)
             : new InteractionResult(false, "Unavailable");
     }
 
@@ -93,7 +152,7 @@ public sealed class InteractionDirector : MonoBehaviour
             if (result.Success && !definition.Repeatable)
                 state?.CompleteInteraction(definition.Id);
 
-            RefreshHotspots();
+            RefreshAvailability();
 
             if (result.Success && result.AdvanceStorySceneRequested)
             {
@@ -112,7 +171,7 @@ public sealed class InteractionDirector : MonoBehaviour
         finally
         {
             isExecuting = false;
-            RefreshHotspots();
+            RefreshAvailability();
         }
     }
 
@@ -144,8 +203,16 @@ public sealed class InteractionDirector : MonoBehaviour
     {
         foreach (InteractionPointView view in hotspotViews)
         {
-            if (view?.Definition != null)
+            if (view != null && view.Definition != null)
                 view.gameObject.SetActive(view.Definition.IsAvailable(state));
         }
     }
+
+    private void RefreshAvailability()
+    {
+        RefreshHotspots();
+        AvailabilityChanged?.Invoke();
+    }
+
+    private void OnStateChanged(GameState _) => RefreshAvailability();
 }

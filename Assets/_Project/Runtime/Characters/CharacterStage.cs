@@ -24,18 +24,28 @@ public sealed class CharacterStage : MonoBehaviour
 
     private void OnEnable()
     {
-        if (narrative == null)
-            return;
-        narrative.LineChanged += OnDialogueLineChanged;
-        narrative.DialogueEnded += ClearDialogueFocus;
+        if (narrative != null)
+        {
+            narrative.LineChanged += OnDialogueLineChanged;
+            narrative.DialogueEnded += ClearDialogueFocus;
+        }
+        if (interactions != null)
+        {
+            interactions.AvailabilityChanged += RefreshInteractionAvailability;
+            if (views.Count > 0)
+                RefreshInteractionAvailability();
+        }
     }
 
     private void OnDisable()
     {
-        if (narrative == null)
-            return;
-        narrative.LineChanged -= OnDialogueLineChanged;
-        narrative.DialogueEnded -= ClearDialogueFocus;
+        if (narrative != null)
+        {
+            narrative.LineChanged -= OnDialogueLineChanged;
+            narrative.DialogueEnded -= ClearDialogueFocus;
+        }
+        if (interactions != null)
+            interactions.AvailabilityChanged -= RefreshInteractionAvailability;
         ClearDialogueFocus();
     }
 
@@ -51,6 +61,7 @@ public sealed class CharacterStage : MonoBehaviour
                 view.ConfigurePresentation(defaultPresentation);
                 view.Apply(placement);
                 view.Clicked += OnCharacterClicked;
+                view.ContextClicked += OnContextClicked;
                 views.Add(view);
             }
         }
@@ -63,6 +74,7 @@ public sealed class CharacterStage : MonoBehaviour
             if (view != null)
             {
                 view.Clicked -= OnCharacterClicked;
+                view.ContextClicked -= OnContextClicked;
                 Destroy(view.gameObject);
             }
         views.Clear();
@@ -138,6 +150,50 @@ public sealed class CharacterStage : MonoBehaviour
         catch (System.Exception exception)
         {
             Debug.LogException(exception, view);
+        }
+    }
+
+    private async void OnContextClicked(
+        CharacterView view,
+        InteractionDefinition definition)
+    {
+        if (interactions == null)
+            return;
+
+        try
+        {
+            await interactions.ExecuteAsync(definition);
+        }
+        catch (System.Exception exception)
+        {
+            Debug.LogException(exception, view);
+        }
+    }
+
+    private void RefreshInteractionAvailability()
+    {
+        foreach (CharacterView view in views)
+        {
+            if (view == null)
+                continue;
+
+            string targetId = view.Definition?.Id;
+            bool hasCharacterInteraction = interactions != null
+                && interactions.TryGetFirstAvailableAnchored(
+                    InteractionType.Character,
+                    targetId,
+                    out _);
+            view.SetBodyInteractionAvailable(hasCharacterInteraction);
+
+            InteractionDefinition context = null;
+            if (interactions != null)
+            {
+                interactions.TryGetFirstAvailableAnchored(
+                    InteractionType.Context,
+                    targetId,
+                    out context);
+            }
+            view.SetContextInteraction(context);
         }
     }
 

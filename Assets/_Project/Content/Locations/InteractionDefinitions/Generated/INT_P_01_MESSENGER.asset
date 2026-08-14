@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: UTH.Runtime::InteractionDefinition
   id: INT_P_01_MESSENGER
   type: 2
-  displayName: "\uC554\uD638\uD654 \uBA54\uC2E0\uC800 \uC54C\uB9BC"
+  displayName: "\uB2E4\uB2C8\uC5D8\uC774 \uD655\uC778 \uC911\uC778 \uBA54\uC2E0\uC800 \uC54C\uB9BC \uC0B4\uD3B4\uBCF4\uAE30"
   targetId: CHR_DANIEL
   hasWorldHotspot: 0
   normalizedRect: {x: 0, y: 0, width: 0, height: 0}

@@ -12,6 +12,10 @@ public sealed class BootstrapReferenceTests
     private const string GameScenePath = "Assets/_Project/Scenes/Game.unity";
     private const string HotspotPrefabPath =
         "Assets/_Project/Prefabs/Interaction/PF_Hotspot.prefab";
+    private const string CharacterHotspotPrefabPath =
+        "Assets/_Project/Prefabs/Interaction/PF_CharacterHotspot.prefab";
+    private const string CharacterViewPrefabPath =
+        "Assets/_Project/Prefabs/Characters/PF_CharacterView.prefab";
 
     [Test]
     public void BootstrapSceneReferencesCanonicalGameDefinition()
@@ -95,5 +99,36 @@ public sealed class BootstrapReferenceTests
         {
             EditorSceneManager.CloseScene(scene, true);
         }
+    }
+
+    [Test]
+    public void CharacterPrefabWiresAnchoredContextViewAndTooltip()
+    {
+        GameObject characterPrefab = AssetDatabase.LoadAssetAtPath<GameObject>(
+            CharacterViewPrefabPath);
+        GameObject contextPrefab = AssetDatabase.LoadAssetAtPath<GameObject>(
+            CharacterHotspotPrefabPath);
+
+        Assert.That(characterPrefab, Is.Not.Null);
+        Assert.That(contextPrefab, Is.Not.Null);
+
+        CharacterView character = characterPrefab.GetComponent<CharacterView>();
+        InteractionPointView context = contextPrefab.GetComponent<InteractionPointView>();
+        Assert.That(character, Is.Not.Null);
+        Assert.That(context, Is.Not.Null);
+        var characterData = new SerializedObject(character);
+        Assert.That(
+            characterData.FindProperty("contextBadgePrefab").objectReferenceValue,
+            Is.SameAs(context),
+            "CharacterView must instantiate the canonical Context affordance prefab.");
+
+        Assert.That(context.Tooltip, Is.Not.Null);
+        Assert.That(
+            context.Tooltip.transform.IsChildOf(context.transform),
+            Is.True);
+        Assert.That(
+            context.GetComponent<UnityEngine.UI.Graphic>().raycastTarget,
+            Is.True,
+            "The visible Context affordance must receive pointer hover and click events.");
     }
 }

@@ -5,20 +5,36 @@ using UnityEngine.EventSystems;
 public sealed class InteractionPointView : MonoBehaviour,
     IPointerClickHandler, IPointerEnterHandler, IPointerExitHandler
 {
+    [SerializeField]
+    private TooltipView tooltip;
+
     public InteractionDefinition Definition { get; private set; }
+    public TooltipView Tooltip => tooltip;
     public event Action<InteractionPointView> Clicked;
     private InteractionFeedbackService feedback;
 
-    private void Awake() => AppContext.Services?.TryGet(out feedback);
+    private void Awake()
+    {
+        AppContext.Services?.TryGet(out feedback);
+        tooltip?.Hide();
+    }
 
-    public void Apply(InteractionDefinition definition)
+    public void Apply(InteractionDefinition definition) =>
+        Apply(definition, applyNormalizedRect: true);
+
+    public void ApplyAnchored(InteractionDefinition definition) =>
+        Apply(definition, applyNormalizedRect: false);
+
+    private void Apply(InteractionDefinition definition, bool applyNormalizedRect)
     {
         Definition = definition;
         gameObject.name = definition == null
             ? "Hotspot"
             : $"Hotspot_{definition.Id}";
 
-        if (transform is RectTransform rect && definition != null)
+        if (applyNormalizedRect
+            && transform is RectTransform rect
+            && definition != null)
         {
             Rect normalized = definition.NormalizedRect;
             rect.anchorMin = normalized.min;
@@ -27,6 +43,7 @@ public sealed class InteractionPointView : MonoBehaviour,
             rect.sizeDelta = Vector2.zero;
         }
 
+        tooltip?.Hide();
         gameObject.SetActive(definition != null);
     }
 
@@ -35,6 +52,7 @@ public sealed class InteractionPointView : MonoBehaviour,
         if (Definition != null)
         {
             ResolveFeedback()?.Click();
+            tooltip?.Hide();
             Clicked?.Invoke(this);
         }
     }
@@ -42,12 +60,23 @@ public sealed class InteractionPointView : MonoBehaviour,
     public void OnPointerEnter(PointerEventData eventData)
     {
         if (Definition != null)
+        {
             ResolveFeedback()?.Enter();
+            tooltip?.Show(Definition.DisplayName);
+        }
     }
 
-    public void OnPointerExit(PointerEventData eventData) => feedback?.Exit();
+    public void OnPointerExit(PointerEventData eventData)
+    {
+        feedback?.Exit();
+        tooltip?.Hide();
+    }
 
-    private void OnDisable() => feedback?.Exit();
+    private void OnDisable()
+    {
+        feedback?.Exit();
+        tooltip?.Hide();
+    }
 
     private InteractionFeedbackService ResolveFeedback()
     {

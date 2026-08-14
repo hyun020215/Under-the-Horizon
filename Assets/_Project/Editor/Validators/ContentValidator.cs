@@ -135,9 +135,50 @@ public static class ContentValidator
             return;
         }
 
+        var placedCharacterIds = new HashSet<string>(
+            (scene.CharacterSet?.Placements ?? Array.Empty<CharacterPlacement>())
+                .Where(placement => placement.character != null)
+                .Select(placement => placement.character.Id)
+                .Where(id => !string.IsNullOrWhiteSpace(id)),
+            StringComparer.Ordinal);
+        var attachedContextDefinitions = new HashSet<InteractionDefinition>();
+
         foreach (InteractionDefinition interaction in interactions)
         {
-            if (interaction == null || interaction.Action == null)
+            if (interaction == null)
+            {
+                errors.Add($"{scene.Id} has an invalid interaction reference.");
+                continue;
+            }
+
+            bool isCharacterAttachedContext = interaction.Type == InteractionType.Context
+                && !interaction.HasWorldHotspot
+                && !string.IsNullOrWhiteSpace(interaction.TargetId);
+            if (isCharacterAttachedContext)
+            {
+                if (!attachedContextDefinitions.Add(interaction))
+                {
+                    errors.Add(
+                        $"{scene.Id}/{interaction.Id} repeats the same "
+                        + "character-attached Context definition.");
+                }
+
+                if (string.IsNullOrWhiteSpace(interaction.DisplayName))
+                {
+                    errors.Add(
+                        $"{scene.Id}/{interaction.Id} is a character-attached Context "
+                        + "without a display name.");
+                }
+
+                if (!placedCharacterIds.Contains(interaction.TargetId))
+                {
+                    errors.Add(
+                        $"{scene.Id}/{interaction.Id} targets {interaction.TargetId}, "
+                        + "which is not present in its CharacterPlacementSet.");
+                }
+            }
+
+            if (interaction.Action == null)
             {
                 errors.Add($"{scene.Id} has an invalid interaction reference.");
                 continue;
