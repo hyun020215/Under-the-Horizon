@@ -23,6 +23,20 @@ public sealed class GameStateStore : MonoBehaviour
         Notify();
     }
 
+    public void SetPendingStoryScene(string sceneId)
+    {
+        state.pendingStorySceneId = Normalize(sceneId);
+        Notify();
+    }
+
+    public void ClearPendingStoryScene()
+    {
+        if (string.IsNullOrEmpty(state.pendingStorySceneId))
+            return;
+        state.pendingStorySceneId = string.Empty;
+        Notify();
+    }
+
     public void SetStoryContext(string sceneId, int day, TimeBlock timeBlock)
     {
         state.currentStorySceneId = Normalize(sceneId);

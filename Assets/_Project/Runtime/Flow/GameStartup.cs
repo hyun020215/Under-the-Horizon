@@ -45,6 +45,7 @@ public sealed class GameStartup : MonoBehaviour
             }
 
             string sceneId = ResolveFirstStorySceneId();
+            bool loadedExistingSave = false;
             if (screens != null && saveSlotScreen != null)
             {
                 await screens.OpenAsync(ScreenId.SaveSlot);
@@ -55,7 +56,10 @@ public sealed class GameStartup : MonoBehaviour
                 {
                     state?.Replace(saves.Load(slot));
                     if (!string.IsNullOrWhiteSpace(state?.State.currentStorySceneId))
+                    {
                         sceneId = state.State.currentStorySceneId;
+                        loadedExistingSave = true;
+                    }
                 }
                 else
                 {
@@ -63,7 +67,10 @@ public sealed class GameStartup : MonoBehaviour
                 }
             }
 
-            await flow.StartAsync(sceneId);
+            if (loadedExistingSave)
+                await flow.ResumeAsync();
+            else
+                await flow.StartAsync(sceneId);
         }
         catch (Exception exception)
         {

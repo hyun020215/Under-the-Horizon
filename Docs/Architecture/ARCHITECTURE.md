@@ -90,10 +90,12 @@ StorySceneDefinition
 ├── AudioCueProfile
 ├── 진입·종료 Sequence와 Transition
 ├── 진입·완료 GameEffect
-└── 다음 Story Scene 경로
+└── 다음 Story Scene 경로와 진입 방식(Immediate / MapTravel)
 ```
 
 `StorySceneDirector`는 이를 해석해 전문 시스템에 명령만 전달한다. 이미지 로딩, AudioSource 제어, UI 텍스트, 좌표 계산, 세이브 파일 쓰기를 직접 담당하지 않는다.
+
+`StorySceneRoute`의 기본 진입 방식은 기존 콘텐츠와 호환되는 `Immediate`다. `MapTravel` route는 현재 Story Scene 완료 후 대상 Story Scene ID를 논리 pending 상태로 남기며, `GameFlowController`가 지도에서 요청한 Location을 검증한 뒤 대상 장면 진입을 수행한다. 지도 View는 Story Scene 완료나 현재 Location 변경을 직접 소유하지 않는다.
 
 공유 런타임에서 `sceneId`를 비교하는 분기나 `D1_06_BodyDiscoveryController` 같은 일반 장면 전용 컨트롤러를 만들지 않는다.
 
@@ -126,9 +128,11 @@ UI나 View가 `GameStateStore`를 임의로 직접 변경하지 않는다.
 
 ## 8. 상태와 세이브
 
-`GameStateStore`가 변경 가능한 논리 상태의 유일한 소유자다. 주요 상태는 현재 장면·장소·시간, 신뢰도, 불안도, 증거 무결성, 플래그, 증거, 완료 상호작용·퍼즐·목표, 이론, 엔딩이다.
+`GameStateStore`가 변경 가능한 논리 상태의 유일한 소유자다. 주요 상태는 현재 장면·장소·시간, 지도 이동을 기다리는 대상 Story Scene, 신뢰도, 불안도, 증거 무결성, 플래그, 증거, 완료 상호작용·퍼즐·목표, 이론, 엔딩이다.
 
 세이브에는 논리 상태만 저장한다. AudioSource 시간, 트윈 진행률, UI Transform, 생성된 View 참조와 임시 모달·전환 상태는 저장하지 않는다. 로드 시 논리 상태와 콘텐츠 정의로 화면을 재구성한다. 저장 스키마 변경에는 버전과 마이그레이션이 필요하다.
+
+지도 이동 대기 상태를 복원할 때는 완료된 출발 Story Scene의 프레젠테이션만 재구성한다. 진입 Effect·Sequence·Dialogue를 재실행하거나 UI 선택 상태를 저장 데이터로 승격하지 않는다.
 
 ## 9. UI와 전환
 

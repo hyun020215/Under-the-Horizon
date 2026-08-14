@@ -355,6 +355,7 @@ Typical logical state includes:
 
 - current Story Scene
 - current Location
+- pending Story Scene selected by a map-travel route
 - day / time block
 - Trust values
 - Public Anxiety
@@ -380,6 +381,7 @@ Save **logical state**, not transient presentation state.
 
 - Story progress
 - current Location / Story Scene
+- pending map-travel Story Scene, when progression is intentionally between scenes
 - flags
 - Trust / Anxiety / Integrity
 - evidence
@@ -398,7 +400,7 @@ Save **logical state**, not transient presentation state.
 - temporary modal state
 - temporary transition state
 
-On load, presentation should be reconstructed from logical state + content definitions.
+On load, presentation should be reconstructed from logical state + content definitions. A pending map-travel save reconstructs the completed source Story Scene without replaying entry effects, sequences, or dialogue; only `GameFlowController` may validate the destination and enter the target Story Scene.
 
 Serialized save schema changes require a migration strategy.
 

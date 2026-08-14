@@ -57,6 +57,24 @@ public sealed class StorySceneDirector : MonoBehaviour
             await narrative.PlayAsync(scene.EntryDialogue);
     }
 
+    public async Task RestorePresentationAsync(StorySceneDefinition scene)
+    {
+        if (scene == null)
+            throw new ArgumentNullException(nameof(scene));
+
+        Current = scene;
+        state.SetStoryContext(scene.Id, (int)scene.Day, scene.TimeBlock);
+        await locations.ApplyAsync(scene.Location, scene.LocationState);
+        await characters.ApplyAsync(scene.CharacterSet);
+        interactions.Apply(scene.InteractionSet);
+        audioDirector.Apply(scene.AudioProfile ?? scene.Location?.DefaultAudio);
+        await screens.OpenAsync(
+            ScreenId.Exploration,
+            default,
+            null,
+            null);
+    }
+
     public async Task<StorySceneResult> CompleteAsync()
     {
         if (Current == null)
@@ -66,10 +84,13 @@ public sealed class StorySceneDirector : MonoBehaviour
         await transitions.BeginAsync(Current.ExitTransition);
         Apply(Current.OnCompleteEffects);
         state.CompleteScene(Current.Id);
-        string next = Current.ResolveNext(state);
+        StorySceneRoute route = Current.ResolveRoute(state);
         Completed?.Invoke(Current);
         await transitions.EndAsync(Current.ExitTransition);
-        return new StorySceneResult(true, next);
+        return new StorySceneResult(
+            true,
+            route?.TargetSceneId,
+            route?.AdvanceMode ?? StorySceneAdvanceMode.Immediate);
     }
 
     private void Apply(GameEffect[] effects)

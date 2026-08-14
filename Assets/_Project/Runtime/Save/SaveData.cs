@@ -7,6 +7,7 @@ public sealed class SaveData
 {
     public int version = SaveVersion.Current;
     public string currentStorySceneId;
+    public string pendingStorySceneId;
     public string currentLocationId;
     public int day;
     public TimeBlock timeBlock;
@@ -27,6 +28,7 @@ public sealed class SaveData
         new()
         {
             currentStorySceneId = state.currentStorySceneId,
+            pendingStorySceneId = state.pendingStorySceneId,
             currentLocationId = state.currentLocationId,
             day = state.day,
             timeBlock = state.timeBlock,
@@ -51,6 +53,7 @@ public sealed class SaveData
         var result = new GameState
         {
             currentStorySceneId = currentStorySceneId ?? string.Empty,
+            pendingStorySceneId = pendingStorySceneId ?? string.Empty,
             currentLocationId = currentLocationId ?? string.Empty,
             day = day,
             timeBlock = timeBlock,

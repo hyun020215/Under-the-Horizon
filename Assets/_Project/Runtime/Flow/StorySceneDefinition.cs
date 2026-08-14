@@ -154,12 +154,17 @@ public sealed class StorySceneDefinition : ScriptableObject
     public StorySceneRoute[] Routes => routes;
     public StorySceneAuthoringRequirements AuthoringRequirements => authoringRequirements;
 
-    public string ResolveNext(GameStateStore state)
+    public StorySceneRoute ResolveRoute(GameStateStore state)
     {
         if (routes != null)
             foreach (StorySceneRoute route in routes)
                 if (route != null && route.IsAvailable(state))
-                    return route.TargetSceneId;
-        return string.Empty;
+                    return route;
+        return null;
+    }
+
+    public string ResolveNext(GameStateStore state)
+    {
+        return ResolveRoute(state)?.TargetSceneId ?? string.Empty;
     }
 }

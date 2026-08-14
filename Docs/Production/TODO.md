@@ -92,6 +92,17 @@
   - C-01 획득과 `anonymous_tip_preview`는 기존 GameEffect 계약으로 적용한다.
   - `StorySceneAdvanceInteractionAction`은 대상 장면을 소유하지 않고 advance 요청만 반환하며,
     `InteractionDirector`가 `GameFlowController`에 위임해 현재 장면 완료와 route 해석을 수행한다.
+- [x] Story Scene 완료와 지도 이동을 분리하는 공통 pending travel 플로우를 추가했다.
+  - `StorySceneRoute`의 `Immediate` 기본값을 유지하면서 재사용 가능한 `MapTravel` 진입 방식을 추가해
+    기존 41개 Story Scene route 동작을 바꾸지 않았다.
+  - `GameFlowController`가 대상 Story Scene·Location·진입 조건을 사전 검증하고, 완료된 출발 장면과
+    `pendingStorySceneId`를 안정 체크포인트로 남긴 뒤 정확한 목적지 요청만 진입시킨다.
+  - `GameStartup.ResumeAsync` 경로는 pending 저장에서 출발 장면 프레젠테이션만 복원하며 진입 Effect·Sequence·Dialogue를
+    재실행하지 않는다. 완료됐지만 pending 필드가 없는 v1 저장도 route 데이터로 일반 복구한다.
+  - `SaveVersion`을 2로 올리고 v1→v2 내장 마이그레이션, pending 체크포인트, 상위 버전 거부 검증을 추가했다.
+  - advance 요청 Interaction이 사전 검증에 실패하면 Action Effect와 완료 기록을 함께 되돌려 재시도 가능한 상태를 보존한다.
+  - 이 증분은 공통 Runtime·Save 계약만 제공한다. P-01 route 활성화와 지도 선택·확정 UI는 후속 증분에서 연결한다.
+  - Unity 6000.3.20f1 기준 EditMode 96/96, PlayMode 24/24와 Build Preflight를 통과했다.
 - [x] P-01 메신저가 Daniel에게 부착된 Context임을 목표 문구와 비음성 조사 내레이션으로 명확히 했다.
   - 캐릭터 부착형 비월드 `Context`는 target Character ID, 현재 `CharacterPlacementSet`, HUD용 display name을 갖도록
     Validator와 저작 지침을 보강했다. target이 없는 기존 일반 Context는 이 부착 계약에 포함하지 않는다.
