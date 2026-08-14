@@ -8,7 +8,7 @@ public sealed class InteractionPointView : MonoBehaviour,
 {
     private const float WorldTooltipEdgeThreshold = 0.25f;
     private const float WorldTooltipTopThreshold = 0.75f;
-    private const float WorldTooltipOffset = 48f;
+    private const float WorldTooltipGap = 12f;
     private const float WorldMarkerInset = 36f;
 
     [SerializeField]
@@ -168,29 +168,31 @@ public sealed class InteractionPointView : MonoBehaviour,
 
     private void PositionWorldTooltip(Vector2 normalizedCenter)
     {
-        if (tooltip?.transform is not RectTransform tooltipRect)
+        if (tooltip?.transform is not RectTransform tooltipRect
+            || transform.Find("Marker") is not RectTransform markerRect)
             return;
 
-        tooltipRect.anchorMin = tooltipRect.anchorMax = new Vector2(0.5f, 0.5f);
+        tooltipRect.anchorMin = tooltipRect.anchorMax = markerRect.anchorMin;
+        Vector2 position = markerRect.anchoredPosition;
+        float horizontalClearance = markerRect.sizeDelta.x * 0.5f + WorldTooltipGap;
+        float verticalClearance = markerRect.sizeDelta.y * 0.5f + WorldTooltipGap;
 
         float pivotX = 0.5f;
-        float offsetX = 0f;
         if (normalizedCenter.x <= WorldTooltipEdgeThreshold)
         {
             pivotX = 0f;
-            offsetX = WorldTooltipOffset;
+            position.x += horizontalClearance;
         }
         else if (normalizedCenter.x >= 1f - WorldTooltipEdgeThreshold)
         {
             pivotX = 1f;
-            offsetX = -WorldTooltipOffset;
+            position.x -= horizontalClearance;
         }
 
         bool nearTop = normalizedCenter.y >= WorldTooltipTopThreshold;
+        position.y += nearTop ? -verticalClearance : verticalClearance;
         tooltipRect.pivot = new Vector2(pivotX, nearTop ? 1f : 0f);
-        tooltipRect.anchoredPosition = new Vector2(
-            offsetX,
-            nearTop ? -WorldTooltipOffset : WorldTooltipOffset);
+        tooltipRect.anchoredPosition = position;
     }
 
     private InteractionFeedbackService ResolveFeedback()

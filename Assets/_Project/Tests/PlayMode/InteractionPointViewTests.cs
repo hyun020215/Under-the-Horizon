@@ -110,10 +110,10 @@ public sealed class InteractionPointViewTests
             "INT_TEST_LEFT",
             "Left edge",
             new Rect(0f, 0.35f, 0.1f, 0.1f)));
-        Assert.That(rig.TooltipRect.anchorMin, Is.EqualTo(new Vector2(0.5f, 0.5f)));
-        Assert.That(rig.TooltipRect.anchorMax, Is.EqualTo(new Vector2(0.5f, 0.5f)));
+        Assert.That(rig.TooltipRect.anchorMin, Is.EqualTo(new Vector2(1f, 0.5f)));
+        Assert.That(rig.TooltipRect.anchorMax, Is.EqualTo(new Vector2(1f, 0.5f)));
         Assert.That(rig.TooltipRect.pivot, Is.EqualTo(new Vector2(0f, 0f)));
-        Assert.That(rig.TooltipRect.anchoredPosition, Is.EqualTo(new Vector2(48f, 48f)));
+        Assert.That(rig.TooltipRect.anchoredPosition, Is.EqualTo(new Vector2(12f, 48f)));
         Assert.That(rig.MarkerRect.anchorMin, Is.EqualTo(new Vector2(1f, 0.5f)));
         Assert.That(rig.MarkerRect.anchorMax, Is.EqualTo(new Vector2(1f, 0.5f)));
         Assert.That(rig.MarkerRect.anchoredPosition, Is.EqualTo(new Vector2(-36f, 0f)));
@@ -122,10 +122,12 @@ public sealed class InteractionPointViewTests
             "INT_TEST_RIGHT_TOP",
             "Right top edge",
             new Rect(0.9f, 0.9f, 0.1f, 0.1f)));
+        Assert.That(rig.TooltipRect.anchorMin, Is.EqualTo(Vector2.zero));
+        Assert.That(rig.TooltipRect.anchorMax, Is.EqualTo(Vector2.zero));
         Assert.That(rig.TooltipRect.pivot, Is.EqualTo(new Vector2(1f, 1f)));
         Assert.That(
             rig.TooltipRect.anchoredPosition,
-            Is.EqualTo(new Vector2(-48f, -48f)));
+            Is.EqualTo(new Vector2(-12f, -12f)));
         Assert.That(rig.MarkerRect.anchorMin, Is.EqualTo(Vector2.zero));
         Assert.That(rig.MarkerRect.anchorMax, Is.EqualTo(Vector2.zero));
         Assert.That(rig.MarkerRect.anchoredPosition, Is.EqualTo(new Vector2(36f, 36f)));
@@ -134,11 +136,21 @@ public sealed class InteractionPointViewTests
             "INT_TEST_CENTER_TOP",
             "Center top edge",
             new Rect(0.45f, 0.9f, 0.1f, 0.1f)));
+        Assert.That(rig.TooltipRect.anchorMin, Is.EqualTo(new Vector2(0.5f, 0f)));
+        Assert.That(rig.TooltipRect.anchorMax, Is.EqualTo(new Vector2(0.5f, 0f)));
         Assert.That(rig.TooltipRect.pivot, Is.EqualTo(new Vector2(0.5f, 1f)));
-        Assert.That(rig.TooltipRect.anchoredPosition, Is.EqualTo(new Vector2(0f, -48f)));
+        Assert.That(rig.TooltipRect.anchoredPosition, Is.EqualTo(new Vector2(0f, -12f)));
         Assert.That(rig.MarkerRect.anchorMin, Is.EqualTo(new Vector2(0.5f, 0f)));
         Assert.That(rig.MarkerRect.anchorMax, Is.EqualTo(new Vector2(0.5f, 0f)));
         Assert.That(rig.MarkerRect.anchoredPosition, Is.EqualTo(new Vector2(0f, 36f)));
+
+        float markerBottom = rig.MarkerRect.anchoredPosition.y
+            - rig.MarkerRect.sizeDelta.y * 0.5f;
+        float tooltipTop = rig.TooltipRect.anchoredPosition.y;
+        Assert.That(
+            markerBottom - tooltipTop,
+            Is.EqualTo(12f),
+            "A top-edge tooltip must remain clear of its inset marker.");
     }
 
     [Test]
