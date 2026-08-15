@@ -14,6 +14,8 @@ public sealed class GameViewPngCaptureWindowTests
                 new Vector2Int(1920, 1080),
                 new Vector2Int(2560, 1440),
                 new Vector2Int(1920, 1200),
+                new Vector2Int(2560, 1080),
+                new Vector2Int(3440, 1440),
             }));
     }
 

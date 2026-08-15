@@ -31,11 +31,7 @@ public sealed class GameViewPngCaptureWindow : EditorWindow
         new(StringComparer.OrdinalIgnoreCase);
 
     private static readonly Vector2Int[] Resolutions =
-    {
-        new(1920, 1080),
-        new(2560, 1440),
-        new(1920, 1200),
-    };
+        VisualQaResolutionMatrix.Resolutions.ToArray();
 
     private static readonly string[] StateLabels =
     {

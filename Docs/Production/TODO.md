@@ -317,7 +317,12 @@
     `Game.unity`의 `CharacterLayer/BackgroundCharacterFrame`은 배경과 같은 `EnvelopeParent` 비율을
     사용하며 그림자와 캐릭터를 같은 루트에 생성한다. 41개 기존 세트는 모두 viewport 좌표로 유지하고,
     SaveVersion·저장 데이터·hotspot 좌표는 변경하지 않는다.
-  - [ ] 배경 좌표 변환·미리보기·5해상도 캡처 도구를 추가한 뒤 P-01부터 세트별로 opt-in한다.
+  - [x] 선택한 세트 하나만 Undo 가능한 단위로 변환하는 안전 변환 도구, 실제 `Sprite.rect` cover/crop을
+    재현하는 Story Scene 미리보기, 1920×1080·2560×1440·1920×1200·2560×1080·3440×1440 exact PNG
+    캡처 행렬을 추가했다. 미참조·빈 세트·null/서로 다른 공유 배경·visible crop 밖 제안은 변환 전에
+    차단한다. 일반 Inspector의 공간 필드는 읽기 전용이며, 변환은 Scale·sorting·pose·expression·clickable과
+    다른 세트를 변경하지 않는다.
+  - [ ] P-01을 첫 `BackgroundNormalized` 파일럿으로 opt-in하고 다섯 해상도 합성 화면을 승인한다.
   - [x] P-01 Daniel은 `(normalizedX=0.60, normalizedY=0.12, scale=0.78, sortingOrder=0)`로
     FHD·QHD·16:10 합성 화면 접지 승인을 완료했다.
   - [ ] 나머지 40개 Story Scene은 각 전용 Location State·배경·HUD 합성 화면에서 별도로 검수한다.

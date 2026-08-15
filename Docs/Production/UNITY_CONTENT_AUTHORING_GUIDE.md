@@ -203,12 +203,20 @@ Location Preview는 현재 `defaultBackground` 한 장을 확인하는 간단한
 3. `sortingOrder`로 겹침을 해결한다.
 4. Pose/Expression을 선택한다.
 5. Story Scene Play Mode에서 HUD·Dialogue UI와 겹치는지 확인한다.
-6. 1920×1080·2560×1440·1920×1200 고정 해상도에서 두 발과 접지 그림자가 같은 불투명 보행면 위에 있는지 확인한다.
+6. 1920×1080·2560×1440·1920×1200·2560×1080·3440×1440 고정 해상도에서 두 발과 접지 그림자가 같은 불투명 보행면 위에 있는지 확인한다.
 7. 머리·몸·가방·부착형 Context badge가 HUD나 화면 밖으로 잘리지 않고, 주변 hotspot·tooltip의 클릭 우선순위를 가리지 않는지 확인한다.
 
 위치를 `CharacterView.transform`이나 Story Scene ID 조건문에 하드코딩하지 않는다. 배치의 권위 있는 원본은 CharacterPlacementSet이다.
 
 `Viewport Normalized = 0`은 기존 자산의 영구적인 역호환 기본값이다. 필드를 새로 저장하지 않은 세트도 기존 화면 좌표로 동작한다. `Background Normalized`는 표시되는 배경 `Sprite.rect`의 cover/crop과 동일한 프레임에서 위치를 계산하므로, 종횡비가 달라도 같은 배경 피사체·바닥 지점을 가리킨다. 공간 선택은 `normalizedX/Y`의 기준만 바꾸고 `scale` 의미는 바꾸지 않는다. 좌표를 그대로 복사해 공간만 바꾸면 위치가 달라지므로 금지한다. 승인된 변환 도구와 다중 해상도 합성 화면 검수를 거쳐 Story Scene별로 opt-in한다. 한 세트 안에서 두 좌표 공간을 섞지 않는다.
+
+안전 변환 절차:
+
+1. `Character Placements` 창에서 세트를 선택하고 표시된 참조 Story Scene과 effective background가 맞는지 확인한다.
+2. `Story Scene preview`를 열어 선택 해상도의 실제 cover/crop과 viewport/background anchor를 비교한다. 이 창은 저작 보조이며 최종 승인 근거가 아니다.
+3. 변환 기준 해상도를 선택하고 제안 좌표를 검토한다. 미참조 세트, 빈 세트, null 또는 서로 다른 공유 배경, 잘못된 좌표, 다섯 해상도 중 visible crop 밖으로 나가는 제안은 도구가 차단한다.
+4. 일반 Project Inspector와 `Character Placements` 창에서 `Placement Space`는 읽기 전용이다. 변환 버튼만 선택한 세트 하나의 공간과 X/Y를 단일 Undo 단계로 바꾸며 자동 저장하지 않는다. Scale·sorting order·pose·expression·clickable은 유지한다.
+5. 실제 `Bootstrap` Play Mode에서 다섯 해상도 exact PNG를 캡처하고 접지·HUD·Context badge·tooltip·interaction·저장 재시작을 승인한 뒤에만 자산을 저장·커밋한다.
 
 ## 8. 핫스팟 위치와 상호작용 조정
 
