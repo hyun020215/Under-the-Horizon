@@ -177,6 +177,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 38225114}
+  - component: {fileID: 38225115}
   m_Layer: 0
   m_Name: WorldFrame
   m_TagString: Untagged
@@ -206,6 +207,20 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &38225115
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 38225113}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 82dd6184d6ca4e00aa04b5636fe7fee4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: UTH.Runtime::WorldContentFrame
+  backgroundAspect: {fileID: 378173407}
+  backgroundCharacterAspect: {fileID: 1341508238}
 --- !u!1 &38425195
 GameObject:
   m_ObjectHideFlags: 0
@@ -1084,7 +1099,8 @@ RectTransform:
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children: []
+  m_Children:
+  - {fileID: 1341508237}
   m_Father: {fileID: 38225114}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
@@ -2501,6 +2517,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: UTH.Runtime::CharacterStage
   prefab: {fileID: 1299060057773617244, guid: c4ca27a88fac3874d9b15900f04141e3, type: 3}
   root: {fileID: 245602988}
+  backgroundRoot: {fileID: 1341508237}
   interactions: {fileID: 1885110462}
   defaultPresentation: {fileID: 11400000, guid: ab3f9f82becf72042bfb86532d357ce5, type: 2}
   narrative: {fileID: 416082523}
@@ -4012,6 +4029,56 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1291007533}
   m_CullTransparentMesh: 1
+--- !u!1 &1341508236
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1341508237}
+  - component: {fileID: 1341508238}
+  m_Layer: 0
+  m_Name: BackgroundCharacterFrame
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &1341508237
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1341508236}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 245602988}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 0, y: 0}
+  m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &1341508238
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1341508236}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 86710e43de46f6f4bac7c8e50813a599, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.AspectRatioFitter
+  m_AspectMode: 4
+  m_AspectRatio: 1.3333334
 --- !u!1 &1451419862
 GameObject:
   m_ObjectHideFlags: 0
@@ -5395,6 +5462,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: UTH.Runtime::LocationPresenter
   background: {fileID: 378173408}
   backgroundAspect: {fileID: 378173407}
+  worldContentFrame: {fileID: 38225115}
   state: {fileID: 360852667}
   defaultAmbientParticles: {fileID: 11400000, guid: fafc4fc5bdc5e5945981fee6e99bc934, type: 2}
 --- !u!4 &1677215537

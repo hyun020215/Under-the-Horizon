@@ -1,6 +1,9 @@
+using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using NUnit.Framework;
 using UnityEditor;
+using UnityEngine;
 
 public sealed class ContentValidationTests
 {
@@ -54,4 +57,83 @@ public sealed class ContentValidationTests
             Assert.That(interaction.HasWorldHotspot, Is.True, scene.Id);
         }
     }
+
+    [Test]
+    public void PlacementValidationRejectsUnknownCoordinateSpace()
+    {
+        StorySceneDefinition scene =
+            ScriptableObject.CreateInstance<StorySceneDefinition>();
+        CharacterPlacementSet set =
+            ScriptableObject.CreateInstance<CharacterPlacementSet>();
+
+        try
+        {
+            SetPrivateField(
+                set,
+                "placementSpace",
+                (CharacterPlacementSpace)99);
+            SetPrivateField(scene, "characterSet", set);
+
+            List<string> errors = InvokePlacementValidation(scene);
+
+            Assert.That(
+                errors.Any(error =>
+                    error.Contains("unsupported character placement space")),
+                Is.True);
+        }
+        finally
+        {
+            Object.DestroyImmediate(scene);
+            Object.DestroyImmediate(set);
+        }
+    }
+
+    [Test]
+    public void PlacementValidationRequiresEffectiveBackgroundForOptIn()
+    {
+        StorySceneDefinition scene =
+            ScriptableObject.CreateInstance<StorySceneDefinition>();
+        CharacterPlacementSet set =
+            ScriptableObject.CreateInstance<CharacterPlacementSet>();
+
+        try
+        {
+            SetPrivateField(
+                set,
+                "placementSpace",
+                CharacterPlacementSpace.BackgroundNormalized);
+            SetPrivateField(scene, "characterSet", set);
+
+            List<string> errors = InvokePlacementValidation(scene);
+
+            Assert.That(
+                errors.Any(error =>
+                    error.Contains("without an effective background")),
+                Is.True);
+        }
+        finally
+        {
+            Object.DestroyImmediate(scene);
+            Object.DestroyImmediate(set);
+        }
+    }
+
+    private static List<string> InvokePlacementValidation(
+        StorySceneDefinition scene)
+    {
+        MethodInfo validate = typeof(ContentValidator).GetMethod(
+            "ValidatePlacements",
+            BindingFlags.Static | BindingFlags.NonPublic);
+        Assert.That(validate, Is.Not.Null);
+        var errors = new List<string>();
+        validate.Invoke(null, new object[] { scene, errors });
+        return errors;
+    }
+
+    private static void SetPrivateField(
+        object target,
+        string name,
+        object value) => target.GetType()
+        .GetField(name, BindingFlags.Instance | BindingFlags.NonPublic)
+        ?.SetValue(target, value);
 }

@@ -12,6 +12,9 @@ public sealed class CharacterStage : MonoBehaviour
     private RectTransform root;
 
     [SerializeField]
+    private RectTransform backgroundRoot;
+
+    [SerializeField]
     private InteractionDirector interactions;
     [SerializeField]
     private CharacterPresentationProfile defaultPresentation;
@@ -52,8 +55,11 @@ public sealed class CharacterStage : MonoBehaviour
     public Task ApplyAsync(CharacterPlacementSet set)
     {
         Clear();
-        if (set?.Placements != null && prefab != null)
+        if (set?.Placements != null
+            && set.Placements.Length > 0
+            && prefab != null)
         {
+            RectTransform targetRoot = ResolveRoot(set.PlacementSpace);
             var orderedPlacements = new List<(
                 CharacterPlacement Placement,
                 int AuthoredIndex)>(set.Placements.Length);
@@ -69,12 +75,12 @@ public sealed class CharacterStage : MonoBehaviour
             });
 
             foreach (var item in orderedPlacements)
-                shadows.Add(CreateGroundShadow(item.Placement));
+                shadows.Add(CreateGroundShadow(item.Placement, targetRoot));
 
             foreach (var item in orderedPlacements)
             {
                 CharacterPlacement placement = item.Placement;
-                CharacterView view = Instantiate(prefab, root);
+                CharacterView view = Instantiate(prefab, targetRoot);
                 view.ConfigurePresentation(defaultPresentation);
                 view.Apply(placement);
                 view.Clicked += OnCharacterClicked;
@@ -84,6 +90,21 @@ public sealed class CharacterStage : MonoBehaviour
         }
         return Task.CompletedTask;
     }
+
+    private RectTransform ResolveRoot(CharacterPlacementSpace placementSpace) =>
+        placementSpace switch
+        {
+            CharacterPlacementSpace.ViewportNormalized => root,
+            CharacterPlacementSpace.BackgroundNormalized => backgroundRoot != null
+                ? backgroundRoot
+                : throw new System.InvalidOperationException(
+                    "Background-normalized character placement requires "
+                    + "CharacterStage.backgroundRoot."),
+            _ => throw new System.ArgumentOutOfRangeException(
+                nameof(placementSpace),
+                placementSpace,
+                "Unsupported character placement space."),
+        };
 
     public void Clear()
     {
@@ -101,13 +122,15 @@ public sealed class CharacterStage : MonoBehaviour
         shadows.Clear();
     }
 
-    private GameObject CreateGroundShadow(CharacterPlacement placement)
+    private GameObject CreateGroundShadow(
+        CharacterPlacement placement,
+        RectTransform targetRoot)
     {
         EnsureGroundShadowSprite();
         GameObject shadow = new(
             $"{placement.character?.Id ?? "Character"} Ground Shadow",
             typeof(RectTransform), typeof(CanvasRenderer), typeof(Image));
-        shadow.transform.SetParent(root, false);
+        shadow.transform.SetParent(targetRoot, false);
         RectTransform rect = shadow.GetComponent<RectTransform>();
         rect.anchorMin = rect.anchorMax = new Vector2(
             placement.normalizedX, placement.normalizedY);

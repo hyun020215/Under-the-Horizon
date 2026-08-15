@@ -7,6 +7,11 @@ using UnityEngine;
 public sealed class CharacterPlacementSet : ScriptableObject
 {
     [SerializeField]
+    private CharacterPlacementSpace placementSpace;
+
+    [SerializeField]
     private CharacterPlacement[] placements;
+
+    public CharacterPlacementSpace PlacementSpace => placementSpace;
     public CharacterPlacement[] Placements => placements;
 }

@@ -1815,7 +1815,22 @@ public static class P0ProjectBuilder
         backgroundAspect.aspectMode = AspectRatioFitter.AspectMode.EnvelopeParent;
         background.raycastTarget = false;
         RectTransform characterLayer = CreateLayer("CharacterLayer", worldFrame);
+        RectTransform backgroundCharacterFrame = CreateLayer(
+            "BackgroundCharacterFrame",
+            characterLayer);
+        AspectRatioFitter backgroundCharacterAspect =
+            backgroundCharacterFrame.gameObject.AddComponent<AspectRatioFitter>();
+        backgroundCharacterAspect.aspectMode =
+            AspectRatioFitter.AspectMode.EnvelopeParent;
+        backgroundCharacterAspect.aspectRatio = backgroundAspect.aspectRatio;
         RectTransform hotspotLayer = CreateLayer("HotspotLayer", worldFrame);
+        WorldContentFrame worldContentFrame =
+            worldFrame.gameObject.AddComponent<WorldContentFrame>();
+        SetObject(worldContentFrame, "backgroundAspect", backgroundAspect);
+        SetObject(
+            worldContentFrame,
+            "backgroundCharacterAspect",
+            backgroundCharacterAspect);
 
         Canvas ui = CreateCanvas("UICanvas", root.transform);
         ui.sortingOrder = 100;
@@ -1872,6 +1887,7 @@ public static class P0ProjectBuilder
         characterStage.transform.SetParent(root.transform);
         SetObject(characterStage, "prefab", characterPrefab);
         SetObject(characterStage, "root", characterLayer);
+        SetObject(characterStage, "backgroundRoot", backgroundCharacterFrame);
         SetObject(characterStage, "defaultPresentation",
             AssetDatabase.LoadAssetAtPath<CharacterPresentationProfile>(
                 ContentRoot + "/Characters/CHR_PRESENTATION_STANDARD.asset"));
@@ -1880,6 +1896,7 @@ public static class P0ProjectBuilder
         location.transform.SetParent(root.transform);
         SetObject(location, "background", background);
         SetObject(location, "backgroundAspect", backgroundAspect);
+        SetObject(location, "worldContentFrame", worldContentFrame);
         SetObject(location, "state", state);
         SetObject(location, "defaultAmbientParticles",
             AssetDatabase.LoadAssetAtPath<AmbientParticleProfile>(

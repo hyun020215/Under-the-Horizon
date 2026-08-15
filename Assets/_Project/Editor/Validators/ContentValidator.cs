@@ -106,6 +106,26 @@ public static class ContentValidator
         StorySceneDefinition scene,
         ICollection<string> errors)
     {
+        if (scene.CharacterSet != null
+            && !Enum.IsDefined(
+                typeof(CharacterPlacementSpace),
+                scene.CharacterSet.PlacementSpace))
+        {
+            errors.Add(
+                $"{scene.Id} has an unsupported character placement space "
+                + $"{(int)scene.CharacterSet.PlacementSpace}.");
+        }
+
+        if (scene.CharacterSet?.PlacementSpace
+                == CharacterPlacementSpace.BackgroundNormalized
+            && (scene.LocationState?.Background
+                ?? scene.Location?.DefaultBackground) == null)
+        {
+            errors.Add(
+                $"{scene.Id} uses background-normalized character placement "
+                + "without an effective background.");
+        }
+
         if (scene.CharacterSet?.Placements == null)
             return;
 

@@ -103,7 +103,12 @@ StorySceneDefinition
 
 물리 장소는 `LocationDefinition`, 그 장소의 시각·게임 상태는 `LocationStateDefinition`이다. 동일 장소를 날짜별로 복제하지 않는다.
 
-인물의 위치, 크기, 정렬 순서, 자세, 표정, 클릭 가능 여부는 `CharacterPlacementSet`에 둔다. 가능한 경우 배경 기준 0~1 정규화 좌표를 사용한다. `CharacterStage`가 `CharacterView`를 생성하고 배치를 적용하며, View는 스토리 진행을 직접 변경하지 않는다.
+인물의 위치, 크기, 정렬 순서, 자세, 표정, 클릭 가능 여부는 `CharacterPlacementSet`에 둔다. 세트는 하나의 좌표 공간을 명시한다.
+
+- `ViewportNormalized = 0`: 화면 전체를 기준으로 한 기존 0~1 좌표다. 직렬화 필드가 없는 기존 자산도 이 값으로 해석하므로 영구적인 역호환 기본값이다.
+- `BackgroundNormalized = 1`: `LocationState.Background` 또는 `Location.DefaultBackground`에서 실제 표시되는 `Sprite.rect`를 기준으로 한 0~1 좌표다. 배경과 캐릭터 프레임은 같은 `EnvelopeParent` cover 결과를 사용하므로 종횡비가 달라도 같은 배경 지점에 고정된다.
+
+`CharacterStage`는 세트의 좌표 공간에 맞는 루트에 그림자와 `CharacterView`를 함께 생성한다. `WorldContentFrame`은 배경과 배경 기준 캐릭터 프레임의 종횡비를 동기화한다. 공간 선택은 `normalizedX/Y`의 기준만 바꾸며 기존 `scale` 의미는 유지한다. 기존 세트를 묵시적으로 재해석하거나 일괄 변환하지 않으며, 승인한 Story Scene만 배경 공간에 opt-in한다. 좌표 공간과 배치는 저장 논리 상태가 아닌 콘텐츠 표현이므로 SaveVersion과 저장 마이그레이션에는 영향을 주지 않는다. View는 스토리 진행을 직접 변경하지 않는다.
 
 ## 7. 상호작용, 조건과 효과
 
