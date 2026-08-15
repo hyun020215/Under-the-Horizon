@@ -186,9 +186,10 @@ Location Preview는 현재 `defaultBackground` 한 장을 확인하는 간단한
 
 | 필드 | 범위/의미 |
 |---|---|
+| `Placement Space` | `Viewport Normalized`는 화면 기준 기존 좌표, `Background Normalized`는 표시되는 배경 `Sprite.rect` 기준 좌표 |
 | `Character` | CharacterDefinition 참조 |
-| `Normalized X` | 배경 왼쪽 0, 오른쪽 1 |
-| `Normalized Y` | 배경 아래 0, 위 1 |
+| `Normalized X` | 선택한 Placement Space의 왼쪽 0, 오른쪽 1 |
+| `Normalized Y` | 선택한 Placement Space의 아래 0, 위 1 |
 | `Scale` | 0보다 큰 배율 |
 | `Sorting Order` | 값이 클수록 앞에 표시 |
 | `Pose` | 전신 자세 |
@@ -206,6 +207,8 @@ Location Preview는 현재 `defaultBackground` 한 장을 확인하는 간단한
 7. 머리·몸·가방·부착형 Context badge가 HUD나 화면 밖으로 잘리지 않고, 주변 hotspot·tooltip의 클릭 우선순위를 가리지 않는지 확인한다.
 
 위치를 `CharacterView.transform`이나 Story Scene ID 조건문에 하드코딩하지 않는다. 배치의 권위 있는 원본은 CharacterPlacementSet이다.
+
+`Viewport Normalized = 0`은 기존 자산의 영구적인 역호환 기본값이다. 필드를 새로 저장하지 않은 세트도 기존 화면 좌표로 동작한다. `Background Normalized`는 표시되는 배경 `Sprite.rect`의 cover/crop과 동일한 프레임에서 위치를 계산하므로, 종횡비가 달라도 같은 배경 피사체·바닥 지점을 가리킨다. 공간 선택은 `normalizedX/Y`의 기준만 바꾸고 `scale` 의미는 바꾸지 않는다. 좌표를 그대로 복사해 공간만 바꾸면 위치가 달라지므로 금지한다. 승인된 변환 도구와 다중 해상도 합성 화면 검수를 거쳐 Story Scene별로 opt-in한다. 한 세트 안에서 두 좌표 공간을 섞지 않는다.
 
 ## 8. 핫스팟 위치와 상호작용 조정
 

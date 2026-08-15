@@ -170,9 +170,33 @@ public sealed class BootstrapTests
         Assert.That(uiCanvas.GetComponent<CanvasGroup>(), Is.Null);
         AspectRatioFitter backgroundAspect = GameObject.Find("BackgroundLayer")
             .GetComponent<AspectRatioFitter>();
+        Image backgroundImage = backgroundAspect.GetComponent<Image>();
+        float expectedBackgroundAspect = backgroundImage.sprite.rect.width
+            / backgroundImage.sprite.rect.height;
         Assert.That(
             backgroundAspect.aspectMode,
             Is.EqualTo(AspectRatioFitter.AspectMode.EnvelopeParent)
+        );
+        Assert.That(
+            backgroundAspect.aspectRatio,
+            Is.EqualTo(expectedBackgroundAspect).Within(0.0001f),
+            "LocationPresenter must apply the effective sprite aspect ratio."
+        );
+        AspectRatioFitter backgroundCharacterAspect =
+            GameObject.Find("BackgroundCharacterFrame")
+                .GetComponent<AspectRatioFitter>();
+        Assert.That(
+            backgroundCharacterAspect.aspectMode,
+            Is.EqualTo(AspectRatioFitter.AspectMode.EnvelopeParent)
+        );
+        Assert.That(
+            backgroundCharacterAspect.aspectRatio,
+            Is.EqualTo(expectedBackgroundAspect).Within(0.0001f),
+            "Background-space characters must use the same live cover geometry."
+        );
+        Assert.That(
+            backgroundCharacterAspect.GetComponent<RectTransform>().rect.size,
+            Is.EqualTo(backgroundAspect.GetComponent<RectTransform>().rect.size)
         );
         RectTransform worldFrame = GameObject.Find("WorldFrame")
             .GetComponent<RectTransform>();

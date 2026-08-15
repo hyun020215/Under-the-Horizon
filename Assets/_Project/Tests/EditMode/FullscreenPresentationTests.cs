@@ -24,6 +24,9 @@ public sealed class FullscreenPresentationTests
             Transform worldFrame = Find(scene, "WorldFrame");
             Transform uiFrame = Find(scene, "UIFrame");
             Transform background = Find(scene, "BackgroundLayer");
+            Transform backgroundCharacters = Find(
+                scene,
+                "BackgroundCharacterFrame");
             Camera camera = Find(scene, "Main Camera").GetComponent<Camera>();
 
             AssertFullStretch(worldFrame);
@@ -31,6 +34,17 @@ public sealed class FullscreenPresentationTests
             Assert.That(
                 background.GetComponent<AspectRatioFitter>().aspectMode,
                 Is.EqualTo(AspectRatioFitter.AspectMode.EnvelopeParent));
+            AspectRatioFitter backgroundCharacterAspect =
+                backgroundCharacters.GetComponent<AspectRatioFitter>();
+            Assert.That(
+                backgroundCharacterAspect.aspectMode,
+                Is.EqualTo(AspectRatioFitter.AspectMode.EnvelopeParent));
+            Assert.That(
+                backgroundCharacterAspect.aspectRatio,
+                Is.EqualTo(background.GetComponent<AspectRatioFitter>().aspectRatio)
+                    .Within(0.0001f));
+            Assert.That(backgroundCharacters.parent.name,
+                Is.EqualTo("CharacterLayer"));
             Assert.That(camera.backgroundColor.maxColorComponent, Is.LessThan(0.02f));
         }
         finally

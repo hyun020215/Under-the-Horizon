@@ -312,6 +312,12 @@
     영역으로 별도 시각 승인한 뒤 후속 P-02 콘텐츠 증분에 기록한다.
 - [ ] 41개 CharacterPlacementSet을 실제 플레이 화면에서 시각 검수하고 좌표·스케일·sorting order를
   최종 조정한다.
+  - [x] 기존 화면 좌표를 `ViewportNormalized = 0`으로 영구 보존하고, 승인한 세트만
+    `BackgroundNormalized = 1`에 opt-in할 수 있는 역호환 좌표 공간 계약을 추가했다.
+    `Game.unity`의 `CharacterLayer/BackgroundCharacterFrame`은 배경과 같은 `EnvelopeParent` 비율을
+    사용하며 그림자와 캐릭터를 같은 루트에 생성한다. 41개 기존 세트는 모두 viewport 좌표로 유지하고,
+    SaveVersion·저장 데이터·hotspot 좌표는 변경하지 않는다.
+  - [ ] 배경 좌표 변환·미리보기·5해상도 캡처 도구를 추가한 뒤 P-01부터 세트별로 opt-in한다.
   - [x] P-01 Daniel은 `(normalizedX=0.60, normalizedY=0.12, scale=0.78, sortingOrder=0)`로
     FHD·QHD·16:10 합성 화면 접지 승인을 완료했다.
   - [ ] 나머지 40개 Story Scene은 각 전용 Location State·배경·HUD 합성 화면에서 별도로 검수한다.

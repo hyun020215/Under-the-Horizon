@@ -98,6 +98,49 @@ public sealed class BootstrapReferenceTests
                 Is.EqualTo(flow),
                 "Loaded saves must resume through the same GameFlowController instance.");
 
+            WorldContentFrame worldContentFrame = scene.GetRootGameObjects()
+                .SelectMany(root =>
+                    root.GetComponentsInChildren<WorldContentFrame>(true))
+                .Single();
+            CharacterStage characterStage = scene.GetRootGameObjects()
+                .SelectMany(root =>
+                    root.GetComponentsInChildren<CharacterStage>(true))
+                .Single();
+            LocationPresenter locationPresenter = scene.GetRootGameObjects()
+                .SelectMany(root =>
+                    root.GetComponentsInChildren<LocationPresenter>(true))
+                .Single();
+            SerializedObject worldContentData = new(worldContentFrame);
+            SerializedObject characterStageData = new(characterStage);
+            SerializedObject locationPresenterData = new(locationPresenter);
+            RectTransform backgroundCharacterRoot =
+                (RectTransform)characterStageData
+                    .FindProperty("backgroundRoot")
+                    .objectReferenceValue;
+
+            Assert.That(worldContentFrame.transform.name, Is.EqualTo("WorldFrame"));
+            Assert.That(backgroundCharacterRoot.name,
+                Is.EqualTo("BackgroundCharacterFrame"));
+            Assert.That(backgroundCharacterRoot.parent.name,
+                Is.EqualTo("CharacterLayer"));
+            Assert.That(
+                characterStageData.FindProperty("root").objectReferenceValue.name,
+                Is.EqualTo("CharacterLayer"));
+            Assert.That(
+                locationPresenterData.FindProperty("worldContentFrame")
+                    .objectReferenceValue,
+                Is.EqualTo(worldContentFrame));
+            Assert.That(
+                worldContentData.FindProperty("backgroundAspect")
+                    .objectReferenceValue,
+                Is.EqualTo(locationPresenterData.FindProperty("backgroundAspect")
+                    .objectReferenceValue));
+            Assert.That(
+                worldContentData.FindProperty("backgroundCharacterAspect")
+                    .objectReferenceValue,
+                Is.EqualTo(backgroundCharacterRoot
+                    .GetComponent<UnityEngine.UI.AspectRatioFitter>()));
+
             GameObject transitionOverlay = scene.GetRootGameObjects()
                 .SelectMany(root => root.GetComponentsInChildren<Transform>(true))
                 .Single(item => item.name == "TransitionOverlay")

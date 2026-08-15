@@ -267,7 +267,12 @@ Character positions, pose, expression, scale, sorting order, and clickability ar
 
 ### MUST
 
-- Use normalized coordinates relative to the location/background where practical.
+- Treat `CharacterPlacementSpace.ViewportNormalized = 0` as the permanent
+  backward-compatible default for existing serialized content.
+- Use `BackgroundNormalized` only when a Story Scene has been explicitly opted in
+  and visually approved against its effective Location/Location State background.
+- Keep every placement in one `CharacterPlacementSet` in the coordinate space
+  declared by that set.
 - Keep placement data out of Story Scene-specific MonoBehaviours.
 - Let `CharacterStage` instantiate/apply placement.
 
@@ -281,6 +286,9 @@ if (sceneId == "D1-01")
 ```
 
 Do not put important story placement only in a Unity Scene hierarchy.
+
+Do not reinterpret existing viewport-normalized assets as background-normalized,
+and do not mass-convert placement assets without scene-by-scene visual approval.
 
 ---
 

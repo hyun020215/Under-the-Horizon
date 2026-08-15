@@ -20,6 +20,7 @@ public sealed class P0ProjectBuilderPlacementTests
         Assert.That(set, Is.Not.Null);
         CharacterPlacementSet snapshot = UnityEngine.Object.Instantiate(set);
         snapshot.name = set.name;
+        CharacterPlacementSpace expectedSpace = snapshot.PlacementSpace;
         bool wasDirty = EditorUtility.IsDirty(set);
 
         try
@@ -30,6 +31,7 @@ public sealed class P0ProjectBuilderPlacementTests
 
             CharacterPlacement[] expected = snapshot.Placements;
             CharacterPlacement[] actual = set.Placements;
+            Assert.That(set.PlacementSpace, Is.EqualTo(expectedSpace));
             Assert.That(actual, Has.Length.EqualTo(expected.Length));
             for (int index = 0; index < expected.Length; index++)
                 AssertPlacementEqual(expected[index], actual[index], index);
