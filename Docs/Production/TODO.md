@@ -59,7 +59,7 @@
 - [ ] 각 기능 단위로 TODO, 관련 테스트/검증, Unity Play Mode 결과를 같은 커밋에 포함한다.
 
 > 이 문서는 프로젝트의 유일한 TODO 목록이다. 자산 폴더 안에 TODO 파일을 다시 만들지 않는다.  
-> 갱신일: 2026-08-15 (고정 해상도 Fit 캡처 절차 증분)
+> 갱신일: 2026-08-15 (P-01 합성 화면 다중 해상도 승인)
 
 ## 완료
 
@@ -249,10 +249,22 @@
     PlayMode는 초대장 전용 Location State가 적용되고 hover 전 marker가 숨겨지며, hover
     tooltip/marker와 실제 EventSystem 클릭이 동작하고 완료 뒤 hotspot만 사라진 채 같은 배경
     Sprite가 유지되는지 검증한다.
-  - [ ] P-01 합성 화면은 16:9 FHD 1920×1080, 16:9 QHD 2560×1440과 16:10 1920×1200에서 다시
+  - [x] P-01 합성 화면은 16:9 FHD 1920×1080, 16:9 QHD 2560×1440과 16:10 1920×1200에서 다시
     승인한다. hover 전 초대장 피사체 존재, hover/focus marker와 tooltip, HUD·Daniel 비가림,
     실제 EventSystem 클릭, 완료 후 hotspot 비활성, 저장 재시작을 모두 확인한다. D1-06과 후속 P-02
     지점의 콘텐츠별 합성 화면 승인은 각 Story Scene 저작 증분에서 별도로 수행한다.
+    - Unity `6000.3.20f1`, tested SHA `9f57ae4`에서 세 해상도별 `idle`·`hover`·`focus`·`completed`·
+      `restarted` exact PNG 15장의 pixel 크기와 합성 상태를 직접 확인했다. 초대장은 hover 전에도
+      식별 가능하고 marker·tooltip은 피사체와 정렬되며 HUD와 Daniel에게 가려지지 않는다.
+    - live EventSystem submit dispatch가 실제 조사 대화를 열고, 별도 fresh run의 실제 pointer click이
+      `C-01` 획득과 초대장 Interaction 완료를 적용하는지 확인했다. 완료 뒤 hotspot만 비활성화되고
+      Location State 배경의 초대장 그림은 유지된다.
+    - Daniel 메신저와 본체 대화·C1 선택까지 P-01을 완료해 `current=P-01`, `pending=P-02` 체크포인트를
+      저장했다. 같은 슬롯 재시작은 진입 대화를 재생하지 않고 Port Exploration을 복원하며 초대장·
+      메신저·Daniel Interaction을 다시 만들지 않는다.
+    - 로컬 QA 증거는 Git에서 제외되는
+      `Logs/Validation/2026-08-15_9f57ae4_p01-invitation-visual-approval/`에 보존했다. 집중
+      `P01ProgressionTests.FreshSlotCompletesP01TravelsThroughMapAndRestoresP02`는 1/1 통과했다.
   - [ ] 이미지별 alpha/polygon hit shape는 최종 hotspot 아트가 확정되면 동일 View의 Raycast 계약으로 추가한다.
     현재 권위 있는 클릭 형상은 계속 `InteractionDefinition.NormalizedRect`이며 marker 이미지의 alpha는
     클릭 판정으로 해석하지 않는다.
