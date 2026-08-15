@@ -202,6 +202,8 @@ Location Preview는 현재 `defaultBackground` 한 장을 확인하는 간단한
 3. `sortingOrder`로 겹침을 해결한다.
 4. Pose/Expression을 선택한다.
 5. Story Scene Play Mode에서 HUD·Dialogue UI와 겹치는지 확인한다.
+6. 1920×1080·2560×1440·1920×1200 고정 해상도에서 두 발과 접지 그림자가 같은 불투명 보행면 위에 있는지 확인한다.
+7. 머리·몸·가방·부착형 Context badge가 HUD나 화면 밖으로 잘리지 않고, 주변 hotspot·tooltip의 클릭 우선순위를 가리지 않는지 확인한다.
 
 위치를 `CharacterView.transform`이나 Story Scene ID 조건문에 하드코딩하지 않는다. 배치의 권위 있는 원본은 CharacterPlacementSet이다.
 
