@@ -222,7 +222,8 @@ Location Preview는 현재 `defaultBackground` 한 장을 확인하는 간단한
 | `Display Name` | HUD/목표 안내용 이름 |
 | `Target Id` | 캐릭터 등 대상 필터. 비어 있으면 모든 대상 허용 |
 | `Has World Hotspot` | 배경 위 클릭 영역 생성 여부 |
-| `Normalized Rect` | 0~1 배경 좌표의 x/y/width/height |
+| `Normalized Rect` | 0~1 실행 `WorldFrame` 기준의 실제 클릭 x/y/width/height |
+| `World Marker Visibility` | 월드 marker 표시 정책. `Always`, `Hover Or Focus`, `Hidden` |
 | `Conditions` | 노출·실행 조건 |
 | `Action` | 실행할 재사용 Action |
 | `Repeatable` | 완료 뒤에도 다시 실행 가능한지 |
@@ -238,15 +239,90 @@ Location Preview는 현재 `defaultBackground` 한 장을 확인하는 간단한
   동일한 `InteractionDefinition`을 한 `InteractionSet`에 중복 참조하지 않는다.
 - 캐릭터 본체 클릭을 Context의 대체 입력으로 숨기거나 Story Scene 전용 클릭 스크립트를 만들지 않는다.
 
+월드 핫스팟은 실제 클릭 형상과 플레이어에게 보이는 표시를 다음처럼 분리한다.
+
+- 공통 `PF_Hotspot` root는 투명하며 `Normalized Rect` 전체의 raycast를 받는다.
+- root 안의 marker는 고정 크기를 유지한다. 기본은 중앙이며 화면 가장자리의 Rect에서는 화면 밖
+  overflow를 줄이도록 root 안쪽으로 배치된다. 넓은 클릭 Rect에 맞춰 marker를 늘리거나 배경 피사체를
+  가리는 패널로 사용하지 않는다.
+- marker는 실제 편지, 녹음기, 세면대 같은 월드 오브젝트의 그림을 대신하지 않는 보조 affordance다.
+  실제 피사체는 `LocationState` 배경 또는 별도로 승인된 prop presentation이 표현한다. 배경에 피사체가
+  명확히 보이는 Interaction은 `WorldMarkerVisibility.HoverOrFocus`를 사용해 평상시 피사체를 가리지
+  않고, hover 또는 명시적 focus에서만 marker를 표시한다.
+- `WorldMarkerVisibility.Always=0`은 기존 콘텐츠의 역호환 기본값이다. `Hidden`은 별도의 명확한 시각
+  affordance와 접근성 경로가 승인된 경우에만 사용한다. marker 정책은 콘텐츠 데이터로 선택하며
+  `InteractionPointView`에서 Story Scene ID를 분기하지 않는다.
+- marker와 tooltip은 별도 raycast 대상을 만들지 않는다. 클릭은 항상 root의 같은
+  `InteractionPointView`를 통해 `InteractionDirector`로 전달한다.
+- tooltip은 `Display Name`을 사용하며 pointer hover와 명시적 UI selection/focus가 전달된 경우 같은
+  행동을 설명한다. marker의 색만으로 Interaction 의미를 전달하지 않는다. 키보드·게임패드의 최초
+  focus와 전역 navigation은 Input 시스템의 후속 계약이며 개별 hotspot이 임의로 선택 대상을 정하지 않는다.
+- `Normalized Rect`가 권위 있는 실제 클릭 영역이고 marker는 그 위치를 알려 주는 표시다. 둘을 서로
+  다른 Interaction이나 진행 상태로 저장하지 않는다.
+
+배경 semantic catalog의 zone/region은 배경 피사체, 보호 영역, 캐릭터 배치 여유를 설명하기 위한
+저작 참고 자료다. semantic 검수 완료는 gameplay hitbox 승인과 같지 않으며, 해당 Rect를
+`InteractionDefinition.NormalizedRect`에 그대로 복사하지 않는다. 배경의 cover crop, 현재
+`LocationState`, 캐릭터 배치, HUD를 합성한 실제 화면에서 Interaction별 클릭 영역을 다시 측정하고
+서로 겹치지 않는지 별도로 승인한다.
+
+### P-01 초대장 시각 계약
+
+P-01의 canonical 시각 상태는
+`Assets/_Project/Content/Locations/States/Port/PORT_P01_Invitation.asset`이며 ID는
+`PORT_P01_INVITATION`이다. 이 상태는 벤치 위 초대장이 합성된
+`Assets/_Project/Art/Backgrounds/Locations/BG_P01_CrumpledInvitation.png`를 사용한다.
+
+- `BG_P01_CrumpledInvitation.png`의 초대장은 세계에 놓인 실제 조사 대상이다. 수신인
+  `DANIEL MERCER`, 종이를 가로지르는 두 주 접힘선, 눌린 모서리, 불규칙한 잔주름과 접촉
+  그림자가 일반 Game View에서도 식별되어야 한다.
+- 기존 `BG_location_port_evidence.png`는 legacy semantic catalog가 원본 GUID와 SHA-256에 묶어
+  보존하는 provenance 자산이다. 새 P-01 아트를 그 파일에 덮어쓰거나 수동으로 catalog hash를
+  바꾸지 않는다.
+- P-01 진입 내레이션 `P-01_002`는 Daniel이 주머니 진동을 확인하려 손에 쥔 초대장을 벤치에
+  내려놓았다고 명시한다. 따라서 초대장의 벤치 배치와 Daniel 소유권은 배경 위치만으로 추론하는
+  정보가 아니라 `Dialogue_Master_KR.csv`가 소유하는 canonical 서사 계약이다.
+- 조사 내레이션 `P-01_003`~`004`는 월드 피사체를 벤치 위 구겨진 초대장으로 지칭하고,
+  앞면의 수신인 `DANIEL MERCER`, 두 번 접힌 흔적, Richard 전자서명과 서로 다른 발송 코드 서체를
+  함께 확인한다. 이미지 수정 시 이 네 단서를 제거하거나 Evelyn 등 후반 정보를 앞당겨 표시하지 않는다.
+- `INT_P_01_INVITATION`의 투명 root는 승인된 초대장 영역을 실제 클릭 대상으로 사용하고,
+  marker는 `HoverOrFocus` 보조 표시로만 사용한다.
+- C-01 semantic/polygon은 해당 배경에서 초대장이 존재하는 위치와 형상을 확인하는 근거다. 이 승인은
+  현재 UI crop까지 반영한 gameplay `Normalized Rect` 승인과 동일하지 않다.
+- `C01_DanielInvitation`이 참조하는 `EVD_evidence_c01.png`는 조사·증거 UI용 전체 클로즈업이다.
+  월드와 동일한 `DANIEL MERCER` 표기와 두 주 접힘선·눌린 모서리·잔주름을 보여야 한다. 알파가
+  없는 이 이미지를 월드 prop이나 marker Sprite로 축소 재사용하지 않는다.
+- 초대장 조사 완료 시 `InteractionDirector`가 hotspot을 비활성화하므로 marker와 tooltip도 사라진다.
+  초대장 자체는 `LocationState` 배경에 합성돼 있으므로 그대로 남는다. 피사체 제거가 필요해지면
+  별도 `LocationState`와 공통 Effect/Sequence로 전환하며 View가 배경 그림을 직접 토글하지 않는다.
+- `PORT_Default`를 초대장 배경으로 교체하지 않는다. P-01과 D8-03은 같은 물리 Location을 재사용하되
+  서로 다른 `LocationState`를 사용하며, D8-03 화면에 P-01 초대장이 나타나서는 안 된다.
+
+P-02의 `gangway_boarding_register`도 승선 명단이 있는 의미 영역을 찾기 위한 참고 자료일 뿐이다.
+승선 명단과 전자서명은 서로 다른 gameplay Interaction으로 시각 검수해야 하며, 공통 `PF_Hotspot`
+표시를 수정하는 증분에서는 두 Interaction이나 좌표를 함께 저작하지 않는다.
+
 `Normalized Rect` 조정 절차:
 
-1. 1920×1080 기준 화면에서 대상의 좌상/우하 위치를 잰다.
-2. x와 width는 픽셀 값을 1920으로, y와 height는 1080으로 나눈다.
-3. Inspector에서 Rect를 입력한다.
-4. 1280×720과 2560×1440에서도 클릭 영역이 대상을 따라가는지 확인한다.
-5. UI가 위에 겹치는 영역은 의도치 않은 클릭이 발생하지 않는지 확인한다.
+1. 대상 Story Scene의 실제 `LocationState`, 배경 crop, 캐릭터, HUD를 모두 적용한다.
+2. 1920×1080 `WorldFrame`에서 대상의 좌상/우하 위치를 잰다. 원본 이미지나 semantic Rect의
+   좌표를 실행 화면 확인 없이 대신 사용하지 않는다. Unity Rect의 원점은 왼쪽 아래다.
+3. 왼쪽 위가 원점인 화면 캡처에서 `left`, `top`, `right`, `bottom`을 쟀다면
+   `x = left / 1920`, `y = (1080 - bottom) / 1080`, `width = (right - left) / 1920`,
+   `height = (bottom - top) / 1080`으로 변환해 Inspector에 입력한다.
+4. marker가 클릭 Rect 안에서 고정 크기를 유지하고, marker 바깥의 투명 Rect도 의도대로 클릭되는지
+   확인한다. 화면 가장자리에서는 marker가 Rect 안쪽으로 이동한 뒤 HUD·캐릭터를 가리지 않는지 별도로
+   확인한다.
+5. 16:9 FHD 1920×1080과 QHD 2560×1440에서 피사체가 hover 전부터 보이고, marker가 피사체를
+   대체하거나 가리지 않으며 tooltip이 화면 안에 있는지 확인한다.
+6. 16:10 1920×1200에서도 background cover crop 뒤 피사체와 클릭 영역이 일치하는지 확인한다.
+7. UI·캐릭터·다른 핫스팟이 겹치는 영역에서 의도치 않은 클릭 우선순위가 생기지 않는지 확인한다.
+8. 실제 EventSystem 클릭·submit, 완료 뒤 hotspot 비활성, 저장 후 재시작 상태까지 확인한다.
 
-이미지 alpha/polygon hit shape는 아직 공통 최종 계약이 완성되지 않았다. 현 단계에서는 Rect가 권위 있는 영역이며, 장면 전용 Raycast 스크립트를 만들지 않는다.
+이미지 alpha/polygon hit shape는 아직 공통 최종 계약이 완성되지 않았다. 투명 root는 Rect 내부를
+모두 클릭할 수 있다는 뜻이며 marker Sprite의 alpha로 정밀 판정하지 않는다. 현 단계에서는 Rect가
+권위 있는 영역이고, 최종 hotspot 아트와 공통 Raycast 계약이 승인되기 전에는 장면 전용 alpha threshold나
+polygon Raycast 스크립트를 만들지 않는다.
 
 기존 Action 유형:
 
@@ -504,7 +580,7 @@ Sequence:    SEQ_D3_05_ENTRY.asset
 - Bootstrap/Game Unity Scene
 - Content database catalog
 
-생성 대상 자산을 Inspector에서만 수정하면 덮어쓸 수 있다. 영구 변경은 원본 CSV 또는 `P0ProjectBuilder.cs`의 생성 규칙에도 반영해야 한다.
+생성 대상 자산을 Inspector에서만 수정하면 덮어쓸 수 있다. 영구 변경은 원본 CSV 또는 `P0ProjectBuilder.cs`의 생성 규칙에도 반영해야 한다. 공통 `PF_Hotspot`도 생성 대상이므로 투명 hit rect·고정 marker·tooltip 계층을 Prefab에서만 수정하지 않는다.
 
 일반적인 에셋 한 장 교체나 Placement 수정을 위해 P0 builder를 실행하지 않는다.
 

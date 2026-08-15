@@ -89,6 +89,19 @@
 - [x] P-01을 실제 상호작용으로 완주하고 지도에서 P-02로 이동하는 첫 프롤로그 흐름을 연결했다.
   - 진입 Sequence는 `P-01_001`~`002`만 재생하고, 초대장 조사 → Daniel 부착 메신저 확인 →
     Daniel 본체 대화·선택을 `InteractionCompletedCondition`으로 순서화했다.
+  - [x] P-01의 시각 상태는 `Assets/_Project/Content/Locations/States/Port/PORT_P01_Invitation.asset`
+    (`PORT_P01_INVITATION`)을 canonical 상태로 사용하고, 벤치 위에 수신인 `DANIEL MERCER`와
+    두 번 접힌 흔적이 보이는 `BG_P01_CrumpledInvitation.png`를 연결한다. 공통 `PORT_Default`를
+    바꾸지 않으며, D8-03의 Port 상태에는 P-01 초대장이 나타나지 않게 분리한다. 기존
+    `BG_location_port_evidence.png`는 baked semantic catalog의 원본/hash 근거로 변경 없이 보존한다.
+  - [x] 초대장은 `LocationState` 배경에 포함된 세계 피사체이고 공통 marker는 보조 표시다.
+    `INT_P_01_INVITATION`은 `WorldMarkerVisibility.HoverOrFocus`를 사용해 평상시 실제 초대장을
+    가리지 않는다. 조사 완료는 Interaction hotspot/marker만 비활성화하며 배경에 합성된 초대장
+    그림을 제거하지 않는다.
+  - [x] `P-01_002`는 Daniel이 주머니 진동을 확인하려 초대장을 벤치에 내려놓았다고 명시하고,
+    `P-01_003`~`004`는 같은 피사체를 벤치 위 구겨진 초대장으로 연결해 수신인
+    `DANIEL MERCER`, 두 번 접힌 흔적, Richard 전자서명과 서로 다른 발송 코드 서체를 확인한다.
+    line ID·순서·VO 플래그와 기존 조사 Action 범위는 유지한다.
   - C-01 획득과 `anonymous_tip_preview`는 기존 GameEffect 계약으로 적용한다.
   - 마지막 `DialogueInteractionAction`의 재사용 가능한 advance 옵션이 대화 성공 뒤 route 해석을 요청한다.
     P-01은 Port에서 완료·저장되고 P-02를 pending으로 유지하며, HUD 지도에서 M.V. 엘리시움의
@@ -215,7 +228,33 @@
 - [ ] 게임 커서, 클릭 가능 지점 피드백, alpha/polygon hit 영역을 공통 Interaction View로 이식한다.
   - [x] `InteractionFeedbackService`가 클릭 가능 커서와 hover/click 오디오를 공통 소유한다.
   - [x] 기존 `InteractionPointView`는 피드백을 위임하고 실행 명령은 계속 `InteractionDirector`에 전달한다.
+  - [x] 공통 `PF_Hotspot`의 클릭 영역과 표시를 분리했다. `Normalized Rect`를 따르는 투명 root가
+    실제 raycast를 받고, 고정 크기 자식 marker와 `Display Name` tooltip은 Rect 크기에 따라 늘어나거나
+    별도 실행 대상을 만들지 않는다. pointer hover와 명시적 UI selection/focus, click/submit도 같은
+    `InteractionPointView` 계약을 사용한다.
+  - [x] marker를 월드 오브젝트의 대체 그림이 아닌 보조 affordance로 분류한다.
+    `InteractionDefinition.worldMarkerVisibility`의 `Always=0`, `HoverOrFocus=1`, `Hidden=2`를 공통
+    View에서 해석하고, 기존 자산은 역호환 기본값 `Always`를 유지한다. Story Scene ID를 검사하거나
+    P-01 전용 View/controller를 추가하지 않는다.
+  - [x] `P0ProjectBuilder`가 같은 투명 hit rect·고정 marker·tooltip 계층을 canonical
+    `PF_Hotspot`으로 다시 저작하도록 해 콘텐츠 재생성 뒤에도 공통 View 계약을 유지한다.
+  - [x] Unity EditMode 111/111, PlayMode 29/29, Build Preflight, Windows64 Development Player smoke로
+    투명 root·고정 marker·tooltip의 구조 계약을 검증했다. 다만 이 검수는 P-01 배경에 실제 초대장
+    피사체가 존재하는지 확인하지 않아 marker만 남는 콘텐츠 회귀를 발견하지 못했다.
+  - [x] 초대장 피사체·서사·구김 표현 보정 뒤 Unity EditMode 116/116과 PlayMode 30/30을 통과했다. 실제 P-01
+    PlayMode는 초대장 전용 Location State가 적용되고 hover 전 marker가 숨겨지며, hover
+    tooltip/marker와 실제 EventSystem 클릭이 동작하고 완료 뒤 hotspot만 사라진 채 같은 배경
+    Sprite가 유지되는지 검증한다.
+  - [ ] P-01 합성 화면은 16:9 FHD 1920×1080, 16:9 QHD 2560×1440과 16:10 1920×1200에서 다시
+    승인한다. hover 전 초대장 피사체 존재, hover/focus marker와 tooltip, HUD·Daniel 비가림,
+    실제 EventSystem 클릭, 완료 후 hotspot 비활성, 저장 재시작을 모두 확인한다. D1-06과 후속 P-02
+    지점의 콘텐츠별 합성 화면 승인은 각 Story Scene 저작 증분에서 별도로 수행한다.
   - [ ] 이미지별 alpha/polygon hit shape는 최종 hotspot 아트가 확정되면 동일 View의 Raycast 계약으로 추가한다.
+    현재 권위 있는 클릭 형상은 계속 `InteractionDefinition.NormalizedRect`이며 marker 이미지의 alpha는
+    클릭 판정으로 해석하지 않는다.
+  - [ ] 키보드·게임패드의 최초 focus, hotspot/캐릭터/UI 사이 navigation, focus 복원은 프로젝트 Input
+    증분에서 공통 소유자를 연결한다. 현재 View는 focus/submit 이벤트를 동일 계약으로 처리하지만
+    스스로 선택 대상을 정하거나 전역 navigation을 소유하지 않는다.
 - [ ] 타이틀 수면/광선, 발견·증거 획득·이론 해금 화면 효과를 Sequence/Transition 데이터로 이식한다.
   - [x] `ScreenRouter`가 화면별 `TransitionProfile` 매핑을 사용하도록 확장했다.
   - [x] 조사·발견/기록·증거 보드·퍼즐·지도·엔딩에 기존 TRANS 자산을 연결했다.
@@ -242,6 +281,10 @@
     Condition/GameEffect가 일치한다.
   - P-02의 첫 Daniel `Character` 대화와 직접 PlayMode 진입 검증은 완료했다. P-02의 나머지 원본 행동,
     장면 완료 조건과 P-03으로 이어지는 완주 흐름은 아직 남아 있다.
+  - 공통 world hotspot 표시 정상화는 P-02용 승선 명단·전자서명 Interaction이나 좌표를 저작하지 않는다.
+    승인된 배경 semantic 영역은 피사체를 설명·보호하는 참고 영역이지 gameplay hitbox 승인본이 아니다.
+    두 조사 지점은 활성 Gangway 배경 crop, 캐릭터, HUD를 합성한 화면에서 서로 겹치지 않는 실제 클릭
+    영역으로 별도 시각 승인한 뒤 후속 P-02 콘텐츠 증분에 기록한다.
 - [ ] 41개 CharacterPlacementSet을 실제 플레이 화면에서 시각 검수하고 좌표·스케일·sorting order를
   최종 조정한다.
 - [ ] 모든 Story Scene을 원본의 전용 Location State와 배경·오디오에 연결한다.

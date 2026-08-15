@@ -19,7 +19,7 @@ MonoBehaviour:
   timeBlock: 2
   entryConditions: []
   location: {fileID: 11400000, guid: 0d5914e5da0c79d43bbfe43bd4b98b51, type: 2}
-  locationState: {fileID: 11400000, guid: 7699431661924f84099f636e3074eb79, type: 2}
+  locationState: {fileID: 11400000, guid: 1b4b11aa8b7b4084892d8cda4299c510, type: 2}
   initialScreen: 2
   characterSet: {fileID: 11400000, guid: 380b6a300716d9b48b35364500bac62f, type: 2}
   interactionSet: {fileID: 11400000, guid: df59ac3f3d13bcb489f36c7adc12a70d, type: 2}

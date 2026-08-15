@@ -17,6 +17,7 @@ MonoBehaviour:
   defaultBackground: {fileID: 21300000, guid: d0ed3ac38a4dca646a3d0831c7f0cf6d, type: 3}
   states:
   - {fileID: 11400000, guid: 7699431661924f84099f636e3074eb79, type: 2}
+  - {fileID: 11400000, guid: 1b4b11aa8b7b4084892d8cda4299c510, type: 2}
   exits: []
   defaultAudio: {fileID: 11400000, guid: 749189f0fb863304c97a8be3f61cc946, type: 2}
   mapNode:
