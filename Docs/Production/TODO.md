@@ -59,7 +59,7 @@
 - [ ] 각 기능 단위로 TODO, 관련 테스트/검증, Unity Play Mode 결과를 같은 커밋에 포함한다.
 
 > 이 문서는 프로젝트의 유일한 TODO 목록이다. 자산 폴더 안에 TODO 파일을 다시 만들지 않는다.  
-> 갱신일: 2026-08-15 (P-01 합성 화면 다중 해상도 승인)
+> 갱신일: 2026-08-15 (P-01 Daniel 부두 접지 배치 승인)
 
 ## 완료
 
@@ -265,6 +265,15 @@
     - 로컬 QA 증거는 Git에서 제외되는
       `Logs/Validation/2026-08-15_9f57ae4_p01-invitation-visual-approval/`에 보존했다. 집중
       `P01ProgressionTests.FreshSlotCompletesP01TravelsThroughMapAndRestoresP02`는 1/1 통과했다.
+  - [x] P-01 Daniel의 범용 초기 배치 `(0.78, 0.04, 0.94)`를 전경 계선주 왼쪽의 안전한 석재 부두에
+    접지되는 승인값 `(0.60, 0.12, 0.78)`로 재저작했다. Unity `6000.3.20f1`에서 1920×1080,
+    2560×1440, 1920×1200 exact PNG를 비교해 양발과 접지 그림자가 수면·계선주를 침범하지 않고,
+    머리·가방이 HUD와 화면 경계에 가리지 않으며 좌하단 초대장을 가리지 않는지 확인했다.
+    `CharacterPlacementSet` 데이터와 해당 좌표 계약 테스트만 변경하며 Runtime·Prefab·Unity Scene·Save
+    schema는 변경하지 않는다. 로컬 QA 증거는 Git에서 제외되는
+    `Logs/Validation/2026-08-15_working-tree_p01-daniel-grounding/`에 보존한다.
+    집중 EditMode 1/1·대표 P-01 PlayMode 1/1, 전체 EditMode 127/127·PlayMode 30/30,
+    Build Preflight와 Windows 64-bit Development Player smoke를 실패·건너뜀 없이 통과했다.
   - [ ] 이미지별 alpha/polygon hit shape는 최종 hotspot 아트가 확정되면 동일 View의 Raycast 계약으로 추가한다.
     현재 권위 있는 클릭 형상은 계속 `InteractionDefinition.NormalizedRect`이며 marker 이미지의 alpha는
     클릭 판정으로 해석하지 않는다.
@@ -303,6 +312,9 @@
     영역으로 별도 시각 승인한 뒤 후속 P-02 콘텐츠 증분에 기록한다.
 - [ ] 41개 CharacterPlacementSet을 실제 플레이 화면에서 시각 검수하고 좌표·스케일·sorting order를
   최종 조정한다.
+  - [x] P-01 Daniel은 `(normalizedX=0.60, normalizedY=0.12, scale=0.78, sortingOrder=0)`로
+    FHD·QHD·16:10 합성 화면 접지 승인을 완료했다.
+  - [ ] 나머지 40개 Story Scene은 각 전용 Location State·배경·HUD 합성 화면에서 별도로 검수한다.
 - [ ] 모든 Story Scene을 원본의 전용 Location State와 배경·오디오에 연결한다.
   - 현재 다수 장면은 생성된 기본 State를 공유하므로 구조적 유효성과 장면별 시각 재현을 구분한다.
 - [ ] D4-02, D5-01, D7-01, D8-02, D8-03 Sequence를 실제 연출 명령으로 작성한다.

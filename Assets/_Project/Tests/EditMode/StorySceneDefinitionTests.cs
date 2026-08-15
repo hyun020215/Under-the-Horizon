@@ -165,6 +165,22 @@ public sealed class StorySceneDefinitionTests
                     "다니엘이 확인 중인 메신저 알림 살펴보기",
                     "다니엘과 대화",
                 }));
+            CharacterPlacement[] p01Placements = p01.CharacterSet.Placements;
+            Assert.That(
+                p01Placements
+                    .Where(placement => placement.character != null)
+                    .Select(placement => placement.character.Id),
+                Is.EqualTo(new[] { "CHR_DANIEL" }));
+            AssertPlacementSlot(
+                p01Placements,
+                "CHR_DANIEL",
+                new Vector2(0.60f, 0.12f),
+                0.78f,
+                0);
+            Assert.That(
+                p01Placements.Single().clickable,
+                Is.True,
+                "P-01 must keep Daniel available for the authored messenger and dialogue interactions.");
             Assert.That(interactions[0].Action.GrantsEvidence, Is.True);
             Assert.That(interactions[0].HasWorldHotspot, Is.True);
             Assert.That(interactions[0].TargetId, Is.EqualTo("C-01"));
@@ -448,7 +464,7 @@ public sealed class StorySceneDefinitionTests
         Assert.That(
             new Vector2(placement.normalizedX, placement.normalizedY),
             Is.EqualTo(expectedPosition),
-            $"{characterId} must remain in the authored P-02 placement slot.");
+            $"{characterId} must remain in the authored placement slot.");
         Assert.That(placement.scale, Is.EqualTo(expectedScale), characterId);
         Assert.That(
             placement.sortingOrder,
