@@ -45,7 +45,7 @@ public sealed class CharacterPlacementAuthoringTests
     }
 
     [Test]
-    public void ExistingP01ConversionIsRejectedByUltrawideVisibleCrop()
+    public void P01PilotKeepsItsApprovedBackgroundLandmarkAcrossQaMatrix()
     {
         CharacterPlacementSet set =
             AssetDatabase.LoadAssetAtPath<CharacterPlacementSet>(P01PlacementPath);
@@ -56,25 +56,48 @@ public sealed class CharacterPlacementAuthoringTests
         float aspect = background.rect.width / background.rect.height;
         CharacterPlacement authored = set.Placements.Single();
 
-        Vector2 converted =
-            WorldContentGeometry.ViewportToBackgroundNormalized(
-                new Vector2(authored.normalizedX, authored.normalizedY),
-                new Vector2(1920f, 1080f),
-                aspect);
-        bool valid = CharacterPlacementAuthoringUtility.TryCreateConversionProposal(
-            set,
-            scenes,
-            new Vector2Int(1920, 1080),
-            VisualQaResolutionMatrix.Resolutions,
-            out _,
-            out string error);
-
+        Assert.That(
+            set.PlacementSpace,
+            Is.EqualTo(CharacterPlacementSpace.BackgroundNormalized));
         Assert.That(authored.normalizedX, Is.EqualTo(0.6f));
-        Assert.That(authored.normalizedY, Is.EqualTo(0.12f));
-        Assert.That(converted.x, Is.EqualTo(0.6f).Within(0.00001f));
-        Assert.That(converted.y, Is.EqualTo(0.179375f).Within(0.00001f));
-        Assert.That(valid, Is.False);
-        Assert.That(error, Does.Contain("visible crop"));
+        Assert.That(authored.normalizedY, Is.EqualTo(0.207f));
+        Assert.That(
+            authored.normalizedX * background.rect.width,
+            Is.EqualTo(921.6f).Within(0.01f));
+        Assert.That(
+            authored.normalizedY * background.rect.height,
+            Is.EqualTo(211.968f).Within(0.01f));
+
+        foreach (Vector2Int resolution in VisualQaResolutionMatrix.Resolutions)
+        {
+            Vector2 viewport =
+                WorldContentGeometry.BackgroundToViewportNormalized(
+                    new Vector2(authored.normalizedX, authored.normalizedY),
+                    resolution,
+                    aspect);
+            Vector2 roundTrip =
+                WorldContentGeometry.ViewportToBackgroundNormalized(
+                    viewport,
+                    resolution,
+                    aspect);
+            Rect visible =
+                CharacterPlacementAuthoringUtility.GetVisibleBackgroundRect(
+                    resolution,
+                    aspect);
+
+            Assert.That(
+                visible.Contains(new Vector2(
+                    authored.normalizedX,
+                    authored.normalizedY)),
+                Is.True,
+                $"P-01 anchor must remain visible at {resolution.x}x{resolution.y}.");
+            Assert.That(
+                roundTrip.x,
+                Is.EqualTo(authored.normalizedX).Within(0.00001f));
+            Assert.That(
+                roundTrip.y,
+                Is.EqualTo(authored.normalizedY).Within(0.00001f));
+        }
     }
 
     [Test]

@@ -266,14 +266,15 @@
       `Logs/Validation/2026-08-15_9f57ae4_p01-invitation-visual-approval/`에 보존했다. 집중
       `P01ProgressionTests.FreshSlotCompletesP01TravelsThroughMapAndRestoresP02`는 1/1 통과했다.
   - [x] P-01 Daniel의 범용 초기 배치 `(0.78, 0.04, 0.94)`를 전경 계선주 왼쪽의 안전한 석재 부두에
-    접지되는 승인값 `(0.60, 0.12, 0.78)`로 재저작했다. Unity `6000.3.20f1`에서 1920×1080,
+    접지되는 당시 `ViewportNormalized` 승인값 `(0.60, 0.12, 0.78)`로 재저작했다. Unity `6000.3.20f1`에서 1920×1080,
     2560×1440, 1920×1200 exact PNG를 비교해 양발과 접지 그림자가 수면·계선주를 침범하지 않고,
     머리·가방이 HUD와 화면 경계에 가리지 않으며 좌하단 초대장을 가리지 않는지 확인했다.
     `CharacterPlacementSet` 데이터와 해당 좌표 계약 테스트만 변경하며 Runtime·Prefab·Unity Scene·Save
     schema는 변경하지 않는다. 로컬 QA 증거는 Git에서 제외되는
     `Logs/Validation/2026-08-15_working-tree_p01-daniel-grounding/`에 보존한다.
     집중 EditMode 1/1·대표 P-01 PlayMode 1/1, 전체 EditMode 127/127·PlayMode 30/30,
-    Build Preflight와 Windows 64-bit Development Player smoke를 실패·건너뜀 없이 통과했다.
+    Build Preflight와 Windows 64-bit Development Player smoke를 실패·건너뜀 없이 통과했다. 이 값은 아래
+    `BackgroundNormalized` 파일럿 전환 전의 화면 좌표 승인 이력이며, 현재 최종 배경 좌표는 아래 항목이 권위 있다.
   - [ ] 이미지별 alpha/polygon hit shape는 최종 hotspot 아트가 확정되면 동일 View의 Raycast 계약으로 추가한다.
     현재 권위 있는 클릭 형상은 계속 `InteractionDefinition.NormalizedRect`이며 marker 이미지의 alpha는
     클릭 판정으로 해석하지 않는다.
@@ -315,16 +316,27 @@
   - [x] 기존 화면 좌표를 `ViewportNormalized = 0`으로 영구 보존하고, 승인한 세트만
     `BackgroundNormalized = 1`에 opt-in할 수 있는 역호환 좌표 공간 계약을 추가했다.
     `Game.unity`의 `CharacterLayer/BackgroundCharacterFrame`은 배경과 같은 `EnvelopeParent` 비율을
-    사용하며 그림자와 캐릭터를 같은 루트에 생성한다. 41개 기존 세트는 모두 viewport 좌표로 유지하고,
-    SaveVersion·저장 데이터·hotspot 좌표는 변경하지 않는다.
+    사용하며 그림자와 캐릭터를 같은 루트에 생성한다. 파운데이션 증분에서는 41개 기존 세트를 모두 viewport 좌표로
+    보존했고, 현재는 아래 P-01 한 세트만 opt-in해 나머지 40개를 기존 좌표로 유지한다. SaveVersion·저장 데이터·
+    hotspot 좌표는 변경하지 않는다.
   - [x] 선택한 세트 하나만 Undo 가능한 단위로 변환하는 안전 변환 도구, 실제 `Sprite.rect` cover/crop을
     재현하는 Story Scene 미리보기, 1920×1080·2560×1440·1920×1200·2560×1080·3440×1440 exact PNG
     캡처 행렬을 추가했다. 미참조·빈 세트·null/서로 다른 공유 배경·visible crop 밖 제안은 변환 전에
     차단한다. 일반 Inspector의 공간 필드는 읽기 전용이며, 변환은 Scale·sorting·pose·expression·clickable과
     다른 세트를 변경하지 않는다.
-  - [ ] P-01을 첫 `BackgroundNormalized` 파일럿으로 opt-in하고 다섯 해상도 합성 화면을 승인한다.
-  - [x] P-01 Daniel은 `(normalizedX=0.60, normalizedY=0.12, scale=0.78, sortingOrder=0)`로
-    FHD·QHD·16:10 합성 화면 접지 승인을 완료했다.
+  - [x] P-01을 첫 `BackgroundNormalized` 파일럿으로 opt-in했다. Daniel은
+    `(normalizedX=0.60, normalizedY=0.207, scale=0.78, sortingOrder=0)`을 사용하며, 1536×1024 배경의
+    원본 지점 `(921.6, 211.968 from bottom)`에 고정된다.
+    - Unity `6000.3.20f1`에서 1920×1080·2560×1440·1920×1200·2560×1080·3440×1440의
+      `idle`·`hover`·`focus`·`completed`·`restarted` exact PNG 25장을 승인했다. 모든 PNG 헤더 크기가 목표와
+      일치하고 `.pending.png`는 0개다. 양발과 그림자는 같은 불투명 석재 부두에 접지되며 수면·계선주·화면 하단을
+      침범하지 않고, 머리·가방·marker·tooltip은 HUD와 화면 경계에 가리지 않는다.
+    - 수동 EventSystem submit이 실제 초대장 조사 대화와 `C-01` 효과를 실행하는지 확인했다. 초대장 완료 뒤 배경
+      피사체는 유지되고 hotspot만 사라지며 Daniel 메신저 badge가 나타난다. P-01을 C1으로 완주해
+      `current=P-01`, `pending=P-02`, 세 Interaction 완료, `C-01`, Daniel 신뢰도 3 체크포인트를 확인했고,
+      Bootstrap 재시작 뒤 진입 대화나 완료 Interaction 재생성 없이 Port Exploration이 복원됐다.
+    - Git에서 제외되는 로컬 QA 증거는
+      `Logs/Validation/2026-08-15_working-tree_p01-background-placement-visual-approval/`에 보존한다.
   - [ ] 나머지 40개 Story Scene은 각 전용 Location State·배경·HUD 합성 화면에서 별도로 검수한다.
 - [ ] 모든 Story Scene을 원본의 전용 Location State와 배경·오디오에 연결한다.
   - 현재 다수 장면은 생성된 기본 State를 공유하므로 구조적 유효성과 장면별 시각 재현을 구분한다.

@@ -12,10 +12,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 861dd47ca2c8cc84dbf89d5a964fa2f6, type: 3}
   m_Name: SET_P_01_CHARACTERS
   m_EditorClassIdentifier: UTH.Runtime::CharacterPlacementSet
+  placementSpace: 1
   placements:
   - character: {fileID: 11400000, guid: 3c149c9299d6ca44b95f2cdf2aaf07d0, type: 2}
     normalizedX: 0.6
-    normalizedY: 0.12
+    normalizedY: 0.207
     scale: 0.78
     sortingOrder: 0
     pose: 0
