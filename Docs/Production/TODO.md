@@ -13,7 +13,11 @@
   - 현재 `DisplaySettingsService.Load()`는 선택값만 복원하고 `Screen.SetResolution`을 호출하지 않는다.
   - 1920x1080을 권장 기본값으로 유지하고 1280x720, 1600x900, 2560x1440, 3840x2160을 설정에서 선택 가능하게 유지한다.
   - Bootstrap과 Game Canvas가 같은 1920x1080 기준과 0.5 width/height match를 사용하는지 검증한다.
-- [ ] 원본과 현재 화면을 비교할 때 Unity Game View를 16:9 Fit 상태로 맞추는 개발용 검증 절차를 문서화한다.
+- [x] 원본과 현재 화면을 비교할 때 Unity Game View를 고정 해상도 Fit 상태로 맞추는 개발용 검증 절차를 문서화했다.
+  - `ART_ASSET_GUIDE.md`에 실제 `Bootstrap` 흐름, 1920×1080·2560×1440·1920×1200 고정 해상도,
+    `Fit`/1배 이하, 현재 Screen과 PNG pixel 크기 일치, 표준 `Logs/Validation` 증거 경로를 기록했다.
+  - `GameViewPngCaptureWindow`는 Play Mode의 현재 합성 화면만 캡처하고 실제 pixel 크기를 재검증한다.
+    Interaction ID 기반 EventSystem focus는 시각 상태 확인용이며 전역 키보드·게임패드 navigation을 소유하지 않는다.
 - [ ] 공통 타이포그래피 기준을 확장해 제목/섹션/본문/버튼/보조 문구의 크기, 굵기, 자간, 행간, 대비를 원본 수준으로 맞춘다.
   - Dialogue 본문, `NARRATION` 이름표, Map/Save Slot의 작은 텍스트를 1080p 실기 기준으로 우선 개선한다.
   - 한글/영문 fallback, 깨진 글리프, `LOC_PORT` 같은 내부 ID 노출과 언어 혼용을 검증한다.
@@ -55,7 +59,7 @@
 - [ ] 각 기능 단위로 TODO, 관련 테스트/검증, Unity Play Mode 결과를 같은 커밋에 포함한다.
 
 > 이 문서는 프로젝트의 유일한 TODO 목록이다. 자산 폴더 안에 TODO 파일을 다시 만들지 않는다.  
-> 갱신일: 2026-08-14 (지도 선택·확정 이동 UI 증분)
+> 갱신일: 2026-08-15 (고정 해상도 Fit 캡처 절차 증분)
 
 ## 완료
 
