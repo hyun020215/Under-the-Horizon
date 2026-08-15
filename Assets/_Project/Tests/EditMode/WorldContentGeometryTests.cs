@@ -62,7 +62,7 @@ public sealed class WorldContentGeometryTests
     }
 
     [Test]
-    public void ExistingPlacementSetsRemainViewportNormalizedByDefault()
+    public void P01IsTheOnlyBackgroundSpacePilot()
     {
         CharacterPlacementSet[] sets = AssetDatabase
             .FindAssets("t:CharacterPlacementSet")
@@ -71,11 +71,16 @@ public sealed class WorldContentGeometryTests
             .ToArray();
 
         Assert.That(sets, Has.Length.EqualTo(41));
+        CharacterPlacementSet p01 = sets.Single(
+            set => set.name == "SET_P_01_CHARACTERS");
         Assert.That(
-            sets.All(set =>
+            p01.PlacementSpace,
+            Is.EqualTo(CharacterPlacementSpace.BackgroundNormalized));
+        Assert.That(
+            sets.Count(set =>
                 set.PlacementSpace == CharacterPlacementSpace.ViewportNormalized),
-            Is.True,
-            "Foundation must not opt existing content into the new coordinate space.");
+            Is.EqualTo(40),
+            "The remaining placement sets must stay on the legacy viewport contract until individually approved.");
     }
 
     [Test]

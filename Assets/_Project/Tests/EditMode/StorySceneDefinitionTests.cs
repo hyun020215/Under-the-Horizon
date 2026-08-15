@@ -167,6 +167,10 @@ public sealed class StorySceneDefinitionTests
                 }));
             CharacterPlacement[] p01Placements = p01.CharacterSet.Placements;
             Assert.That(
+                p01.CharacterSet.PlacementSpace,
+                Is.EqualTo(CharacterPlacementSpace.BackgroundNormalized),
+                "P-01 is the first explicitly approved background-space pilot.");
+            Assert.That(
                 p01Placements
                     .Where(placement => placement.character != null)
                     .Select(placement => placement.character.Id),
@@ -174,7 +178,7 @@ public sealed class StorySceneDefinitionTests
             AssertPlacementSlot(
                 p01Placements,
                 "CHR_DANIEL",
-                new Vector2(0.60f, 0.12f),
+                new Vector2(0.60f, 0.207f),
                 0.78f,
                 0);
             Assert.That(

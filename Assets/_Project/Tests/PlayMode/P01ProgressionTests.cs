@@ -114,6 +114,18 @@ public sealed class P01ProgressionTests
         yield return WaitFor(
             () => (daniel = FindActiveCharacter("CHR_DANIEL")) != null,
             "Daniel's CharacterView did not appear in P-01.");
+        Transform backgroundCharacterRoot = daniel.transform.parent;
+        Assert.That(backgroundCharacterRoot, Is.Not.Null);
+        Assert.That(
+            backgroundCharacterRoot.name,
+            Is.EqualTo("BackgroundCharacterFrame"),
+            "P-01 Daniel must use the background-space character frame.");
+        GameObject danielShadow = GameObject.Find("CHR_DANIEL Ground Shadow");
+        Assert.That(danielShadow, Is.Not.Null);
+        Assert.That(
+            danielShadow.transform.parent,
+            Is.SameAs(backgroundCharacterRoot),
+            "Daniel and his ground shadow must share the background-space root.");
         Assert.That(
             FindActiveInteractionView("INT_P_01_MESSENGER"),
             Is.Null,
