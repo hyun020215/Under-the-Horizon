@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: UTH.Runtime::InteractionDefinition
   id: INT_P_01_INVITATION
   type: 3
-  displayName: "\uAD6C\uACA8\uC9C4 \uCD08\uB300\uC7A5"
+  displayName: "DANIEL MERCER\uC758 \uAD6C\uACA8\uC9C4 \uCD08\uB300\uC7A5"
   targetId: C-01
   hasWorldHotspot: 1
   worldMarkerVisibility: 1

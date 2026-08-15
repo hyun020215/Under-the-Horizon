@@ -271,15 +271,27 @@ Location Preview는 현재 `defaultBackground` 한 장을 확인하는 간단한
 P-01의 canonical 시각 상태는
 `Assets/_Project/Content/Locations/States/Port/PORT_P01_Invitation.asset`이며 ID는
 `PORT_P01_INVITATION`이다. 이 상태는 벤치 위 초대장이 합성된
-`Assets/_Project/Art/Backgrounds/Locations/BG_location_port_evidence.png`를 사용한다.
+`Assets/_Project/Art/Backgrounds/Locations/BG_P01_CrumpledInvitation.png`를 사용한다.
 
-- `BG_location_port_evidence.png`의 초대장은 세계에 놓인 실제 조사 대상이다.
+- `BG_P01_CrumpledInvitation.png`의 초대장은 세계에 놓인 실제 조사 대상이다. 수신인
+  `DANIEL MERCER`, 종이를 가로지르는 두 주 접힘선, 눌린 모서리, 불규칙한 잔주름과 접촉
+  그림자가 일반 Game View에서도 식별되어야 한다.
+- 기존 `BG_location_port_evidence.png`는 legacy semantic catalog가 원본 GUID와 SHA-256에 묶어
+  보존하는 provenance 자산이다. 새 P-01 아트를 그 파일에 덮어쓰거나 수동으로 catalog hash를
+  바꾸지 않는다.
+- P-01 진입 내레이션 `P-01_002`는 Daniel이 주머니 진동을 확인하려 손에 쥔 초대장을 벤치에
+  내려놓았다고 명시한다. 따라서 초대장의 벤치 배치와 Daniel 소유권은 배경 위치만으로 추론하는
+  정보가 아니라 `Dialogue_Master_KR.csv`가 소유하는 canonical 서사 계약이다.
+- 조사 내레이션 `P-01_003`~`004`는 월드 피사체를 벤치 위 구겨진 초대장으로 지칭하고,
+  앞면의 수신인 `DANIEL MERCER`, 두 번 접힌 흔적, Richard 전자서명과 서로 다른 발송 코드 서체를
+  함께 확인한다. 이미지 수정 시 이 네 단서를 제거하거나 Evelyn 등 후반 정보를 앞당겨 표시하지 않는다.
 - `INT_P_01_INVITATION`의 투명 root는 승인된 초대장 영역을 실제 클릭 대상으로 사용하고,
   marker는 `HoverOrFocus` 보조 표시로만 사용한다.
 - C-01 semantic/polygon은 해당 배경에서 초대장이 존재하는 위치와 형상을 확인하는 근거다. 이 승인은
   현재 UI crop까지 반영한 gameplay `Normalized Rect` 승인과 동일하지 않다.
 - `C01_DanielInvitation`이 참조하는 `EVD_evidence_c01.png`는 조사·증거 UI용 전체 클로즈업이다.
-  알파가 없는 이 이미지를 월드 prop이나 marker Sprite로 축소 재사용하지 않는다.
+  월드와 동일한 `DANIEL MERCER` 표기와 두 주 접힘선·눌린 모서리·잔주름을 보여야 한다. 알파가
+  없는 이 이미지를 월드 prop이나 marker Sprite로 축소 재사용하지 않는다.
 - 초대장 조사 완료 시 `InteractionDirector`가 hotspot을 비활성화하므로 marker와 tooltip도 사라진다.
   초대장 자체는 `LocationState` 배경에 합성돼 있으므로 그대로 남는다. 피사체 제거가 필요해지면
   별도 `LocationState`와 공통 Effect/Sequence로 전환하며 View가 배경 그림을 직접 토글하지 않는다.

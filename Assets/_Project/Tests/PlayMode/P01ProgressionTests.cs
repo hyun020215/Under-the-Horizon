@@ -135,8 +135,11 @@ public sealed class P01ProgressionTests
             "The runtime P-01 composition must show its authored invitation background.");
         Assert.That(
             locationBackground.sprite.name,
-            Is.EqualTo("BG_location_port_evidence"));
+            Is.EqualTo("BG_P01_CrumpledInvitation"));
         Assert.That(invitation.Definition.TargetId, Is.EqualTo("C-01"));
+        Assert.That(
+            invitation.Definition.DisplayName,
+            Is.EqualTo("DANIEL MERCER의 구겨진 초대장"));
         Assert.That(invitation.Marker, Is.Not.Null);
         Assert.That(
             invitation.Marker.gameObject.activeSelf,
@@ -150,7 +153,7 @@ public sealed class P01ProgressionTests
         Assert.That(invitation.Tooltip.IsVisible, Is.True);
         Assert.That(
             invitation.Tooltip.Text,
-            Is.EqualTo(invitation.Definition.DisplayName));
+            Is.EqualTo("DANIEL MERCER의 구겨진 초대장"));
         int historyBeforeInvitation = narrative.History.Lines.Count;
         yield return ClickThroughEventSystem(invitation, "P-01 invitation hotspot");
         yield return CompleteCurrentDialogue(dialogue, screens, null, "invitation inspection");
@@ -337,8 +340,12 @@ public sealed class P01ProgressionTests
             Is.SameAs(story.Current.LocationState.Background));
         Assert.That(
             locationBackground.sprite.name,
-            Is.EqualTo("BG_location_port_evidence"),
+            Is.EqualTo("BG_P01_CrumpledInvitation"),
             "Restoring completed P-01 must retain the invitation painted into its location state.");
+        Assert.That(
+            FindActiveHotspot("INT_P_01_INVITATION"),
+            Is.Null,
+            "Restoring completed P-01 must retain the painted invitation without respawning its completed hotspot.");
         Assert.That(FindActiveHotspot("INT_P_01_CONTINUE"), Is.Null);
 
         PersistentHud hud = null;

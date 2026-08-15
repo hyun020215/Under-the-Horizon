@@ -18,13 +18,19 @@ public sealed class P01InvitationContentTests
     private const string BasePortBackgroundPath =
         "Assets/_Project/Art/Backgrounds/Locations/BG_location_port.png";
     private const string InvitationPortBackgroundPath =
+        "Assets/_Project/Art/Backgrounds/Locations/BG_P01_CrumpledInvitation.png";
+    private const string LegacyInvitationPortBackgroundPath =
         "Assets/_Project/Art/Backgrounds/Locations/BG_location_port_evidence.png";
+    private const string C01EvidencePath =
+        "Assets/_Project/Content/Evidence/C01_DanielInvitation.asset";
+    private const string C01CloseupPath =
+        "Assets/_Project/Art/Evidence/EVD_evidence_c01.png";
     private const string InvitationInteractionPath =
         "Assets/_Project/Content/Locations/InteractionDefinitions/Generated/"
         + "INT_P_01_INVITATION.asset";
 
     [Test]
-    public void P01UsesApprovedInvitationBackgroundWithoutChangingD803()
+    public void P01UsesAuthoredCrumpledInvitationBackgroundWithoutChangingD803()
     {
         LocationDefinition port = Load<LocationDefinition>(PortPath);
         LocationStateDefinition portDefault =
@@ -47,10 +53,23 @@ public sealed class P01InvitationContentTests
         Assert.That(
             AssetDatabase.GetAssetPath(p01Invitation.Background),
             Is.EqualTo(InvitationPortBackgroundPath),
-            "P-01 must use the approved Port composition with C-01 painted on the bench.");
+            "P-01 must use the authored Port composition with the crumpled C-01 invitation on the bench.");
         Assert.That(
             AssetDatabase.AssetPathToGUID(InvitationPortBackgroundPath),
-            Is.EqualTo("fd85cdd6e6e64585af8ae2d616ecab6e"));
+            Is.EqualTo("861d980b75bb4a05b5106524d4dbd623"),
+            "The authored P-01 background must keep its stable serialized reference.");
+        Assert.That(
+            p01Invitation.Background.rect.size,
+            Is.EqualTo(new Vector2(1536f, 1024f)),
+            "The authored background must preserve the canonical Port canvas size.");
+        Assert.That(
+            AssetDatabase.AssetPathToGUID(InvitationPortBackgroundPath),
+            Is.Not.EqualTo(AssetDatabase.AssetPathToGUID(LegacyInvitationPortBackgroundPath)),
+            "New P-01 art must not overwrite the legacy semantic-catalog source asset.");
+        Assert.That(
+            AssetDatabase.AssetPathToGUID(LegacyInvitationPortBackgroundPath),
+            Is.EqualTo("fd85cdd6e6e64585af8ae2d616ecab6e"),
+            "The legacy background GUID is retained for provenance and reference stability.");
         Assert.That(
             AssetDatabase.GetAssetPath(portDefault.Background),
             Is.EqualTo(BasePortBackgroundPath),
@@ -61,6 +80,26 @@ public sealed class P01InvitationContentTests
         Assert.That(port.States, Does.Contain(portDefault));
         Assert.That(port.States, Does.Contain(p01Invitation));
         Assert.That(port.States.Distinct().Count(), Is.EqualTo(port.States.Length));
+    }
+
+    [Test]
+    public void C01KeepsItsStableCloseupReferenceWhileTheArtworkIsRevised()
+    {
+        EvidenceDefinition c01 = Load<EvidenceDefinition>(C01EvidencePath);
+
+        Assert.That(c01.Id, Is.EqualTo("C-01"));
+        Assert.That(c01.Image, Is.Not.Null);
+        Assert.That(
+            AssetDatabase.GetAssetPath(c01.Image),
+            Is.EqualTo(C01CloseupPath));
+        Assert.That(
+            AssetDatabase.AssetPathToGUID(C01CloseupPath),
+            Is.EqualTo("7e5c03d211844cb5b476016cc0197336"),
+            "Revising the C-01 close-up must preserve its serialized Sprite reference.");
+        Assert.That(
+            c01.Image.rect.size,
+            Is.EqualTo(new Vector2(1536f, 1024f)),
+            "The close-up must retain the evidence canvas size used by the investigation UI.");
     }
 
     [Test]
@@ -80,6 +119,10 @@ public sealed class P01InvitationContentTests
             }));
         Assert.That(p01.InteractionSet.Interactions[0], Is.SameAs(invitation));
         Assert.That(invitation.Id, Is.EqualTo("INT_P_01_INVITATION"));
+        Assert.That(
+            invitation.DisplayName,
+            Is.EqualTo("DANIEL MERCER의 구겨진 초대장"),
+            "The hover tooltip must identify the recipient without relying on microscopic world-art text.");
         Assert.That(invitation.Type, Is.EqualTo(InteractionType.Investigation));
         Assert.That(invitation.TargetId, Is.EqualTo("C-01"));
         Assert.That(invitation.HasWorldHotspot, Is.True);
@@ -88,7 +131,7 @@ public sealed class P01InvitationContentTests
         Assert.That(
             invitation.NormalizedRect,
             Is.EqualTo(new Rect(0.012f, 0.182f, 0.066f, 0.086f)),
-            "The hit area must remain aligned with the approved C-01 background polygon.");
+            "The hit area must remain aligned with the invitation painted on the authored P-01 background.");
 
         SerializedProperty markerVisibility = new SerializedObject(invitation)
             .FindProperty("worldMarkerVisibility");

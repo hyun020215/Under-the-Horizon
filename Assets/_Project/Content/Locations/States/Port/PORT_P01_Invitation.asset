@@ -13,6 +13,6 @@ MonoBehaviour:
   m_Name: PORT_P01_Invitation
   m_EditorClassIdentifier: UTH.Runtime::LocationStateDefinition
   id: PORT_P01_INVITATION
-  background: {fileID: 21300000, guid: fd85cdd6e6e64585af8ae2d616ecab6e, type: 3}
+  background: {fileID: 21300000, guid: 861d980b75bb4a05b5106524d4dbd623, type: 3}
   tint: {r: 1, g: 1, b: 1, a: 1}
   audioOverride: {fileID: 0}

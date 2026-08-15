@@ -161,7 +161,7 @@ public sealed class StorySceneDefinitionTests
                 interactions.Select(interaction => interaction.DisplayName),
                 Is.EqualTo(new[]
                 {
-                    "구겨진 초대장",
+                    "DANIEL MERCER의 구겨진 초대장",
                     "다니엘이 확인 중인 메신저 알림 살펴보기",
                     "다니엘과 대화",
                 }));
@@ -171,7 +171,7 @@ public sealed class StorySceneDefinitionTests
             Assert.That(
                 interactions[0].NormalizedRect,
                 Is.EqualTo(new Rect(0.012f, 0.182f, 0.066f, 0.086f)),
-                "The invitation hotspot must match the manually approved C-01 semantic region.");
+                "The invitation hotspot must stay aligned with the invitation painted on the authored P-01 background.");
             Assert.That(interactions.All(interaction => !interaction.Repeatable), Is.True);
             Assert.That(
                 interactions.All(interaction => interaction.Type != InteractionType.Exit),

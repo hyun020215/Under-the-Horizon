@@ -90,13 +90,18 @@
   - 진입 Sequence는 `P-01_001`~`002`만 재생하고, 초대장 조사 → Daniel 부착 메신저 확인 →
     Daniel 본체 대화·선택을 `InteractionCompletedCondition`으로 순서화했다.
   - [x] P-01의 시각 상태는 `Assets/_Project/Content/Locations/States/Port/PORT_P01_Invitation.asset`
-    (`PORT_P01_INVITATION`)을 canonical 상태로 사용하고, 벤치 위 초대장이 합성된
-    `BG_location_port_evidence.png`를 연결한다. 공통 `PORT_Default`를 바꾸지 않으며, D8-03의 Port
-    상태에는 P-01 초대장이 나타나지 않게 분리한다.
+    (`PORT_P01_INVITATION`)을 canonical 상태로 사용하고, 벤치 위에 수신인 `DANIEL MERCER`와
+    두 번 접힌 흔적이 보이는 `BG_P01_CrumpledInvitation.png`를 연결한다. 공통 `PORT_Default`를
+    바꾸지 않으며, D8-03의 Port 상태에는 P-01 초대장이 나타나지 않게 분리한다. 기존
+    `BG_location_port_evidence.png`는 baked semantic catalog의 원본/hash 근거로 변경 없이 보존한다.
   - [x] 초대장은 `LocationState` 배경에 포함된 세계 피사체이고 공통 marker는 보조 표시다.
     `INT_P_01_INVITATION`은 `WorldMarkerVisibility.HoverOrFocus`를 사용해 평상시 실제 초대장을
     가리지 않는다. 조사 완료는 Interaction hotspot/marker만 비활성화하며 배경에 합성된 초대장
     그림을 제거하지 않는다.
+  - [x] `P-01_002`는 Daniel이 주머니 진동을 확인하려 초대장을 벤치에 내려놓았다고 명시하고,
+    `P-01_003`~`004`는 같은 피사체를 벤치 위 구겨진 초대장으로 연결해 수신인
+    `DANIEL MERCER`, 두 번 접힌 흔적, Richard 전자서명과 서로 다른 발송 코드 서체를 확인한다.
+    line ID·순서·VO 플래그와 기존 조사 Action 범위는 유지한다.
   - C-01 획득과 `anonymous_tip_preview`는 기존 GameEffect 계약으로 적용한다.
   - 마지막 `DialogueInteractionAction`의 재사용 가능한 advance 옵션이 대화 성공 뒤 route 해석을 요청한다.
     P-01은 Port에서 완료·저장되고 P-02를 pending으로 유지하며, HUD 지도에서 M.V. 엘리시움의
@@ -236,9 +241,10 @@
   - [x] Unity EditMode 111/111, PlayMode 29/29, Build Preflight, Windows64 Development Player smoke로
     투명 root·고정 marker·tooltip의 구조 계약을 검증했다. 다만 이 검수는 P-01 배경에 실제 초대장
     피사체가 존재하는지 확인하지 않아 marker만 남는 콘텐츠 회귀를 발견하지 못했다.
-  - [x] 초대장 복구 뒤 Unity EditMode 114/114와 PlayMode 30/30을 통과했다. 실제 P-01 PlayMode는
-    `BG_location_port_evidence`가 적용되고 hover 전 marker가 숨겨지며, hover tooltip/marker와 실제
-    EventSystem 클릭이 동작하고 완료 뒤 hotspot만 사라진 채 같은 배경 Sprite가 유지되는지 검증한다.
+  - [x] 초대장 피사체·서사·구김 표현 보정 뒤 Unity EditMode 116/116과 PlayMode 30/30을 통과했다. 실제 P-01
+    PlayMode는 초대장 전용 Location State가 적용되고 hover 전 marker가 숨겨지며, hover
+    tooltip/marker와 실제 EventSystem 클릭이 동작하고 완료 뒤 hotspot만 사라진 채 같은 배경
+    Sprite가 유지되는지 검증한다.
   - [ ] P-01 합성 화면은 16:9 FHD 1920×1080, 16:9 QHD 2560×1440과 16:10 1920×1200에서 다시
     승인한다. hover 전 초대장 피사체 존재, hover/focus marker와 tooltip, HUD·Daniel 비가림,
     실제 EventSystem 클릭, 완료 후 hotspot 비활성, 저장 재시작을 모두 확인한다. D1-06과 후속 P-02
