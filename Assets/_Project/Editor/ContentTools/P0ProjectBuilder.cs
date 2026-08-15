@@ -753,6 +753,8 @@ public static class P0ProjectBuilder
             pointAnchor: new Vector2(0.5f, 0.5f),
             size: new Vector2(72f, 72f));
         marker.GetComponent<Image>().raycastTarget = false;
+        SetObject(view, "marker", marker.GetComponent<RectTransform>());
+        marker.SetActive(false);
 
         TooltipView tooltip = CreateHotspotTooltip(
             root.transform,

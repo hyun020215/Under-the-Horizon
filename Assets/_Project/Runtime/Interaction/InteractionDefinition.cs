@@ -19,6 +19,10 @@ public sealed class InteractionDefinition : ScriptableObject
     private bool hasWorldHotspot;
 
     [SerializeField]
+    private WorldMarkerVisibility worldMarkerVisibility =
+        WorldMarkerVisibility.Always;
+
+    [SerializeField]
     private Rect normalizedRect;
 
     [SerializeField]
@@ -34,6 +38,7 @@ public sealed class InteractionDefinition : ScriptableObject
     public string DisplayName => displayName;
     public string TargetId => targetId;
     public bool HasWorldHotspot => hasWorldHotspot;
+    public WorldMarkerVisibility WorldMarkerVisibility => worldMarkerVisibility;
     public Rect NormalizedRect => normalizedRect;
     public InteractionAction Action => action;
     public bool Repeatable => repeatable;

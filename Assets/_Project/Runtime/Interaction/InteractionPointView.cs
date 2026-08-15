@@ -14,8 +14,12 @@ public sealed class InteractionPointView : MonoBehaviour,
     [SerializeField]
     private TooltipView tooltip;
 
+    [SerializeField]
+    private RectTransform marker;
+
     public InteractionDefinition Definition { get; private set; }
     public TooltipView Tooltip => tooltip;
+    public RectTransform Marker => ResolveMarker();
     public event Action<InteractionPointView> Clicked;
     private InteractionFeedbackService feedback;
     private bool pointerInside;
@@ -57,6 +61,7 @@ public sealed class InteractionPointView : MonoBehaviour,
         pointerInside = false;
         selected = false;
         tooltipSuppressed = false;
+        RefreshMarkerVisibility();
         tooltip?.Hide();
         gameObject.SetActive(definition != null);
     }
@@ -73,6 +78,7 @@ public sealed class InteractionPointView : MonoBehaviour,
             pointerInside = true;
             tooltipSuppressed = false;
             ResolveFeedback()?.Enter();
+            RefreshMarkerVisibility();
             RefreshTooltip();
         }
     }
@@ -81,6 +87,7 @@ public sealed class InteractionPointView : MonoBehaviour,
     {
         pointerInside = false;
         feedback?.Exit();
+        RefreshMarkerVisibility();
         RefreshTooltip();
     }
 
@@ -88,6 +95,7 @@ public sealed class InteractionPointView : MonoBehaviour,
     {
         selected = true;
         tooltipSuppressed = false;
+        RefreshMarkerVisibility();
         RefreshTooltip();
     }
 
@@ -95,6 +103,7 @@ public sealed class InteractionPointView : MonoBehaviour,
     {
         selected = false;
         tooltipSuppressed = false;
+        RefreshMarkerVisibility();
         RefreshTooltip();
     }
 
@@ -108,6 +117,7 @@ public sealed class InteractionPointView : MonoBehaviour,
         pointerInside = false;
         selected = false;
         tooltipSuppressed = false;
+        RefreshMarkerVisibility();
         feedback?.Exit();
         tooltip?.Hide();
     }
@@ -135,7 +145,8 @@ public sealed class InteractionPointView : MonoBehaviour,
 
     private void PositionWorldMarker(Vector2 normalizedCenter)
     {
-        if (transform.Find("Marker") is not RectTransform markerRect)
+        RectTransform markerRect = ResolveMarker();
+        if (markerRect == null)
             return;
 
         var anchor = new Vector2(0.5f, 0.5f);
@@ -169,7 +180,7 @@ public sealed class InteractionPointView : MonoBehaviour,
     private void PositionWorldTooltip(Vector2 normalizedCenter)
     {
         if (tooltip?.transform is not RectTransform tooltipRect
-            || transform.Find("Marker") is not RectTransform markerRect)
+            || ResolveMarker() is not RectTransform markerRect)
             return;
 
         tooltipRect.anchorMin = tooltipRect.anchorMax = markerRect.anchorMin;
@@ -193,6 +204,28 @@ public sealed class InteractionPointView : MonoBehaviour,
         position.y += nearTop ? -verticalClearance : verticalClearance;
         tooltipRect.pivot = new Vector2(pivotX, nearTop ? 1f : 0f);
         tooltipRect.anchoredPosition = position;
+    }
+
+    private void RefreshMarkerVisibility()
+    {
+        RectTransform markerRect = ResolveMarker();
+        if (markerRect == null)
+            return;
+
+        bool visible = Definition?.WorldMarkerVisibility switch
+        {
+            WorldMarkerVisibility.HoverOrFocus => pointerInside || selected,
+            WorldMarkerVisibility.Hidden => false,
+            _ => Definition != null,
+        };
+        markerRect.gameObject.SetActive(visible);
+    }
+
+    private RectTransform ResolveMarker()
+    {
+        if (marker == null)
+            marker = transform.Find("Marker") as RectTransform;
+        return marker;
     }
 
     private InteractionFeedbackService ResolveFeedback()

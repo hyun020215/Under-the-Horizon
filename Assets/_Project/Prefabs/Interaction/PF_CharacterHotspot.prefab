@@ -91,6 +91,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: UTH.Runtime::InteractionPointView
   tooltip: {fileID: 4084974574698581844}
+  marker: {fileID: 0}
 --- !u!1 &3836267146166065977
 GameObject:
   m_ObjectHideFlags: 0

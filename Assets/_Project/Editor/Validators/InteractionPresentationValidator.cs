@@ -97,8 +97,21 @@ public static class InteractionPresentationValidator
         }
         else
         {
-            if (!marker.gameObject.activeSelf)
-                errors.Add($"{label}/Marker must be active in the prefab default state.");
+            if (marker.gameObject.activeSelf)
+            {
+                errors.Add(
+                    $"{label}/Marker must remain hidden until "
+                    + "InteractionPointView applies its authored visibility mode.");
+            }
+
+            SerializedProperty markerProperty = new SerializedObject(view)
+                .FindProperty("marker");
+            if (markerProperty?.objectReferenceValue != marker)
+            {
+                errors.Add(
+                    $"{label} must wire its canonical Marker child to "
+                    + "InteractionPointView.");
+            }
 
             RectTransform markerRect = marker as RectTransform;
             if (markerRect == null)

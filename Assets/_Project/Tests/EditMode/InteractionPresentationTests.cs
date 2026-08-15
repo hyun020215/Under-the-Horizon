@@ -38,6 +38,25 @@ public sealed class InteractionPresentationTests
     }
 
     [Test]
+    public void NewInteractionDefinitionsDefaultToAlwaysVisibleWorldMarkers()
+    {
+        InteractionDefinition definition =
+            ScriptableObject.CreateInstance<InteractionDefinition>();
+        try
+        {
+            Assert.That(
+                definition.WorldMarkerVisibility,
+                Is.EqualTo(WorldMarkerVisibility.Always),
+                "Missing serialized fields on existing content must retain the "
+                + "legacy always-visible marker behavior.");
+        }
+        finally
+        {
+            UnityEngine.Object.DestroyImmediate(definition);
+        }
+    }
+
+    [Test]
     public void CharacterViewAndGameSceneReferenceCanonicalInteractionPrefabs()
     {
         GameObject world = AssetDatabase.LoadAssetAtPath<GameObject>(
@@ -227,7 +246,11 @@ public sealed class InteractionPresentationTests
         Assert.That(hitSurface.sprite, Is.Null);
         Assert.That(hitSurface.color.a, Is.EqualTo(0f).Within(0.001f));
         Assert.That(marker, Is.Not.Null);
-        Assert.That(marker.gameObject.activeSelf, Is.True);
+        Assert.That(marker.gameObject.activeSelf, Is.False);
+        Assert.That(view.Marker, Is.SameAs(marker));
+        Assert.That(
+            new SerializedObject(view).FindProperty("marker").objectReferenceValue,
+            Is.SameAs(marker));
         Assert.That(marker.anchorMin, Is.EqualTo(new Vector2(0.5f, 0.5f)));
         Assert.That(marker.anchorMax, Is.EqualTo(new Vector2(0.5f, 0.5f)));
         Assert.That(marker.anchoredPosition, Is.EqualTo(Vector2.zero));
@@ -261,6 +284,7 @@ public sealed class InteractionPresentationTests
         Assert.That(rect, Is.Not.Null);
         Assert.That(rect.anchorMin, Is.EqualTo(rect.anchorMax));
         Assert.That(rect.sizeDelta, Is.EqualTo(ExpectedMarkerSize));
+        Assert.That(view.Marker, Is.Null);
         AssertTooltipContract(root, view);
     }
 

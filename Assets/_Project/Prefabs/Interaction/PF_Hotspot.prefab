@@ -186,7 +186,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &497215357874794938
 RectTransform:
   m_ObjectHideFlags: 0
@@ -415,3 +415,4 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: UTH.Runtime::InteractionPointView
   tooltip: {fileID: 8269965478219704203}
+  marker: {fileID: 497215357874794938}

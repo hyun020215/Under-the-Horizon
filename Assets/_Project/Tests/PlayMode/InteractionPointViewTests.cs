@@ -102,6 +102,77 @@ public sealed class InteractionPointViewTests
     }
 
     [Test]
+    public void WorldMarkerVisibilityFollowsAuthoredMode()
+    {
+        using var rig = new TestRig();
+        var pointer = new PointerEventData(rig.EventSystem);
+
+        InteractionDefinition always = rig.CreateDefinition(
+            "INT_TEST_MARKER_ALWAYS",
+            "Always marker",
+            new Rect(0.4f, 0.4f, 0.2f, 0.2f),
+            markerVisibility: WorldMarkerVisibility.Always);
+        rig.View.Apply(always);
+        Assert.That(rig.MarkerRect.gameObject.activeSelf, Is.True);
+        ExecuteEvents.Execute(
+            rig.View.gameObject,
+            pointer,
+            ExecuteEvents.pointerEnterHandler);
+        ExecuteEvents.Execute(
+            rig.View.gameObject,
+            pointer,
+            ExecuteEvents.pointerExitHandler);
+        Assert.That(rig.MarkerRect.gameObject.activeSelf, Is.True);
+
+        InteractionDefinition hoverOrFocus = rig.CreateDefinition(
+            "INT_TEST_MARKER_DISCOVERABLE",
+            "Discoverable marker",
+            new Rect(0.4f, 0.4f, 0.2f, 0.2f),
+            markerVisibility: WorldMarkerVisibility.HoverOrFocus);
+        rig.View.Apply(hoverOrFocus);
+        Assert.That(rig.MarkerRect.gameObject.activeSelf, Is.False);
+        ExecuteEvents.Execute(
+            rig.View.gameObject,
+            pointer,
+            ExecuteEvents.pointerEnterHandler);
+        Assert.That(rig.MarkerRect.gameObject.activeSelf, Is.True);
+        ExecuteEvents.Execute(
+            rig.View.gameObject,
+            pointer,
+            ExecuteEvents.pointerExitHandler);
+        Assert.That(rig.MarkerRect.gameObject.activeSelf, Is.False);
+        rig.EventSystem.SetSelectedGameObject(rig.View.gameObject);
+        Assert.That(rig.MarkerRect.gameObject.activeSelf, Is.True);
+        rig.EventSystem.SetSelectedGameObject(null);
+        Assert.That(rig.MarkerRect.gameObject.activeSelf, Is.False);
+
+        InteractionDefinition hidden = rig.CreateDefinition(
+            "INT_TEST_MARKER_HIDDEN",
+            "Hidden marker",
+            new Rect(0.4f, 0.4f, 0.2f, 0.2f),
+            markerVisibility: WorldMarkerVisibility.Hidden);
+        rig.View.Apply(hidden);
+        ExecuteEvents.Execute(
+            rig.View.gameObject,
+            pointer,
+            ExecuteEvents.pointerEnterHandler);
+        rig.EventSystem.SetSelectedGameObject(rig.View.gameObject);
+        Assert.That(rig.MarkerRect.gameObject.activeSelf, Is.False);
+        rig.EventSystem.SetSelectedGameObject(null);
+
+        InteractionDefinition unknown = rig.CreateDefinition(
+            "INT_TEST_MARKER_UNKNOWN",
+            "Unknown marker mode",
+            new Rect(0.4f, 0.4f, 0.2f, 0.2f),
+            markerVisibility: (WorldMarkerVisibility)999);
+        rig.View.Apply(unknown);
+        Assert.That(
+            rig.MarkerRect.gameObject.activeSelf,
+            Is.True,
+            "Unknown serialized values must fall back to the safe Always behavior.");
+    }
+
+    [Test]
     public void WorldApplyPositionsTooltipAwayFromScreenEdges()
     {
         using var rig = new TestRig();
@@ -212,6 +283,8 @@ public sealed class InteractionPointViewTests
             MarkerRect.anchorMin = MarkerRect.anchorMax = new Vector2(0.5f, 0.5f);
             MarkerRect.sizeDelta = new Vector2(72f, 72f);
 
+            markerObject.SetActive(false);
+
             GameObject tooltipObject = new("Tooltip", typeof(RectTransform));
             tooltipObject.SetActive(false);
             tooltipObject.transform.SetParent(viewObject.transform, false);
@@ -227,6 +300,7 @@ public sealed class InteractionPointViewTests
             Text label = labelObject.GetComponent<Text>();
             SetPrivateField(Tooltip, "label", label);
             SetPrivateField(View, "tooltip", Tooltip);
+            SetPrivateField(View, "marker", MarkerRect);
 
             viewObject.SetActive(true);
         }
@@ -240,13 +314,18 @@ public sealed class InteractionPointViewTests
         public InteractionDefinition CreateDefinition(
             string id,
             string displayName,
-            Rect normalizedRect)
+            Rect normalizedRect,
+            WorldMarkerVisibility markerVisibility = WorldMarkerVisibility.Always)
         {
             InteractionDefinition definition =
                 ScriptableObject.CreateInstance<InteractionDefinition>();
             definition.name = id;
             SetPrivateField(definition, "id", id);
             SetPrivateField(definition, "displayName", displayName);
+            SetPrivateField(
+                definition,
+                "worldMarkerVisibility",
+                markerVisibility);
             SetPrivateField(definition, "normalizedRect", normalizedRect);
             definitions.Add(definition);
             return definition;
