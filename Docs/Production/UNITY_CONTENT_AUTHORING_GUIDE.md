@@ -223,6 +223,7 @@ Location Preview는 현재 `defaultBackground` 한 장을 확인하는 간단한
 | `Target Id` | 캐릭터 등 대상 필터. 비어 있으면 모든 대상 허용 |
 | `Has World Hotspot` | 배경 위 클릭 영역 생성 여부 |
 | `Normalized Rect` | 0~1 실행 `WorldFrame` 기준의 실제 클릭 x/y/width/height |
+| `World Marker Visibility` | 월드 marker 표시 정책. `Always`, `Hover Or Focus`, `Hidden` |
 | `Conditions` | 노출·실행 조건 |
 | `Action` | 실행할 재사용 Action |
 | `Repeatable` | 완료 뒤에도 다시 실행 가능한지 |
@@ -244,6 +245,13 @@ Location Preview는 현재 `defaultBackground` 한 장을 확인하는 간단한
 - root 안의 marker는 고정 크기를 유지한다. 기본은 중앙이며 화면 가장자리의 Rect에서는 화면 밖
   overflow를 줄이도록 root 안쪽으로 배치된다. 넓은 클릭 Rect에 맞춰 marker를 늘리거나 배경 피사체를
   가리는 패널로 사용하지 않는다.
+- marker는 실제 편지, 녹음기, 세면대 같은 월드 오브젝트의 그림을 대신하지 않는 보조 affordance다.
+  실제 피사체는 `LocationState` 배경 또는 별도로 승인된 prop presentation이 표현한다. 배경에 피사체가
+  명확히 보이는 Interaction은 `WorldMarkerVisibility.HoverOrFocus`를 사용해 평상시 피사체를 가리지
+  않고, hover 또는 명시적 focus에서만 marker를 표시한다.
+- `WorldMarkerVisibility.Always=0`은 기존 콘텐츠의 역호환 기본값이다. `Hidden`은 별도의 명확한 시각
+  affordance와 접근성 경로가 승인된 경우에만 사용한다. marker 정책은 콘텐츠 데이터로 선택하며
+  `InteractionPointView`에서 Story Scene ID를 분기하지 않는다.
 - marker와 tooltip은 별도 raycast 대상을 만들지 않는다. 클릭은 항상 root의 같은
   `InteractionPointView`를 통해 `InteractionDirector`로 전달한다.
 - tooltip은 `Display Name`을 사용하며 pointer hover와 명시적 UI selection/focus가 전달된 경우 같은
@@ -257,6 +265,26 @@ Location Preview는 현재 `defaultBackground` 한 장을 확인하는 간단한
 `InteractionDefinition.NormalizedRect`에 그대로 복사하지 않는다. 배경의 cover crop, 현재
 `LocationState`, 캐릭터 배치, HUD를 합성한 실제 화면에서 Interaction별 클릭 영역을 다시 측정하고
 서로 겹치지 않는지 별도로 승인한다.
+
+### P-01 초대장 시각 계약
+
+P-01의 canonical 시각 상태는
+`Assets/_Project/Content/Locations/States/Port/PORT_P01_Invitation.asset`이며 ID는
+`PORT_P01_INVITATION`이다. 이 상태는 벤치 위 초대장이 합성된
+`Assets/_Project/Art/Backgrounds/Locations/BG_location_port_evidence.png`를 사용한다.
+
+- `BG_location_port_evidence.png`의 초대장은 세계에 놓인 실제 조사 대상이다.
+- `INT_P_01_INVITATION`의 투명 root는 승인된 초대장 영역을 실제 클릭 대상으로 사용하고,
+  marker는 `HoverOrFocus` 보조 표시로만 사용한다.
+- C-01 semantic/polygon은 해당 배경에서 초대장이 존재하는 위치와 형상을 확인하는 근거다. 이 승인은
+  현재 UI crop까지 반영한 gameplay `Normalized Rect` 승인과 동일하지 않다.
+- `C01_DanielInvitation`이 참조하는 `EVD_evidence_c01.png`는 조사·증거 UI용 전체 클로즈업이다.
+  알파가 없는 이 이미지를 월드 prop이나 marker Sprite로 축소 재사용하지 않는다.
+- 초대장 조사 완료 시 `InteractionDirector`가 hotspot을 비활성화하므로 marker와 tooltip도 사라진다.
+  초대장 자체는 `LocationState` 배경에 합성돼 있으므로 그대로 남는다. 피사체 제거가 필요해지면
+  별도 `LocationState`와 공통 Effect/Sequence로 전환하며 View가 배경 그림을 직접 토글하지 않는다.
+- `PORT_Default`를 초대장 배경으로 교체하지 않는다. P-01과 D8-03은 같은 물리 Location을 재사용하되
+  서로 다른 `LocationState`를 사용하며, D8-03 화면에 P-01 초대장이 나타나서는 안 된다.
 
 P-02의 `gangway_boarding_register`도 승선 명단이 있는 의미 영역을 찾기 위한 참고 자료일 뿐이다.
 승선 명단과 전자서명은 서로 다른 gameplay Interaction으로 시각 검수해야 하며, 공통 `PF_Hotspot`
@@ -273,8 +301,11 @@ P-02의 `gangway_boarding_register`도 승선 명단이 있는 의미 영역을 
 4. marker가 클릭 Rect 안에서 고정 크기를 유지하고, marker 바깥의 투명 Rect도 의도대로 클릭되는지
    확인한다. 화면 가장자리에서는 marker가 Rect 안쪽으로 이동한 뒤 HUD·캐릭터를 가리지 않는지 별도로
    확인한다.
-5. 1280×720과 2560×1440에서도 클릭 영역이 대상을 따라가며 tooltip이 화면 안에 있는지 확인한다.
-6. UI·캐릭터·다른 핫스팟이 겹치는 영역에서 의도치 않은 클릭 우선순위가 생기지 않는지 확인한다.
+5. 16:9 FHD 1920×1080과 QHD 2560×1440에서 피사체가 hover 전부터 보이고, marker가 피사체를
+   대체하거나 가리지 않으며 tooltip이 화면 안에 있는지 확인한다.
+6. 16:10 1920×1200에서도 background cover crop 뒤 피사체와 클릭 영역이 일치하는지 확인한다.
+7. UI·캐릭터·다른 핫스팟이 겹치는 영역에서 의도치 않은 클릭 우선순위가 생기지 않는지 확인한다.
+8. 실제 EventSystem 클릭·submit, 완료 뒤 hotspot 비활성, 저장 후 재시작 상태까지 확인한다.
 
 이미지 alpha/polygon hit shape는 아직 공통 최종 계약이 완성되지 않았다. 투명 root는 Rect 내부를
 모두 클릭할 수 있다는 뜻이며 marker Sprite의 alpha로 정밀 판정하지 않는다. 현 단계에서는 Rect가
