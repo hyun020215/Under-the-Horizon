@@ -12,6 +12,8 @@ public abstract class ContentAssetEditorWindow<T> : EditorWindow where T : Unity
     private T selected;
     private string search = string.Empty;
 
+    protected T SelectedAsset => selected;
+
     protected virtual void OnEnable() => Refresh();
 
     protected void DrawContent()
@@ -33,6 +35,8 @@ public abstract class ContentAssetEditorWindow<T> : EditorWindow where T : Unity
         if (editor != null)
         {
             editor.OnInspectorGUI();
+            EditorGUILayout.Space();
+            DrawSelectedTools(selected);
             if (GUILayout.Button("Project에서 선택"))
                 Selection.activeObject = selected;
         }
@@ -40,6 +44,10 @@ public abstract class ContentAssetEditorWindow<T> : EditorWindow where T : Unity
             EditorGUILayout.HelpBox("왼쪽에서 콘텐츠 자산을 선택하세요.", MessageType.Info);
         EditorGUILayout.EndScrollView();
         EditorGUILayout.EndHorizontal();
+    }
+
+    protected virtual void DrawSelectedTools(T asset)
+    {
     }
 
     private bool MatchesSearch(T asset) => string.IsNullOrWhiteSpace(search)
