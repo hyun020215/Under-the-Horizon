@@ -161,7 +161,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 7980e5db8ef60a044a558b9ca2d44f2a, type: 3}
-  m_Name:
+  m_Name: 
   m_EditorClassIdentifier: UTH.Runtime::InteractionFeedbackService
   interactiveCursor: {fileID: 2800000, guid: e92f10e406e6987409744ae153c265db, type: 3}
   cursorHotspot: {x: 0, y: 0}
@@ -701,7 +701,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: e19747de3f5aca642ab2be37e372fb86, type: 3}
-  m_Name:
+  m_Name: 
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Outline
   m_EffectColor: {r: 0.82, g: 0.62, b: 0.25, a: 0.82}
   m_EffectDistance: {x: 0, y: -2}
@@ -1445,6 +1445,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: UTH.Runtime::GameStateStore
   state:
     currentStorySceneId: 
+    pendingStorySceneId: 
     currentLocationId: 
     day: 0
     timeBlock: 0
@@ -3455,7 +3456,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4999421208891143909, guid: 0b9a4e62ed7b3db46bb19439fb6ca600, type: 3}
       propertyPath: flow
-      value:
+      value: 
       objectReference: {fileID: 1229261065}
     - target: {fileID: 4999421208891143909, guid: 0b9a4e62ed7b3db46bb19439fb6ca600, type: 3}
       propertyPath: state
@@ -3844,22 +3845,6 @@ MonoBehaviour:
   saveCheckpoint: {fileID: 1265287070}
   audioDirector: {fileID: 1682964838}
   titleAudio: {fileID: 11400000, guid: 08319e193966fa04380132595519380f, type: 2}
---- !u!114 &1265287070
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1265287067}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: afbacb9ab90a5aa45983974dc280ed92, type: 3}
-  m_Name:
-  m_EditorClassIdentifier: UTH.Runtime::SaveCheckpoint
-  stateStore: {fileID: 360852667}
-  storyScenes: {fileID: 1528931846}
-  flow: {fileID: 1229261065}
-  slot: 0
 --- !u!4 &1265287069
 Transform:
   m_ObjectHideFlags: 0
@@ -3894,6 +3879,22 @@ Transform:
   - {fileID: 551605397}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1265287070
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1265287067}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: afbacb9ab90a5aa45983974dc280ed92, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: UTH.Runtime::SaveCheckpoint
+  stateStore: {fileID: 360852667}
+  storyScenes: {fileID: 1528931846}
+  flow: {fileID: 1229261065}
+  slot: 0
 --- !u!1 &1291007533
 GameObject:
   m_ObjectHideFlags: 0
